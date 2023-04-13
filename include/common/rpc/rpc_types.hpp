@@ -89,9 +89,9 @@ MERCURY_GEN_PROC(
         rpc_read_data_in_t,
         ((hg_const_string_t) (path))((int64_t) (offset))(
                 (hg_uint64_t) (host_id))((hg_uint64_t) (host_size))(
-                (hg_uint64_t) (chunk_n))((hg_uint64_t) (chunk_start))(
-                (hg_uint64_t) (chunk_end))((hg_uint64_t) (total_chunk_size))(
-                (hg_bulk_t) (bulk_handle)))
+                (hg_const_string_t) (wbitset))((hg_uint64_t) (chunk_n))(
+                (hg_uint64_t) (chunk_start))((hg_uint64_t) (chunk_end))(
+                (hg_uint64_t) (total_chunk_size))((hg_bulk_t) (bulk_handle)))
 
 MERCURY_GEN_PROC(rpc_data_out_t, ((int32_t) (err))((hg_size_t) (io_size)))
 
@@ -99,9 +99,9 @@ MERCURY_GEN_PROC(
         rpc_write_data_in_t,
         ((hg_const_string_t) (path))((int64_t) (offset))(
                 (hg_uint64_t) (host_id))((hg_uint64_t) (host_size))(
-                (hg_uint64_t) (chunk_n))((hg_uint64_t) (chunk_start))(
-                (hg_uint64_t) (chunk_end))((hg_uint64_t) (total_chunk_size))(
-                (hg_bulk_t) (bulk_handle)))
+                (hg_const_string_t) (wbitset))((hg_uint64_t) (chunk_n))(
+                (hg_uint64_t) (chunk_start))((hg_uint64_t) (chunk_end))(
+                (hg_uint64_t) (total_chunk_size))((hg_bulk_t) (bulk_handle)))
 
 MERCURY_GEN_PROC(rpc_get_dirents_in_t,
                  ((hg_const_string_t) (path))((hg_bulk_t) (bulk_handle)))

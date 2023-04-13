@@ -35,6 +35,9 @@ extern "C" {
 }
 
 #include <string>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 namespace gkfs::rpc {
 
@@ -48,6 +51,18 @@ get_my_hostname(bool short_hostname = false);
 std::string
 get_host_by_name(const std::string& hostname);
 #endif
+
+bool
+get_bitset(const std::vector<uint8_t>& data, const uint16_t position);
+
+void
+set_bitset(std::vector<uint8_t>& data, const uint16_t position);
+
+std::string
+compressBitset(const std::vector<uint8_t>& bytes);
+
+std::vector<uint8_t>
+decompressBitset(const std::string& compressedString);
 
 } // namespace gkfs::rpc
 

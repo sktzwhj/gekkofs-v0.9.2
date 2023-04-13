@@ -105,6 +105,7 @@ private:
     bool internal_fds_must_relocate_;
     std::bitset<MAX_USER_FDS> protected_fds_;
     std::string hostname;
+    int replicas_;
 
 public:
     static PreloadContext*
@@ -216,6 +217,12 @@ public:
 
     std::string
     get_hostname();
+
+    void
+    set_replicas(const int repl);
+
+    int
+    get_replicas();
 };
 
 } // namespace preload

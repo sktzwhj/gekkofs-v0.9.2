@@ -200,16 +200,26 @@ namespace gkfs::utils {
 optional<gkfs::metadata::Metadata>
 get_metadata(const string& path, bool follow_links) {
     std::string attr;
-    auto err = gkfs::rpc::forward_stat(path, attr);
+    auto err = gkfs::rpc::forward_stat(path, attr, 0);
+    // TODO: retry on failure
+
     if(err) {
-        errno = err;
-        return {};
+        auto copy = 1;
+        while(copy < CTX->get_replicas() + 1 && err) {
+            LOG(ERROR, "Retrying Stat on replica {} {}", copy, follow_links);
+            err = gkfs::rpc::forward_stat(path, attr, copy);
+            copy++;
+        }
+        if(err) {
+            errno = err;
+            return {};
+        }
     }
 #ifdef HAS_SYMLINKS
     if(follow_links) {
         gkfs::metadata::Metadata md{attr};
         while(md.is_link()) {
-            err = gkfs::rpc::forward_stat(md.target_path(), attr);
+            err = gkfs::rpc::forward_stat(md.target_path(), attr, 0);
             if(err) {
                 errno = err;
                 return {};

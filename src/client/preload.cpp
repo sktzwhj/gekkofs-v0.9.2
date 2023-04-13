@@ -238,6 +238,9 @@ init_environment() {
                 EXIT_FAILURE,
                 "Unable to fetch file system configurations from daemon process through RPC.");
     }
+    if(CTX->get_replicas() > 0) {
+        srand(time(NULL));
+    }
 
     LOG(INFO, "Environment initialization successful.");
 }
@@ -277,6 +280,7 @@ init_preload() {
     gkfs::path::init_cwd();
 
     LOG(DEBUG, "Current working directory: '{}'", CTX->cwd());
+    LOG(DEBUG, "Number of replicas : '{}'", CTX->get_replicas());
     gkfs::preload::init_environment();
     CTX->enable_interception();
 

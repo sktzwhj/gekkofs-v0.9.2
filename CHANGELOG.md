@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Replication without using the server. NUM_REPL (0 < NUM_REPL < num_servers) env variable defines the number of 
+replicas ([!166](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/141)).
+- Modified write and reads to use a bitset instead of the traditional hash per chunk in the server.
+- Added reattemp support in get_fs_config to other servers, when the initial server fails.
 
 ### New
 ### Changed

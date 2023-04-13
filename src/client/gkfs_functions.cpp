@@ -298,11 +298,21 @@ gkfs_create(const std::string& path, mode_t mode) {
     if(check_parent_dir(path)) {
         return -1;
     }
-    auto err = gkfs::rpc::forward_create(path, mode);
-    if(err) {
-        errno = err;
+    // Write to all replicas, at least one need to success
+    bool success = false;
+    for(auto copy = 0; copy < CTX->get_replicas() + 1; copy++) {
+        auto err = gkfs::rpc::forward_create(path, mode, copy);
+        if(err) {
+            errno = err;
+        } else {
+            success = true;
+            errno = 0;
+        }
+    }
+    if(!success) {
         return -1;
     }
+
     return 0;
 }
 
@@ -340,7 +350,7 @@ gkfs_remove(const std::string& path) {
                     return -1;
                 }
             }
-            auto err = gkfs::rpc::forward_remove(new_path);
+            auto err = gkfs::rpc::forward_remove(new_path, CTX->get_replicas());
             if(err) {
                 errno = err;
                 return -1;
@@ -350,7 +360,7 @@ gkfs_remove(const std::string& path) {
 #endif // HAS_RENAME
 #endif // HAS_SYMLINKS
 
-    auto err = gkfs::rpc::forward_remove(path);
+    auto err = gkfs::rpc::forward_remove(path, CTX->get_replicas());
     if(err) {
         errno = err;
         return -1;
@@ -406,6 +416,7 @@ gkfs_access(const std::string& path, const int mask, bool follow_links) {
  * We use blocks to determine if the file is a renamed file.
  * If the file is re-renamed (a->b->a) a recovers the block of b
  * and we delete b.
+ * There is no support for replication in rename
  * @param old_path
  * @param new_path
  * @return 0 on success, -1 on failure
@@ -441,14 +452,14 @@ gkfs_rename(const string& old_path, const string& new_path) {
             md_old.value().target_path("");
 
             auto err = gkfs::rpc::forward_update_metadentry(
-                    new_path, md_old.value(), flags);
+                    new_path, md_old.value(), flags, 0);
 
             if(err) {
                 errno = err;
                 return -1;
             }
             // Delete old file
-            err = gkfs::rpc::forward_remove(old_path);
+            err = gkfs::rpc::forward_remove(old_path, CTX->get_replicas());
             if(err) {
                 errno = err;
                 return -1;
@@ -674,7 +685,9 @@ gkfs_lseek(shared_ptr<gkfs::filemap::OpenFile> gkfs_fd, off_t offset,
             gkfs_fd->pos(gkfs_fd->pos() + offset);
             break;
         case SEEK_END: {
-            auto ret = gkfs::rpc::forward_get_metadentry_size(gkfs_fd->path());
+            // TODO: handle replicas
+            auto ret =
+                    gkfs::rpc::forward_get_metadentry_size(gkfs_fd->path(), 0);
             auto err = ret.first;
             if(err) {
                 errno = err;
@@ -723,14 +736,17 @@ gkfs_truncate(const std::string& path, off_t old_size, off_t new_size) {
     if(new_size == old_size) {
         return 0;
     }
-    auto err = gkfs::rpc::forward_decr_size(path, new_size);
-    if(err) {
-        LOG(DEBUG, "Failed to decrease size");
-        errno = err;
-        return -1;
+    for(auto copy = 0; copy < (CTX->get_replicas() + 1); copy++) {
+        auto err = gkfs::rpc::forward_decr_size(path, new_size, copy);
+        if(err) {
+            LOG(DEBUG, "Failed to decrease size");
+            errno = err;
+            return -1;
+        }
     }
 
-    err = gkfs::rpc::forward_truncate(path, old_size, new_size);
+    auto err = gkfs::rpc::forward_truncate(path, old_size, new_size,
+                                           CTX->get_replicas());
     if(err) {
         LOG(DEBUG, "Failed to truncate data");
         errno = err;
@@ -864,9 +880,11 @@ gkfs_pwrite(std::shared_ptr<gkfs::filemap::OpenFile> file, const char* buf,
     }
     auto path = make_unique<string>(file->path());
     auto is_append = file->get_flag(gkfs::filemap::OpenFile_flags::append);
+    auto write_size = 0;
+    auto num_replicas = CTX->get_replicas();
 
     auto ret_offset = gkfs::rpc::forward_update_metadentry_size(
-            *path, count, offset, is_append);
+            *path, count, offset, is_append, num_replicas);
     auto err = ret_offset.first;
     if(err) {
         LOG(ERROR, "update_metadentry_size() failed with err '{}'", err);
@@ -888,8 +906,23 @@ gkfs_pwrite(std::shared_ptr<gkfs::filemap::OpenFile> file, const char* buf,
         offset = ret_offset.second;
     }
 
-    auto ret_write = gkfs::rpc::forward_write(*path, buf, offset, count);
+    auto ret_write = gkfs::rpc::forward_write(*path, buf, offset, count, 0);
     err = ret_write.first;
+    write_size = ret_write.second;
+
+    if(num_replicas > 0) {
+        auto ret_write_repl =
+                gkfs::rpc::forward_write(*path, buf, append_flag, offset, count,
+                                         updated_size, num_replicas);
+
+        if(err and ret_write_repl.first == 0) {
+            // We succesfully write the data to some replica
+            err = ret_write_repl.first;
+            // Write size will be wrong
+            write_size = ret_write_repl.second;
+        }
+    }
+
     if(err) {
         LOG(WARNING, "gkfs::rpc::forward_write() failed with err '{}'", err);
         errno = err;
@@ -897,14 +930,14 @@ gkfs_pwrite(std::shared_ptr<gkfs::filemap::OpenFile> file, const char* buf,
     }
     if(update_pos) {
         // Update offset in file descriptor in the file map
-        file->pos(offset + ret_write.second);
+        file->pos(offset + write_size);
     }
-    if(static_cast<size_t>(ret_write.second) != count) {
+    if(static_cast<size_t>(write_size) != count) {
         LOG(WARNING,
             "gkfs::rpc::forward_write() wrote '{}' bytes instead of '{}'",
-            ret_write.second, count);
+            write_size, count);
     }
-    return ret_write.second; // return written size
+    return write_size; // return written size
 }
 
 /**
@@ -1024,7 +1057,24 @@ gkfs_pread(std::shared_ptr<gkfs::filemap::OpenFile> file, char* buf,
     if constexpr(gkfs::config::io::zero_buffer_before_read) {
         memset(buf, 0, sizeof(char) * count);
     }
-    auto ret = gkfs::rpc::forward_read(file->path(), buf, offset, count);
+    std::pair<int, off_t> ret;
+    std::set<int8_t> failed; // set with failed targets.
+    if(CTX->get_replicas() != 0) {
+
+        ret = gkfs::rpc::forward_read(file->path(), buf, offset, count,
+                                      CTX->get_replicas(), failed);
+        while(ret.first == EIO) {
+            ret = gkfs::rpc::forward_read(file->path(), buf, offset, count,
+                                          CTX->get_replicas(), failed);
+            LOG(WARNING, "gkfs::rpc::forward_read() failed with ret '{}'",
+                ret.first);
+        }
+
+    } else {
+        ret = gkfs::rpc::forward_read(file->path(), buf, offset, count, 0,
+                                      failed);
+    }
+
     auto err = ret.first;
     if(err) {
         LOG(WARNING, "gkfs::rpc::forward_read() failed with ret '{}'", err);
@@ -1192,7 +1242,7 @@ gkfs_rmdir(const std::string& path) {
         errno = ENOTEMPTY;
         return -1;
     }
-    err = gkfs::rpc::forward_remove(path);
+    err = gkfs::rpc::forward_remove(path, CTX->get_replicas());
     if(err) {
         errno = err;
         return -1;

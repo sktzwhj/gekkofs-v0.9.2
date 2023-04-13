@@ -320,6 +320,12 @@ Support for fstat in renamed files is included.
 
 This is disabled by default.
 
+### Replication
+The user can enable the data replication feature by setting the replication environment variable:
+`LIBGKFS_NUM_REPL=<num repl>`.
+The number of replicas should go from 0 to the number of servers-1. 
+The replication environment variable can be set up for each client, independently.
+
 ## Acknowledgment
 
 This software was partially supported by the EC H2020 funded NEXTGenIO project (Project ID: 671951, www.nextgenio.eu).

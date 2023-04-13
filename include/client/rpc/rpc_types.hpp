@@ -1469,11 +1469,11 @@ struct write_data {
 
     public:
         input(const std::string& path, int64_t offset, uint64_t host_id,
-              uint64_t host_size, uint64_t chunk_n, uint64_t chunk_start,
-              uint64_t chunk_end, uint64_t total_chunk_size,
-              const hermes::exposed_memory& buffers)
+              uint64_t host_size, const std::string& wbitset, uint64_t chunk_n,
+              uint64_t chunk_start, uint64_t chunk_end,
+              uint64_t total_chunk_size, const hermes::exposed_memory& buffers)
             : m_path(path), m_offset(offset), m_host_id(host_id),
-              m_host_size(host_size), m_chunk_n(chunk_n),
+              m_host_size(host_size), m_wbitset(wbitset), m_chunk_n(chunk_n),
               m_chunk_start(chunk_start), m_chunk_end(chunk_end),
               m_total_chunk_size(total_chunk_size), m_buffers(buffers) {}
 
@@ -1512,6 +1512,11 @@ struct write_data {
             return m_chunk_n;
         }
 
+        std::string
+        wbitset() const {
+            return m_wbitset;
+        }
+
         uint64_t
         chunk_start() const {
             return m_chunk_start;
@@ -1535,15 +1540,16 @@ struct write_data {
         explicit input(const rpc_write_data_in_t& other)
             : m_path(other.path), m_offset(other.offset),
               m_host_id(other.host_id), m_host_size(other.host_size),
-              m_chunk_n(other.chunk_n), m_chunk_start(other.chunk_start),
-              m_chunk_end(other.chunk_end),
+              m_wbitset(other.wbitset), m_chunk_n(other.chunk_n),
+              m_chunk_start(other.chunk_start), m_chunk_end(other.chunk_end),
               m_total_chunk_size(other.total_chunk_size),
               m_buffers(other.bulk_handle) {}
 
         explicit operator rpc_write_data_in_t() {
-            return {m_path.c_str(), m_offset,           m_host_id,
-                    m_host_size,    m_chunk_n,          m_chunk_start,
-                    m_chunk_end,    m_total_chunk_size, hg_bulk_t(m_buffers)};
+            return {m_path.c_str(),      m_offset,          m_host_id,
+                    m_host_size,         m_wbitset.c_str(), m_chunk_n,
+                    m_chunk_start,       m_chunk_end,       m_total_chunk_size,
+                    hg_bulk_t(m_buffers)};
         }
 
     private:
@@ -1551,6 +1557,7 @@ struct write_data {
         int64_t m_offset;
         uint64_t m_host_id;
         uint64_t m_host_size;
+        std::string m_wbitset;
         uint64_t m_chunk_n;
         uint64_t m_chunk_start;
         uint64_t m_chunk_end;
@@ -1647,11 +1654,11 @@ struct read_data {
 
     public:
         input(const std::string& path, int64_t offset, uint64_t host_id,
-              uint64_t host_size, uint64_t chunk_n, uint64_t chunk_start,
-              uint64_t chunk_end, uint64_t total_chunk_size,
-              const hermes::exposed_memory& buffers)
+              uint64_t host_size, const std::string& wbitset, uint64_t chunk_n,
+              uint64_t chunk_start, uint64_t chunk_end,
+              uint64_t total_chunk_size, const hermes::exposed_memory& buffers)
             : m_path(path), m_offset(offset), m_host_id(host_id),
-              m_host_size(host_size), m_chunk_n(chunk_n),
+              m_host_size(host_size), m_wbitset(wbitset), m_chunk_n(chunk_n),
               m_chunk_start(chunk_start), m_chunk_end(chunk_end),
               m_total_chunk_size(total_chunk_size), m_buffers(buffers) {}
 
@@ -1685,6 +1692,11 @@ struct read_data {
             return m_host_size;
         }
 
+        std::string
+        wbitset() const {
+            return m_wbitset;
+        }
+
         uint64_t
         chunk_n() const {
             return m_chunk_n;
@@ -1713,15 +1725,16 @@ struct read_data {
         explicit input(const rpc_read_data_in_t& other)
             : m_path(other.path), m_offset(other.offset),
               m_host_id(other.host_id), m_host_size(other.host_size),
-              m_chunk_n(other.chunk_n), m_chunk_start(other.chunk_start),
-              m_chunk_end(other.chunk_end),
+              m_wbitset(other.wbitset), m_chunk_n(other.chunk_n),
+              m_chunk_start(other.chunk_start), m_chunk_end(other.chunk_end),
               m_total_chunk_size(other.total_chunk_size),
               m_buffers(other.bulk_handle) {}
 
         explicit operator rpc_read_data_in_t() {
-            return {m_path.c_str(), m_offset,           m_host_id,
-                    m_host_size,    m_chunk_n,          m_chunk_start,
-                    m_chunk_end,    m_total_chunk_size, hg_bulk_t(m_buffers)};
+            return {m_path.c_str(),      m_offset,          m_host_id,
+                    m_host_size,         m_wbitset.c_str(), m_chunk_n,
+                    m_chunk_start,       m_chunk_end,       m_total_chunk_size,
+                    hg_bulk_t(m_buffers)};
         }
 
     private:
@@ -1729,6 +1742,7 @@ struct read_data {
         int64_t m_offset;
         uint64_t m_host_id;
         uint64_t m_host_size;
+        std::string m_wbitset;
         uint64_t m_chunk_n;
         uint64_t m_chunk_start;
         uint64_t m_chunk_end;
