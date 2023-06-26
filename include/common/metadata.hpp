@@ -37,7 +37,6 @@
 #include <string>
 #include <cstdint>
 
-
 namespace gkfs::metadata {
 
 constexpr mode_t LINK_MODE = ((S_IRWXU | S_IRWXG | S_IRWXO) | S_IFLNK);
