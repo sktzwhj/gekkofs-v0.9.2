@@ -149,12 +149,10 @@ def _process_exists(pid):
     """
 
     try:
-        sh.ps(['-h', '-p', pid])
-    except Exception:
-        # sh.raises an Exception if the command doesn't return 0
+        os.kill(pid, 0)
+        return True
+    except OSError:
         return False
-
-    return True
 
 def _find_search_paths(additional_paths=None):
     """
@@ -291,6 +289,8 @@ class Daemon:
 
         return self
 
+
+
     def wait_until_active(self, pid, timeout, max_lines=50):
         """
         Waits until a GKFS daemon is active or until a certain timeout
@@ -325,7 +325,7 @@ class Daemon:
                 logger.debug(f"daemon log file missing, checking if daemon is alive...")
 
                 pid=self._proc.pid
-
+    
                 if not _process_exists(pid):
                     raise RuntimeError(f"process {pid} is not running")
 
