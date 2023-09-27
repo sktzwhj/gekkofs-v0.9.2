@@ -40,7 +40,7 @@ wgetdeps=(
     ["lz4"]="1.9.3"
     ["capstone"]="4.0.2"
     ["argobots"]="1.1"
-    ["rocksdb"]="6.26.1"
+    ["rocksdb"]="8.5.4"
     ["json-c"]="0.15-20200726"
 )
 

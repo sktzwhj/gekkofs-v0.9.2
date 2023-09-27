@@ -42,6 +42,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <limits>
+#include <cstdint>
 
 using namespace std;
 
@@ -114,7 +115,7 @@ static void pfind_print_help(pfind_options_t *res) {
          "\tworkdir = \"%s\"\n"
          "\t-newer = \"%s\"\n"
          "\t-name|-regex = \"%s\"\n"
-         "\t-S: num servers = \"%s\"\n"
+         "\t-S: num servers = \"%d\"\n"
          "\t-M: mountdir = \"%s\"\n"
          "Optional flags\n"
          "\t-h: prints the help\n"

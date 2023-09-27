@@ -35,6 +35,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string>
+#include <cstdint>
+
 
 namespace gkfs::metadata {
 

@@ -35,6 +35,7 @@
 #include <memory>
 #include <atomic>
 #include <array>
+#include <string>
 
 namespace gkfs::filemap {
 
