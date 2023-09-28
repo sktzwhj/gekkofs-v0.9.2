@@ -26,7 +26,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later                                    #
 ################################################################################
 
-import os, sh, sys, re, pytest, signal
+import os, sh, shutil, sys, re, pytest, signal
 import random, socket, netifaces, time
 from pathlib import Path
 from itertools import islice
@@ -661,7 +661,11 @@ class ShellClient:
         extra properties to it.
         """
 
-        found_cmd = sh.which(cmd, self._search_paths)
+       
+
+        found_cmd = shutil.which(cmd,
+            path=':'.join(str(p) for p in self._search_paths)
+            )
 
         if not found_cmd:
             raise sh.CommandNotFound(cmd)
