@@ -238,8 +238,8 @@ class Daemon:
 
         self._patched_env = {
             'LD_LIBRARY_PATH'      : libdirs,
-            'GKFS_HOSTS_FILE'      : self.cwd / gkfs_hosts_file,
-            'GKFS_DAEMON_LOG_PATH' : self.logdir / gkfs_daemon_log_file,
+            'GKFS_HOSTS_FILE'      : str(self.cwd / gkfs_hosts_file),
+            'GKFS_DAEMON_LOG_PATH' : str(self.logdir / gkfs_daemon_log_file),
             'GKFS_DAEMON_LOG_LEVEL': gkfs_daemon_log_level,
         }
         self._env.update(self._patched_env)
@@ -416,10 +416,10 @@ class Client:
 
         self._patched_env = {
             'LD_LIBRARY_PATH': libdirs,
-            'LD_PRELOAD': self._preload_library,
-            'LIBGKFS_HOSTS_FILE': self.cwd / gkfs_hosts_file,
+            'LD_PRELOAD': str(self._preload_library),
+            'LIBGKFS_HOSTS_FILE': str(self.cwd / gkfs_hosts_file),
             'LIBGKFS_LOG': gkfs_client_log_level,
-            'LIBGKFS_LOG_OUTPUT': self._workspace.logdir / gkfs_client_log_file,
+            'LIBGKFS_LOG_OUTPUT': str(self._workspace.logdir / gkfs_client_log_file),
             'LIBGKFS_LOG_SYSCALL_FILTER': gkfs_client_log_syscall_filter
         }
 
@@ -517,10 +517,10 @@ class ShellClient:
 
         self._patched_env = {
             'LD_LIBRARY_PATH'      : libdirs,
-            'LD_PRELOAD'           : self._preload_library,
-            'LIBGKFS_HOSTS_FILE'   : self.cwd / gkfs_hosts_file,
+            'LD_PRELOAD'           : str(self._preload_library),
+            'LIBGKFS_HOSTS_FILE'   : str(self.cwd / gkfs_hosts_file),
             'LIBGKFS_LOG'          : gkfs_client_log_level,
-            'LIBGKFS_LOG_OUTPUT'   : self._workspace.logdir / gkfs_client_log_file
+            'LIBGKFS_LOG_OUTPUT'   : str(self._workspace.logdir / gkfs_client_log_file)
         }
 
         self._env.update(self._patched_env)
@@ -717,8 +717,8 @@ class FwdDaemon:
 
         self._patched_env = {
             'LD_LIBRARY_PATH'      : libdirs,
-            'GKFS_HOSTS_FILE'      : self.cwd / gkfwd_hosts_file,
-            'GKFS_DAEMON_LOG_PATH' : self.logdir / gkfwd_daemon_log_file,
+            'GKFS_HOSTS_FILE'      : str(self.cwd / gkfwd_hosts_file),
+            'GKFS_DAEMON_LOG_PATH' : str(self.logdir / gkfwd_daemon_log_file),
             'GKFS_DAEMON_LOG_LEVEL': gkfwd_daemon_log_level
         }
         self._env.update(self._patched_env)
@@ -899,10 +899,10 @@ class FwdClient:
         self._patched_env = {
             'LD_LIBRARY_PATH'               : libdirs,
             'LD_PRELOAD'                    : self._preload_library,
-            'LIBGKFS_HOSTS_FILE'            : self.cwd / gkfwd_hosts_file,
-            'LIBGKFS_FORWARDING_MAP_FILE'   : self.cwd / gkfwd_forwarding_map_file_local,
+            'LIBGKFS_HOSTS_FILE'            : str(self.cwd / gkfwd_hosts_file),
+            'LIBGKFS_FORWARDING_MAP_FILE'   : str(self.cwd / gkfwd_forwarding_map_file_local),
             'LIBGKFS_LOG'                   : gkfs_client_log_level,
-            'LIBGKFS_LOG_OUTPUT'            : self._workspace.logdir / gkfwd_client_log_file_local
+            'LIBGKFS_LOG_OUTPUT'            : str(self._workspace.logdir / gkfwd_client_log_file_local)
         }
 
         self._env.update(self._patched_env)
@@ -988,11 +988,11 @@ class ShellFwdClient:
 
         self._patched_env = {
             'LD_LIBRARY_PATH'               : libdirs,
-            'LD_PRELOAD'                    : self._preload_library,
-            'LIBGKFS_HOSTS_FILE'            : self.cwd / gkfwd_hosts_file,
-            'LIBGKFS_FORWARDING_MAP_FILE'   : self.cwd / gkfwd_forwarding_map_file,
+            'LD_PRELOAD'                    : str(self._preload_library),
+            'LIBGKFS_HOSTS_FILE'            : str(self.cwd / gkfwd_hosts_file),
+            'LIBGKFS_FORWARDING_MAP_FILE'   : str(self.cwd / gkfwd_forwarding_map_file),
             'LIBGKFS_LOG'                   : gkfwd_client_log_level,
-            'LIBGKFS_LOG_OUTPUT'            : self._workspace.logdir / gkfwd_client_log_file
+            'LIBGKFS_LOG_OUTPUT'            : str(self._workspace.logdir / gkfwd_client_log_file)
         }
 
         self._env.update(self._patched_env)
