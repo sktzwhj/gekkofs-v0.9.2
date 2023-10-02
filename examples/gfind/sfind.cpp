@@ -41,6 +41,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <limits>
+#include <cstdint>
 
 using namespace std;
 
