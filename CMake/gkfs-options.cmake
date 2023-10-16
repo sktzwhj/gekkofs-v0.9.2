@@ -328,7 +328,7 @@ gkfs_define_option(
 ## Client logging support
 # FIXME: should be prefixed with GKFS_
 gkfs_define_option(
-  ENABLE_CLIENT_LOG HELP_TEXT "Enable logging messages in clients"
+  GKFS_ENABLE_CLIENT_LOG HELP_TEXT "Enable logging messages in clients"
   DEFAULT_VALUE ON
 )
 

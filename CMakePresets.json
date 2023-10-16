@@ -18,7 +18,7 @@
         "GKFS_ENABLE_PARALLAX": false,
         "GKFS_BUILD_TESTS": false,
         "GKFS_INSTALL_TESTS": false,
-        "ENABLE_CLIENT_LOG": true,
+        "GKFS_ENABLE_CLIENT_LOG": true,
         "CLIENT_LOG_MESSAGE_SIZE": "1024",
         "GKFS_SYMLINK_SUPPORT": false
       },

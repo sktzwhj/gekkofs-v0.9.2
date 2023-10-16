@@ -274,7 +274,7 @@ if(GKFS_MAX_OPEN_FDS)
     add_definitions(-DGKFS_MAX_OPEN_FDS=${GKFS_MAX_OPEN_FDS})
 endif()
 
-if(ENABLE_CLIENT_LOG)
+if(GKFS_ENABLE_CLIENT_LOG)
     add_definitions(-DGKFS_ENABLE_LOGGING)
     add_definitions(-DLIBGKFS_LOG_MESSAGE_SIZE=${CLIENT_LOG_MESSAGE_SIZE})
 endif ()
@@ -289,7 +289,7 @@ endif ()
 
 configure_file(include/common/cmake_configure.hpp.in include/common/cmake_configure.hpp)
 
-if(ENABLE_CLIENT_LOG)
+if(GKFS_ENABLE_CLIENT_LOG)
     option(HERMES_LOGGING "" ON)
     option(HERMES_LOGGING_FMT_USE_BUNDLED "" OFF)
     option(HERMES_LOGGING_FMT_HEADER_ONLY "" OFF)
