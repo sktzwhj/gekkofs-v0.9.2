@@ -266,7 +266,7 @@ init_preload() {
     // happens during our internal initialization, there's no way for us to
     // control this creation and the fd will be created in the
     // [0, MAX_USER_FDS) range rather than in our private
-    // [MAX_USER_FDS, MAX_OPEN_FDS) range. To prevent this for our internal
+    // [MAX_USER_FDS, GKFS_MAX_OPEN_FDS) range. To prevent this for our internal
     // initialization code, we forcefully occupy the user fd range to force
     // such modules to create fds in our private range.
     CTX->protect_user_fds();

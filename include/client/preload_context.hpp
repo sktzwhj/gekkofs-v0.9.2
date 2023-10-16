@@ -77,7 +77,7 @@ enum class RelativizeStatus { internal, external, fd_unknown, fd_not_a_dir };
  */
 class PreloadContext {
 
-    static auto constexpr MIN_INTERNAL_FD = MAX_OPEN_FDS - GKFS_MAX_INTERNAL_FDS;
+    static auto constexpr MIN_INTERNAL_FD = GKFS_MAX_OPEN_FDS - GKFS_MAX_INTERNAL_FDS;
     static auto constexpr MAX_USER_FDS = MIN_INTERNAL_FD;
 
 private:

@@ -282,7 +282,7 @@ if (NOT _GETCONF_MAX_FDS)
 endif ()
 
 gkfs_define_variable(
-  MAX_OPEN_FDS
+  GKFS_MAX_OPEN_FDS
   ${_GETCONF_MAX_FDS}
   STRING
   "Maximum number of open file descriptors supported"

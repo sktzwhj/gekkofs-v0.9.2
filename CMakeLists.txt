@@ -121,7 +121,7 @@ include(gkfs-utils)
 ################################################################################
 include(gkfs-options)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS 0)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 
 # ##############################################################################
@@ -270,8 +270,8 @@ if(GKFS_MAX_INTERNAL_FDS)
 	add_definitions(-DGKFS_MAX_INTERNAL_FDS=${GKFS_MAX_INTERNAL_FDS})
 endif()
 
-if(MAX_OPEN_FDS)
-    add_definitions(-DMAX_OPEN_FDS=${MAX_OPEN_FDS})
+if(GKFS_MAX_OPEN_FDS)
+    add_definitions(-DGKFS_MAX_OPEN_FDS=${GKFS_MAX_OPEN_FDS})
 endif()
 
 if(ENABLE_CLIENT_LOG)
