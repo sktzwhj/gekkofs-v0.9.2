@@ -266,8 +266,8 @@ if (GKFS_RENAME_SUPPORT)
     add_definitions(-DHAS_RENAME)
 endif ()
 
-if(MAX_INTERNAL_FDS)
-    add_definitions(-DMAX_INTERNAL_FDS=${MAX_INTERNAL_FDS})
+if(GKFS_MAX_INTERNAL_FDS)
+	add_definitions(-DGKFS_MAX_INTERNAL_FDS=${GKFS_MAX_INTERNAL_FDS})
 endif()
 
 if(MAX_OPEN_FDS)

@@ -267,7 +267,7 @@ gkfs_define_option(
 
 ## Maximum number of internal file descriptors reserved for GekkoFS
 # FIXME: should be prefixed with GKFS_
-gkfs_define_variable(MAX_INTERNAL_FDS 256
+gkfs_define_variable(GKFS_MAX_INTERNAL_FDS 256
   STRING "Number of file descriptors reserved for internal use" ADVANCED
 )
 

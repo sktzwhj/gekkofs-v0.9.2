@@ -316,7 +316,7 @@ PreloadContext::register_internal_fd(int fd) {
 
     if(static_cast<std::size_t>(pos) == internal_fds_.size()) {
         throw std::runtime_error(
-                "Internal GekkoFS file descriptors exhausted, increase MAX_INTERNAL_FDS in "
+                "Internal GekkoFS file descriptors exhausted, increase GKFS_MAX_INTERNAL_FDS in "
                 "CMake, rebuild GekkoFS and try again.");
     }
     internal_fds_.reset(pos);
