@@ -49,7 +49,6 @@ that greatly simplify this process. Thus, GekkoFS provides a CMake
 $ cmake --preset=default-coverage
 Preset CMake variables:
 
-  CLIENT_LOG_MESSAGE_SIZE="512"
   CMAKE_BUILD_TYPE="Coverage"
   CMAKE_CXX_COMPILER="/usr/bin/g++"
   CMAKE_CXX_FLAGS="-Wall -Wextra -fdiagnostics-color=always --pedantic -Wno-unused-parameter -Wno-missing-field-initializers -DGKFS_DEBUG_BUILD -DHERMES_DEBUG_BUILD"
@@ -59,6 +58,7 @@ Preset CMake variables:
   CMAKE_EXE_LINKER_FLAGS_COVERAGE="--coverage"
   CMAKE_MAP_IMPORTED_CONFIG_COVERAGE="Coverage;RelWithDebInfo;Release;Debug;"
   CMAKE_SHARED_LINKER_FLAGS_COVERAGE="--coverage"
+  GKFS_CLIENT_LOG_MESSAGE_SIZE="512"
   GKFS_ENABLE_CLIENT_LOG:BOOL="TRUE"
   GKFS_BUILD_DOCUMENTATION:BOOL="TRUE"
   GKFS_BUILD_TESTS:BOOL="TRUE"

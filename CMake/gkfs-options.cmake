@@ -264,13 +264,11 @@ gkfs_define_option(
 ################################################################################
 
 ## Maximum number of internal file descriptors reserved for GekkoFS
-# FIXME: should be prefixed with GKFS_
 gkfs_define_variable(GKFS_MAX_INTERNAL_FDS 256
   STRING "Number of file descriptors reserved for internal use" ADVANCED
 )
 
 ## Maximum number of open file descriptors for GekkoFS
-# FIXME: should be prefixed with GKFS_
 execute_process(COMMAND getconf OPEN_MAX
   OUTPUT_VARIABLE _GETCONF_MAX_FDS
   OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -324,15 +322,13 @@ gkfs_define_option(
 ################################################################################
 
 ## Client logging support
-# FIXME: should be prefixed with GKFS_
 gkfs_define_option(
   GKFS_ENABLE_CLIENT_LOG HELP_TEXT "Enable logging messages in clients"
   DEFAULT_VALUE ON
 )
 
-# FIXME: should be prefixed with GKFS_
 gkfs_define_variable(
-  CLIENT_LOG_MESSAGE_SIZE
+  GKFS_CLIENT_LOG_MESSAGE_SIZE
   1024
   STRING
   "Maximum size of a log message in the client library"

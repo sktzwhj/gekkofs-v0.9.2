@@ -19,7 +19,7 @@
         "GKFS_BUILD_TESTS": false,
         "GKFS_INSTALL_TESTS": false,
         "GKFS_ENABLE_CLIENT_LOG": true,
-        "CLIENT_LOG_MESSAGE_SIZE": "1024",
+        "GKFS_CLIENT_LOG_MESSAGE_SIZE": "1024",
         "GKFS_SYMLINK_SUPPORT": false
       },
       "warnings": {
