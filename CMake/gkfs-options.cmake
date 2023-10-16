@@ -235,16 +235,14 @@ cmake_dependent_option(GKFS_INSTALL_TESTS "Install GekkoFS self tests" OFF "GKFS
 ################################################################################
 
 ## check before create
-# FIXME: should be prefixed with GKFS_
 gkfs_define_option(
-  CREATE_CHECK_PARENTS
+  GKFS_CREATE_CHECK_PARENTS
   HELP_TEXT "Enable checking parent directory for existence before creating children"
   DEFAULT_VALUE ON
   DESCRIPTION "Verify that a parent directory exists before creating new files or directories"
 )
 
 ## symbolic link support
-# FIXME: should be prefixed with GKFS_
 gkfs_define_option(
   GKFS_SYMLINK_SUPPORT
   HELP_TEXT "Enable support for symlinks"

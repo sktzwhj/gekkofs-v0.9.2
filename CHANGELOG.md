@@ -302,7 +302,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Paths inside kernel pseudo filesystems (`/sys`, `/proc`) are forwarded directly to the kernel and internal path
   resolution will be skipped. Be aware that also paths like  `/sys/../tmp/gkfs_mountpoint/asd` will be forwarded to the
   kernel
-- Added new Cmake flag `CREATE_CHECK_PARENTS` to controls if the existance of the parent node needs to be checked during
+- Added new Cmake flag `GKFS_CREATE_CHECK_PARENTS` to controls if the existance of the parent node needs to be checked during
   the creation of a child node.
 
 ### Changed

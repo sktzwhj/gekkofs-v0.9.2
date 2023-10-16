@@ -813,7 +813,7 @@ main(int argc, const char* argv[]) {
 #else
         cout << "Debug: OFF" << endl;
 #endif
-#if CREATE_CHECK_PARENTS
+#if GKFS_CREATE_CHECK_PARENTS
         cout << "Create check parents: ON" << endl;
 #else
         cout << "Create check parents: OFF" << endl;
