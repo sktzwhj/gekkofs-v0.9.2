@@ -121,7 +121,7 @@ include(gkfs-utils)
 ################################################################################
 include(gkfs-options)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS 0)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 
 # ##############################################################################
@@ -266,17 +266,17 @@ if (GKFS_RENAME_SUPPORT)
     add_definitions(-DHAS_RENAME)
 endif ()
 
-if(MAX_INTERNAL_FDS)
-    add_definitions(-DMAX_INTERNAL_FDS=${MAX_INTERNAL_FDS})
+if(GKFS_MAX_INTERNAL_FDS)
+    add_definitions(-DGKFS_MAX_INTERNAL_FDS=${GKFS_MAX_INTERNAL_FDS})
 endif()
 
-if(MAX_OPEN_FDS)
-    add_definitions(-DMAX_OPEN_FDS=${MAX_OPEN_FDS})
+if(GKFS_MAX_OPEN_FDS)
+    add_definitions(-DGKFS_MAX_OPEN_FDS=${GKFS_MAX_OPEN_FDS})
 endif()
 
-if(ENABLE_CLIENT_LOG)
+if(GKFS_ENABLE_CLIENT_LOG)
     add_definitions(-DGKFS_ENABLE_LOGGING)
-    add_definitions(-DLIBGKFS_LOG_MESSAGE_SIZE=${CLIENT_LOG_MESSAGE_SIZE})
+    add_definitions(-DLIBGKFS_LOG_MESSAGE_SIZE=${GKFS_CLIENT_LOG_MESSAGE_SIZE})
 endif ()
 
 if(GKFS_ENABLE_UNUSED_FUNCTIONS)
@@ -289,7 +289,7 @@ endif ()
 
 configure_file(include/common/cmake_configure.hpp.in include/common/cmake_configure.hpp)
 
-if(ENABLE_CLIENT_LOG)
+if(GKFS_ENABLE_CLIENT_LOG)
     option(HERMES_LOGGING "" ON)
     option(HERMES_LOGGING_FMT_USE_BUNDLED "" OFF)
     option(HERMES_LOGGING_FMT_HEADER_ONLY "" OFF)

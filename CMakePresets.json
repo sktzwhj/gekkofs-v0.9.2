@@ -18,8 +18,8 @@
         "GKFS_ENABLE_PARALLAX": false,
         "GKFS_BUILD_TESTS": false,
         "GKFS_INSTALL_TESTS": false,
-        "ENABLE_CLIENT_LOG": true,
-        "CLIENT_LOG_MESSAGE_SIZE": "1024",
+        "GKFS_ENABLE_CLIENT_LOG": true,
+        "GKFS_CLIENT_LOG_MESSAGE_SIZE": "1024",
         "GKFS_SYMLINK_SUPPORT": false
       },
       "warnings": {
@@ -85,8 +85,8 @@
         "GKFS_CHUNK_STATS": true,
         "GKFS_ENABLE_PROMETHEUS": true,
         "GKFS_RENAME_SUPPORT": true,
-        "MAX_OPEN_FDS": "10000",
-        "MAX_INTERNAL_FDS": "1024"
+        "GKFS_MAX_OPEN_FDS": "10000",
+        "GKFS_MAX_INTERNAL_FDS": "1024"
       }
     },
     {

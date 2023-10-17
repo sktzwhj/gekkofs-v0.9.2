@@ -91,13 +91,13 @@ namespace {
 
 /**
  * Checks if metadata for parent directory exists (can be disabled with
- * CREATE_CHECK_PARENTS). errno may be set
+ * GKFS_CREATE_CHECK_PARENTS). errno may be set
  * @param path
  * @return 0 on success, -1 on failure
  */
 int
 check_parent_dir(const std::string& path) {
-#if CREATE_CHECK_PARENTS
+#if GKFS_CREATE_CHECK_PARENTS
     auto p_comp = gkfs::path::dirname(path);
     auto md = gkfs::utils::get_metadata(p_comp);
     if(!md) {
@@ -114,7 +114,7 @@ check_parent_dir(const std::string& path) {
         errno = ENOTDIR;
         return -1;
     }
-#endif // CREATE_CHECK_PARENTS
+#endif // GKFS_CREATE_CHECK_PARENTS
     return 0;
 }
 } // namespace

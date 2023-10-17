@@ -66,6 +66,10 @@
 *.idea/
 .run/
 
+# clangd
+.clangd
+.cache
+
 # OS generated files
 .DS_Store
 .DS_Store?

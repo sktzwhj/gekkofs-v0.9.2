@@ -77,7 +77,8 @@ enum class RelativizeStatus { internal, external, fd_unknown, fd_not_a_dir };
  */
 class PreloadContext {
 
-    static auto constexpr MIN_INTERNAL_FD = MAX_OPEN_FDS - MAX_INTERNAL_FDS;
+    static auto constexpr MIN_INTERNAL_FD =
+            GKFS_MAX_OPEN_FDS - GKFS_MAX_INTERNAL_FDS;
     static auto constexpr MAX_USER_FDS = MIN_INTERNAL_FD;
 
 private:
@@ -99,7 +100,7 @@ private:
 
     bool interception_enabled_;
 
-    std::bitset<MAX_INTERNAL_FDS> internal_fds_;
+    std::bitset<GKFS_MAX_INTERNAL_FDS> internal_fds_;
     mutable std::mutex internal_fds_mutex_;
     bool internal_fds_must_relocate_;
     std::bitset<MAX_USER_FDS> protected_fds_;

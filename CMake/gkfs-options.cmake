@@ -235,16 +235,14 @@ cmake_dependent_option(GKFS_INSTALL_TESTS "Install GekkoFS self tests" OFF "GKFS
 ################################################################################
 
 ## check before create
-# FIXME: should be prefixed with GKFS_
 gkfs_define_option(
-  CREATE_CHECK_PARENTS
+  GKFS_CREATE_CHECK_PARENTS
   HELP_TEXT "Enable checking parent directory for existence before creating children"
   DEFAULT_VALUE ON
   DESCRIPTION "Verify that a parent directory exists before creating new files or directories"
 )
 
 ## symbolic link support
-# FIXME: should be prefixed with GKFS_
 gkfs_define_option(
   GKFS_SYMLINK_SUPPORT
   HELP_TEXT "Enable support for symlinks"
@@ -266,13 +264,11 @@ gkfs_define_option(
 ################################################################################
 
 ## Maximum number of internal file descriptors reserved for GekkoFS
-# FIXME: should be prefixed with GKFS_
-gkfs_define_variable(MAX_INTERNAL_FDS 256
+gkfs_define_variable(GKFS_MAX_INTERNAL_FDS 256
   STRING "Number of file descriptors reserved for internal use" ADVANCED
 )
 
 ## Maximum number of open file descriptors for GekkoFS
-# FIXME: should be prefixed with GKFS_
 execute_process(COMMAND getconf OPEN_MAX
   OUTPUT_VARIABLE _GETCONF_MAX_FDS
   OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -282,7 +278,7 @@ if (NOT _GETCONF_MAX_FDS)
 endif ()
 
 gkfs_define_variable(
-  MAX_OPEN_FDS
+  GKFS_MAX_OPEN_FDS
   ${_GETCONF_MAX_FDS}
   STRING
   "Maximum number of open file descriptors supported"
@@ -326,15 +322,13 @@ gkfs_define_option(
 ################################################################################
 
 ## Client logging support
-# FIXME: should be prefixed with GKFS_
 gkfs_define_option(
-  ENABLE_CLIENT_LOG HELP_TEXT "Enable logging messages in clients"
+  GKFS_ENABLE_CLIENT_LOG HELP_TEXT "Enable logging messages in clients"
   DEFAULT_VALUE ON
 )
 
-# FIXME: should be prefixed with GKFS_
 gkfs_define_variable(
-  CLIENT_LOG_MESSAGE_SIZE
+  GKFS_CLIENT_LOG_MESSAGE_SIZE
   1024
   STRING
   "Maximum size of a log message in the client library"
