@@ -271,6 +271,8 @@ metadata_to_stat(const std::string& path, const gkfs::metadata::Metadata& md,
     if(CTX->fs_conf()->blocks_state) { // last one will not encounter a
                                        // delimiter anymore
         attr.st_blocks = md.blocks();
+    } else {
+        attr.st_blocks = md.size() / gkfs::config::stats::st_nblocksize;
     }
     return 0;
 }
