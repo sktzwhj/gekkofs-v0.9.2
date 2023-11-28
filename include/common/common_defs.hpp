@@ -66,11 +66,9 @@ constexpr auto na_sm = "na+sm";
 } // namespace protocol
 } // namespace gkfs::rpc
 
-namespace gkfs::config::stats {
-/**
- * Number 512-byte blocks allocated as it is in the linux kernel (struct_stat.h)
- */
+namespace gkfs::config::syscall::stat {
+// Number 512-byte blocks allocated as it is in the linux kernel (struct_stat.h)
 constexpr auto st_nblocksize = 512;
-} // namespace gkfs::config::stats
+} // namespace gkfs::config::syscall::stat
 
 #endif // GEKKOFS_COMMON_DEFS_HPP
