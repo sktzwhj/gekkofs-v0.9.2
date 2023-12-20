@@ -36,6 +36,7 @@ import sh
 import sys
 import pytest
 from harness.logger import logger
+from datetime import datetime
 
 nonexisting = "nonexisting"
 
@@ -51,6 +52,11 @@ def test_statx(gkfs_daemon, gkfs_client):
     dir_b  = topdir / "dir_b"
     file_a = topdir / "file_a"
     subdir_a  = dir_a / "subdir_a"
+
+    # creation timestamp
+    # it is only checked if mtime and ctime are greater than
+    # the creation timestamp due to inprecesion between test and daemon
+    ts = int(datetime.timestamp(datetime.now()))
 
     # create topdir
     ret = gkfs_client.mkdir(
@@ -90,6 +96,13 @@ def test_statx(gkfs_daemon, gkfs_client):
 
     assert ret.retval == 0
     assert (ret.statbuf.stx_size == 2)
+
+    # if greater zero, it is activated in config.hpp
+    if ret.statbuf.stx_mtime.tv_sec > 0:
+        assert (ret.statbuf.stx_mtime.tv_sec > ts)
+
+    if ret.statbuf.stx_ctime.tv_sec > 0:
+        assert (ret.statbuf.stx_ctime.tv_sec > ts)
 
 
     return

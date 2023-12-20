@@ -181,6 +181,10 @@ MetadataMergeOperator::FullMergeV2(const MergeOperationInput& merge_in,
         auto operand_id = MergeOperand::get_id(serialized_op);
         auto parameters = MergeOperand::get_params(serialized_op);
 
+        if constexpr(gkfs::config::metadata::use_mtime) {
+            md.mtime(std::time(nullptr));
+        }
+
         if(operand_id == OperandID::increase_size) {
             auto op = IncreaseSizeOperand(parameters);
             if(op.append()) {
@@ -199,6 +203,9 @@ MetadataMergeOperator::FullMergeV2(const MergeOperationInput& merge_in,
             assert(op.size() < fsize); // we assume no concurrency here
             fsize = op.size();
         } else if(operand_id == OperandID::create) {
+            if constexpr(gkfs::config::metadata::use_ctime) {
+                md.ctime(std::time(nullptr));
+            }
             continue;
         } else {
             throw ::runtime_error("Unrecognized merge operand ID: " +
