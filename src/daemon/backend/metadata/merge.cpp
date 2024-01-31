@@ -181,6 +181,10 @@ MetadataMergeOperator::FullMergeV2(const MergeOperationInput& merge_in,
         auto operand_id = MergeOperand::get_id(serialized_op);
         auto parameters = MergeOperand::get_params(serialized_op);
 
+        if constexpr(gkfs::config::metadata::use_mtime) {
+            md.update_mtime_now();
+        }
+
         if(operand_id == OperandID::increase_size) {
             auto op = IncreaseSizeOperand(parameters);
             if(op.append()) {

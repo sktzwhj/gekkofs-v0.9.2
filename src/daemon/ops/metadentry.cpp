@@ -76,7 +76,7 @@ create(const std::string& path, Metadata& md) {
         if(GKFS_DATA->ctime_state())
             md.ctime(time);
     }
-    if(gkfs::config::metadata::create_exist_check) {
+    if constexpr(gkfs::config::metadata::create_exist_check) {
         GKFS_DATA->mdb()->put_no_exist(path, md.serialize());
     } else {
         GKFS_DATA->mdb()->put(path, md.serialize());
