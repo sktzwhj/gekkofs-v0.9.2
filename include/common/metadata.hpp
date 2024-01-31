@@ -64,6 +64,8 @@ private:
 #endif
 #endif
 
+    void
+    init_time();
 
 public:
     Metadata() = default;
@@ -82,11 +84,12 @@ public:
     std::string
     serialize() const;
 
+    // currently unused
     void
-    init_ACM_time();
+    update_atime_now();
 
     void
-    update_ACM_time(bool a, bool c, bool m);
+    update_mtime_now();
 
     // Getter and Setter
     time_t

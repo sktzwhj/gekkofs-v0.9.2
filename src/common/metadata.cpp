@@ -69,22 +69,36 @@ gen_unique_id(const std::string& path) {
     return static_cast<uint16_t>(hash_value & 0xFFFF);
 }
 
+inline void
+Metadata::init_time() {
+    if constexpr(gkfs::config::metadata::use_ctime) {
+        ctime_ = std::time(nullptr);
+    }
+    if constexpr(gkfs::config::metadata::use_mtime) {
+        mtime_ = std::time(nullptr);
+    }
+    if constexpr(gkfs::config::metadata::use_atime) {
+        atime_ = std::time(nullptr);
+    }
+}
+
 Metadata::Metadata(const mode_t mode)
-    : atime_(), mtime_(), ctime_(), mode_(mode), link_count_(0), size_(0),
-      blocks_(0) {
+    : mode_(mode), link_count_(0), size_(0), blocks_(0) {
     assert(S_ISDIR(mode_) || S_ISREG(mode_));
+    init_time();
 }
 
 #ifdef HAS_SYMLINKS
 
 Metadata::Metadata(const mode_t mode, const std::string& target_path)
-    : atime_(), mtime_(), ctime_(), mode_(mode), link_count_(0), size_(0),
-      blocks_(0), target_path_(target_path) {
+    : mode_(mode), link_count_(0), size_(0), blocks_(0),
+      target_path_(target_path) {
     assert(S_ISLNK(mode_) || S_ISDIR(mode_) || S_ISREG(mode_));
     // target_path should be there only if this is a link
     assert(target_path_.empty() || S_ISLNK(mode_));
     // target_path should be absolute
     assert(target_path_.empty() || target_path_[0] == '/');
+    init_time();
 }
 
 #endif
@@ -205,24 +219,15 @@ Metadata::serialize() const {
 }
 
 void
-Metadata::init_ACM_time() {
-    std::time_t time;
-    std::time(&time);
+Metadata::update_atime_now() {
+    auto time = std::time(nullptr);
     atime_ = time;
-    mtime_ = time;
-    ctime_ = time;
 }
 
 void
-Metadata::update_ACM_time(bool a, bool c, bool m) {
-    std::time_t time;
-    std::time(&time);
-    if(a)
-        atime_ = time;
-    if(c)
-        ctime_ = time;
-    if(m)
-        mtime_ = time;
+Metadata::update_mtime_now() {
+    auto time = std::time(nullptr);
+    mtime_ = time;
 }
 
 //-------------------------------------------- GETTER/SETTER
