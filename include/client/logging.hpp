@@ -273,7 +273,7 @@ protected:
 
 struct logger {
 
-    logger(const std::string& opts, const std::string& path, bool trunc
+    logger(const std::string& opts, const std::string& path, int log_per_process, bool trunc
 #ifdef GKFS_DEBUG_BUILD
            ,
            const std::string& filter, int verbosity
@@ -293,7 +293,7 @@ struct logger {
 
         static_buffer buffer;
         detail::format_timestamp_to(buffer, timezone_);
-        fmt::format_to(buffer, "[{}] [{}] ", ::syscall_no_intercept(SYS_gettid),
+        fmt::format_to(buffer, "[{}] [{}] ", log_process_id_,
                        lookup_level_name(level));
 
         if(!!(level & log::debug)) {
@@ -336,7 +336,7 @@ struct logger {
 
         static_buffer prefix;
         detail::format_timestamp_to(prefix);
-        fmt::format_to(prefix, "[{}] [{}] ", ::syscall_no_intercept(SYS_gettid),
+        fmt::format_to(prefix, "[{}] [{}] ", log_process_id_,
                        lookup_level_name(level));
 
         char buffer[max_buffer_size];
@@ -402,6 +402,7 @@ struct logger {
     }
 
     int log_fd_;
+    int log_process_id_;
     log_level log_mask_;
 
 #ifdef GKFS_DEBUG_BUILD

@@ -31,6 +31,7 @@
 #include <client/env.hpp>
 #include <client/make_array.hpp>
 #include <regex>
+#include <filesystem>
 
 extern "C" {
 #include <date/tz.h>
@@ -42,6 +43,8 @@ extern "C" {
 #include <hermes/logging.hpp>
 
 #endif
+
+namespace fs = std::filesystem;
 
 namespace {
 enum class split_str_mode {
@@ -280,7 +283,8 @@ process_log_filter(const std::string& log_filter) {
 
 #endif // GKFS_DEBUG_BUILD
 
-logger::logger(const std::string& opts, const std::string& path, bool trunc
+logger::logger(const std::string& opts, const std::string& path,
+               int log_per_process, bool trunc
 #ifdef GKFS_DEBUG_BUILD
                ,
                const std::string& filter, int verbosity
@@ -290,6 +294,7 @@ logger::logger(const std::string& opts, const std::string& path, bool trunc
 
     /* use stderr by default */
     log_fd_ = 2;
+    log_process_id_ = ::syscall_no_intercept(SYS_gettid);
     log_mask_ = process_log_options(opts);
 
 #ifdef GKFS_DEBUG_BUILD
@@ -304,11 +309,17 @@ logger::logger(const std::string& opts, const std::string& path, bool trunc
             flags &= ~O_TRUNC;
         }
 
+        std::string file_path = path;
+        if(log_per_process) {
+            fs::create_directories(path);
+            file_path += "/" + std::to_string(log_process_id_);
+        }
+
         // we use ::open() here rather than ::syscall_no_intercept(SYS_open)
         // because we want the call to be intercepted by our hooks, which
         // allows us to categorize the resulting fd as 'internal' and
         // relocate it to our private range
-        int fd = ::open(path.c_str(), flags, 0600);
+        int fd = ::open(file_path.c_str(), flags, 0600);
 
         if(fd == -1) {
             log(gkfs::log::error, __func__, __LINE__,
