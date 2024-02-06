@@ -273,7 +273,8 @@ protected:
 
 struct logger {
 
-    logger(const std::string& opts, const std::string& path, int log_per_process, bool trunc
+    logger(const std::string& opts, const std::string& path,
+           bool log_per_process, bool trunc
 #ifdef GKFS_DEBUG_BUILD
            ,
            const std::string& filter, int verbosity

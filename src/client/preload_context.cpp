@@ -76,8 +76,9 @@ PreloadContext::init_logging() {
     const std::string log_output = gkfs::env::get_var(
             gkfs::env::LOG_OUTPUT, gkfs::config::log::client_log_path);
 
-    const int log_per_process = std::atoi(
-            gkfs::env::get_var(gkfs::env::LOG_PER_PROCESS, "0").c_str());
+    const bool log_per_process =
+            gkfs::env::get_var(gkfs::env::LOG_PER_PROCESS).empty() ? false
+                                                                   : true;
 
 #ifdef GKFS_DEBUG_BUILD
     // atoi returns 0 if no int conversion can be performed, which works
@@ -95,7 +96,8 @@ PreloadContext::init_logging() {
 
     const bool log_trunc = (!trunc_val.empty() && trunc_val[0] != '0');
 
-    gkfs::log::create_global_logger(log_opts, log_output, log_per_process, log_trunc
+    gkfs::log::create_global_logger(log_opts, log_output, log_per_process,
+                                    log_trunc
 #ifdef GKFS_DEBUG_BUILD
                                     ,
                                     log_filter, log_verbosity

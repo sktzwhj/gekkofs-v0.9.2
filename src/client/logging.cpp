@@ -284,7 +284,7 @@ process_log_filter(const std::string& log_filter) {
 #endif // GKFS_DEBUG_BUILD
 
 logger::logger(const std::string& opts, const std::string& path,
-               int log_per_process, bool trunc
+               bool log_per_process, bool trunc
 #ifdef GKFS_DEBUG_BUILD
                ,
                const std::string& filter, int verbosity
@@ -312,7 +312,7 @@ logger::logger(const std::string& opts, const std::string& path,
         std::string file_path = path;
         if(log_per_process) {
             fs::create_directories(path);
-            file_path += "/" + std::to_string(log_process_id_);
+            file_path = fmt::format("{}/{}", path, log_process_id_);
         }
 
         // we use ::open() here rather than ::syscall_no_intercept(SYS_open)

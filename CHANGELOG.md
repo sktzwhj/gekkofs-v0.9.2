@@ -9,6 +9,9 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### New
 
+- Support mtime with option gkfs::config::metadata::use_mtime ([!225](https://storage.bsc.es/gitlab/hpc/gekkofs/-/issues/225))
+- Unify -d and -p flags in scripts/compile_dep.sh and dl_dep.sh  ([!188](https://storage.bsc.es/gitlab/hpc/gekkofs/-/issues/188)).
+- Logfile per process for the client, activated with LIBGKFS_LOG_PER_PROCESS ([!278](https://storage.bsc.es/gitlab/hpc/gekkofs/-/issues/278)).
 - Additional tests to increase code coverage ([!141](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/141)).
 - GKFS_ENABLE_UNUSED_FUNCTIONS added to disable code to increase code
   coverage. ([!141](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/141)).

@@ -200,7 +200,8 @@ usage: gkfs [-h/--help] [-r/--rootdir <path>] [-m/--mountdir <path>] [-a/--args 
 The following environment variables can be used to enable logging in the client library: `LIBGKFS_LOG=<module>`
 and `LIBGKFS_LOG_OUTPUT=<path/to/file>` to configure the output module and set the path to the log file of the client
 library. If not path is specified in `LIBGKFS_LOG_OUTPUT`, the client library will send log messages
-to `/tmp/gkfs_client.log`.
+to `/tmp/gkfs_client.log`. With `LIBGKFS_LOG_PER_PROCESS=1` it is possible to write separate logs per client process.
+If so, the path specified in `LIBGKFS_LOG_OUTPUT` is a directory but should not end with a `/`.
 
 The following modules are available:
 
