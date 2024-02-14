@@ -311,6 +311,9 @@ logger::logger(const std::string& opts, const std::string& path,
 
         std::string file_path = path;
         if(log_per_process) {
+            if(fs::is_regular_file(file_path) && fs::exists(file_path)) {
+                fs::remove(file_path);
+            }
             fs::create_directories(path);
             file_path = fmt::format("{}/{}", path, log_process_id_);
         }
