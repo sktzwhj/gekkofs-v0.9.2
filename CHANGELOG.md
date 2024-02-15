@@ -9,6 +9,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### New
 
+- Support for client-side per process logging, activated
+  with `LIBGKFS_LOG_PER_PROCESS` ([!179](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/179)).
+- Support mtime with option gkfs::config::metadata::
+  use_mtime ([!178](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/178))
 - Additional tests to increase code coverage ([!141](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/141)).
 - GKFS_ENABLE_UNUSED_FUNCTIONS added to disable code to increase code
   coverage. ([!141](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/141)).

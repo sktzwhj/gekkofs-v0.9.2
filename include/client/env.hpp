@@ -45,6 +45,7 @@ static constexpr auto LOG_SYSCALL_FILTER = ADD_PREFIX("LOG_SYSCALL_FILTER");
 #endif
 
 static constexpr auto LOG_OUTPUT = ADD_PREFIX("LOG_OUTPUT");
+static constexpr auto LOG_PER_PROCESS = ADD_PREFIX("LOG_PER_PROCESS");
 static constexpr auto LOG_OUTPUT_TRUNC = ADD_PREFIX("LOG_OUTPUT_TRUNC");
 static constexpr auto CWD = ADD_PREFIX("CWD");
 static constexpr auto HOSTS_FILE = ADD_PREFIX("HOSTS_FILE");
