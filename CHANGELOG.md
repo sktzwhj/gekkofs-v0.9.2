@@ -8,6 +8,13 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### New
+### Changed
+### Removed
+### Fixed
+
+## [0.9.2] - 2024-02
+
+### New
 
 - Support for client-side per process logging, activated
   with `LIBGKFS_LOG_PER_PROCESS` ([!179](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/179)).
@@ -54,8 +61,6 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Improved and simplified coverage generation procedures for developers with
   specific CMake targets ([!163](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/163#note_8179)).
 
-### Removed
-
 ### Fixed
 
 - Updated daemon log level for tests ([!138](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/138)).
@@ -86,7 +91,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Refactored update file size during write
   operations ([!164](https://storage.bsc.es/gitlab/hpc/gekkofs/-/merge_requests/164)).
 
-## [0.9.1] - 2022-04-29
+## [0.9.1] - 2022-04
 
 ### New
 
