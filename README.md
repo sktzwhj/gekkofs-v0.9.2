@@ -329,5 +329,8 @@ the DFG.
 
 This software is partially supported by the FIDIUM project funded by the DFG.
 
-This software is partially supported by the ADMIRE project (https://www.admire-eurohpc.eu/) funded by the European
-Union’s Horizon 2020 JTI-EuroHPC Research and Innovation Programme (Grant 956748).
+This work was partially funded by the European Union’s Horizon 2020 and the German Ministry of Education and Research (
+BMBF) under the ``Adaptive multi-tier intelligent data manager for Exascale (ADMIRE)'' project (https://www.admire-eurohpc.eu/); Grant Agreement number:
+956748-ADMIRE-H2020-JTI-EuroHPC-2019-1. Further, this work was partially supported by the Spanish Ministry of Economy
+and Competitiveness (MINECO) under grants PID2019-107255GB, and the Generalitat de Catalunya under contract
+2021-SGR-00412. This publication is part of the project ADMIRE PCI2021-121952, funded by MCIN/AEI/10.13039/501100011033.

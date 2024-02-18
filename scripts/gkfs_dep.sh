@@ -1,7 +1,7 @@
 #!/bin/bash
 ################################################################################
-# Copyright 2018-2022, Barcelona Supercomputing Center (BSC), Spain            #
-# Copyright 2015-2022, Johannes Gutenberg Universitaet Mainz, Germany          #
+# Copyright 2018-2024, Barcelona Supercomputing Center (BSC), Spain            #
+# Copyright 2015-2024, Johannes Gutenberg Universitaet Mainz, Germany          #
 #                                                                              #
 # This software was partially supported by the                                 #
 # EC H2020 funded project NEXTGenIO (Project ID: 671951, www.nextgenio.eu).    #
@@ -62,7 +62,7 @@ optional arguments:
                         deploy specific library versions and/or configurations,
                         using a recognizable name. Optionally, PROFILE_NAME may include
                         a specific version for the profile, e.g. 'mogon2:latest' or
-                        'ngio:0.9.1', which will download the dependencies defined for
+                        'ngio:0.9.2', which will download the dependencies defined for
                         that specific version. If unspecified, the 'default:latest' profile
                         will be used, which should include all the possible dependencies.
     -d, --dependency DEPENDENCY_NAME[[@PROFILE_NAME][:PROFILE_VERSION]]

@@ -1,6 +1,6 @@
 ################################################################################
-# Copyright 2018-2022, Barcelona Supercomputing Center (BSC), Spain            #
-# Copyright 2015-2022, Johannes Gutenberg Universitaet Mainz, Germany          #
+# Copyright 2018-2024, Barcelona Supercomputing Center (BSC), Spain            #
+# Copyright 2015-2024, Johannes Gutenberg Universitaet Mainz, Germany          #
 #                                                                              #
 # This software was partially supported by the                                 #
 # EC H2020 funded project NEXTGenIO (Project ID: 671951, www.nextgenio.eu).    #
@@ -31,7 +31,7 @@ cmake_minimum_required(VERSION 3.13)
 
 project(
     GekkoFS
-    VERSION 0.9.1
+    VERSION 0.9.2
 )
 
 enable_testing()

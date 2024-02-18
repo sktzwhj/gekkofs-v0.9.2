@@ -24,14 +24,14 @@ on the specifics of the particular GekkoFS build, both scripts rely on
 :code:`configuration profiles` which define a set of related software
 packages which should be downloaded and installed for a specific GekkoFS
 version and/or configuration. To illustrate this, let's take a look at the
-contents of the :code:`default` profile for GekkoFS version :code:`0.9.1`:
+contents of the :code:`default` profile for GekkoFS version :code:`0.9.2`:
 
 .. code-block:: console
 
-    $ dl_dep.sh -l default:0.9.1
-    Configuration profiles for '0.9.1':
+    $ dl_dep.sh -l default:0.9.2
+    Configuration profiles for '0.9.2':
 
-    * default:0.9.1 (/home/user/gekkofs/source/scripts/profiles/0.9.1/default.specs)
+    * default:0.9.2 (/home/user/gekkofs/source/scripts/profiles/0.9.2/default.specs)
 
       All dependencies
 
@@ -59,10 +59,10 @@ supercomputer) followed by an optional :code:`VERSION_TAG`.
 
 .. code-block:: console
 
-    $ ./dl_dep.sh -p default:0.9.1 /home/user/gfks/deps
+    $ ./dl_dep.sh -p default:0.9.2 /home/user/gfks/deps
     Destination path is set to  "/tmp/foo"
     Profile name: default
-    Profile version: 0.9.1
+    Profile version: 0.9.2
     ------------------------------------
     Downloaded 'https://github.com/lz4/lz4/archive/v1.9.3.tar.gz' to 'lz4'
     Downloaded 'https://github.com/json-c/json-c/archive/json-c-0.15-20200726.tar.gz' to 'json-c'
@@ -90,10 +90,10 @@ option. In this case, dependency names follow the
 
 .. code-block:: console
 
-   $ ./dl_dep.sh -d mercury@default:0.9.1 /home/user/gfks/deps
+   $ ./dl_dep.sh -d mercury@default:0.9.2 /home/user/gfks/deps
    Destination path is set to  "/tmp/foo"
    Profile name: default
-   Profile version: 0.9.1
+   Profile version: 0.9.2
    ------------------------------------
    Cloned 'https://github.com/mercury-hpc/mercury' to 'mercury' with commit '[v2.1.0]' and flags '--recurse-submodules'
    Done
@@ -115,12 +115,12 @@ certain directory (e.g. :code:`/home/user/gkfs/deps`), the
 
 .. code-block:: console
 
-    $ ./compile_dep.sh -p default:0.9.1 /home/user/gkfs/deps /home/user/gkfs/install -j8
+    $ ./compile_dep.sh -p default:0.9.2 /home/user/gkfs/deps /home/user/gkfs/install -j8
     CORES = 8 (default)
     Sources download path = /tmp/foo
     Installation path = /tmp/bar
     Profile name: default
-    Profile version: 0.9.1
+    Profile version: 0.9.2
     ------------------------------------
     ######## Installing:  lz4 ###############################
     ...
