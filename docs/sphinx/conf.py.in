@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'GekkoFS'
-copyright = ['2018-2022, Barcelona Supercomputing Center, Spain', '2015-2022, Johannes Gutenberg Universitaet Mainz, Germany' ]
+copyright = ['2018-2024, Barcelona Supercomputing Center, Spain', '2015-2024, Johannes Gutenberg Universitaet Mainz, Germany' ]
 author = 'GekkoFS committers'
 
 # The short X.Y version
