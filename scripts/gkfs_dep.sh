@@ -62,7 +62,7 @@ optional arguments:
                         deploy specific library versions and/or configurations,
                         using a recognizable name. Optionally, PROFILE_NAME may include
                         a specific version for the profile, e.g. 'mogon2:latest' or
-                        'ngio:0.9.1', which will download the dependencies defined for
+                        'ngio:0.9.2', which will download the dependencies defined for
                         that specific version. If unspecified, the 'default:latest' profile
                         will be used, which should include all the possible dependencies.
     -d, --dependency DEPENDENCY_NAME[[@PROFILE_NAME][:PROFILE_VERSION]]
