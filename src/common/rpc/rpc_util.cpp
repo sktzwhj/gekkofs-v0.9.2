@@ -202,12 +202,12 @@ base64_decode(const std::string& encoded) {
 }
 
 std::string
-compressBitset(const std::vector<uint8_t>& bytes) {
+compress_bitset(const std::vector<uint8_t>& bytes) {
     return base64_encode(bytes);
 }
 
 std::vector<uint8_t>
-decompressBitset(const std::string& compressedString) {
+decompress_bitset(const std::string& compressedString) {
     return base64_decode(compressedString);
 }
 

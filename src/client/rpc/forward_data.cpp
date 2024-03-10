@@ -43,7 +43,7 @@ using namespace std;
 namespace gkfs::rpc {
 
 /*
- * This file includes all metadata RPC calls.
+ * This file includes all data RPC calls.
  * NOTE: No errno is defined here!
  */
 
@@ -178,7 +178,7 @@ forward_write(const string& path, const void* buf, const off64_t offset,
                     block_overrun(offset, gkfs::config::rpc::chunksize), target,
                     CTX->hosts().size(),
                     // number of chunks handled by that destination
-                    gkfs::rpc::compressBitset(write_ops_vect[target]),
+                    gkfs::rpc::compress_bitset(write_ops_vect[target]),
                     target_chnks[target].size(),
                     // chunk start id of this write
                     chnk_start,
@@ -410,7 +410,7 @@ forward_read(const string& path, void* buf, const off64_t offset,
                     // a potential offset
                     block_overrun(offset, gkfs::config::rpc::chunksize), target,
                     CTX->hosts().size(),
-                    gkfs::rpc::compressBitset(read_bitset_vect[target]),
+                    gkfs::rpc::compress_bitset(read_bitset_vect[target]),
                     // number of chunks handled by that destination
                     target_chnks[target].size(),
                     // chunk start id of this write

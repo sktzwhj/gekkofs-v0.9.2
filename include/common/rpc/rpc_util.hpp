@@ -59,10 +59,10 @@ void
 set_bitset(std::vector<uint8_t>& data, const uint16_t position);
 
 std::string
-compressBitset(const std::vector<uint8_t>& bytes);
+compress_bitset(const std::vector<uint8_t>& bytes);
 
 std::vector<uint8_t>
-decompressBitset(const std::string& compressedString);
+decompress_bitset(const std::string& compressedString);
 
 } // namespace gkfs::rpc
 

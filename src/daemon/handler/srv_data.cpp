@@ -117,7 +117,7 @@ rpc_srv_write(hg_handle_t handle) {
             in.total_chunk_size, bulk_size, in.offset);
 
     std::vector<uint8_t> write_ops_vect =
-            gkfs::rpc::decompressBitset(in.wbitset);
+            gkfs::rpc::decompress_bitset(in.wbitset);
 
 #ifdef GKFS_ENABLE_AGIOS
     int* data;
@@ -424,7 +424,7 @@ rpc_srv_read(hg_handle_t handle) {
             __func__, in.path, in.chunk_start, in.chunk_end, in.chunk_n,
             in.total_chunk_size, bulk_size, in.offset);
     std::vector<uint8_t> read_bitset_vect =
-            gkfs::rpc::decompressBitset(in.wbitset);
+            gkfs::rpc::decompress_bitset(in.wbitset);
 #ifdef GKFS_ENABLE_AGIOS
     int* data;
     ABT_eventual eventual = ABT_EVENTUAL_NULL;
