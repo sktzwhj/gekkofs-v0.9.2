@@ -231,7 +231,6 @@ rpc_srv_write(hg_handle_t handle) {
         chnk_id_file <= in.chunk_end && chnk_id_curr < in.chunk_n;
         chnk_id_file++) {
         // Continue if chunk does not hash to this host
-#ifndef GKFS_ENABLE_FORWARDING
 
         if(!(gkfs::rpc::get_bitset(write_ops_vect,
                                    chnk_id_file - in.chunk_start))) {
@@ -245,7 +244,6 @@ rpc_srv_write(hg_handle_t handle) {
             GKFS_DATA->stats()->add_write(in.path, chnk_id_file);
         }
 
-#endif
         GKFS_DATA->spdlogger()->error("{}() Processing at host {} -> {}",
                                       __func__, host_id, chnk_id_file);
         chnk_ids_host[chnk_id_curr] =
@@ -492,10 +490,9 @@ rpc_srv_read(hg_handle_t handle) {
                 __func__);
         return gkfs::rpc::cleanup_respond(&handle, &in, &out, &bulk_handle);
     }
-#ifndef GKFS_ENABLE_FORWARDING
+
     auto const host_id = in.host_id;
-    auto const host_size = in.host_size;
-#endif
+
     auto path = make_shared<string>(in.path);
     // chnk_ids used by this host
     vector<uint64_t> chnk_ids_host(in.chunk_n);
@@ -526,7 +523,7 @@ rpc_srv_read(hg_handle_t handle) {
         chnk_id_file <= in.chunk_end && chnk_id_curr < in.chunk_n;
         chnk_id_file++) {
         // Continue if chunk does not hash to this host
-#ifndef GKFS_ENABLE_FORWARDING
+
         // We only check if we are not using replicas
 
         if(!(gkfs::rpc::get_bitset(read_bitset_vect,
@@ -540,7 +537,6 @@ rpc_srv_read(hg_handle_t handle) {
             GKFS_DATA->stats()->add_read(in.path, chnk_id_file);
         }
 
-#endif
 
         chnk_ids_host[chnk_id_curr] =
                 chnk_id_file; // save this id to host chunk list
