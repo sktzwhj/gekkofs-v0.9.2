@@ -50,10 +50,10 @@ class Metadata;
 namespace rpc {
 
 int
-forward_create(const std::string& path, mode_t mode);
+forward_create(const std::string& path, mode_t mode, const int copy);
 
 int
-forward_stat(const std::string& path, std::string& attr);
+forward_stat(const std::string& path, std::string& attr, const int copy);
 
 #ifdef HAS_RENAME
 int
@@ -62,22 +62,24 @@ forward_rename(const std::string& oldpath, const std::string& newpath,
 #endif // HAS_RENAME
 
 int
-forward_remove(const std::string& path);
+forward_remove(const std::string& path, const int8_t num_copies);
 
 int
-forward_decr_size(const std::string& path, size_t length);
+forward_decr_size(const std::string& path, size_t length, const int copy);
 
 int
-forward_update_metadentry(
-        const std::string& path, const gkfs::metadata::Metadata& md,
-        const gkfs::metadata::MetadentryUpdateFlags& md_flags);
+forward_update_metadentry(const std::string& path,
+                          const gkfs::metadata::Metadata& md,
+                          const gkfs::metadata::MetadentryUpdateFlags& md_flags,
+                          const int copy);
 
 std::pair<int, off64_t>
 forward_update_metadentry_size(const std::string& path, size_t size,
-                               off64_t offset, bool append_flag);
+                               off64_t offset, bool append_flag,
+                               const int num_copies);
 
 std::pair<int, off64_t>
-forward_get_metadentry_size(const std::string& path);
+forward_get_metadentry_size(const std::string& path, const int copy);
 
 std::pair<int, std::shared_ptr<gkfs::filemap::OpenDir>>
 forward_get_dirents(const std::string& path);

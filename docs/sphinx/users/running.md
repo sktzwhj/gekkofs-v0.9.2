@@ -218,3 +218,89 @@ the logging subsystem to truncate the file used for logging, rather than append 
 For the daemon, the `GKFS_DAEMON_LOG_PATH=<path/to/file>` environment variable can be provided to set the path to the
 log file, and the log module can be selected with the `GKFS_DAEMON_LOG_LEVEL={off,critical,err,warn,info,debug,trace}`
 environment variable whereas `trace` produces the most trace records while `info` is the default value.
+
+## Miscellaneous
+
+### External functions
+
+GekkoFS allows to use external functions on your client code, via LD_PRELOAD.
+Source code needs to be compiled with -fPIC. We include a pfind io500 substitution,
+`examples/gfind/gfind.cpp` and a non-mpi version `examples/gfind/sfind.cpp`
+
+### Data distributors
+
+The data distribution can be selected at compilation time, we have 2 distributors available:
+
+#### Simple Hash (Default)
+
+Chunks are distributed randomly to the different GekkoFS servers.
+
+#### Guided Distributor
+
+The guided distributor allows defining a specific distribution of data on a per directory or file basis.
+The distribution configurations are defined within a shared file (called `guided_config.txt` henceforth) with the
+following format:
+`<path> <chunk_number> <host>`
+
+To enable the distributor, the following CMake compilation flags are required:
+
+* `GKFS_USE_GUIDED_DISTRIBUTION` ON
+* `GKFS_USE_GUIDED_DISTRIBUTION_PATH` `<path_guided_config.txt>`
+
+To use a custom distribution, a path needs to have the prefix `#` (e.g., `#/mdt-hard 0 0`), in which all the data of all
+files in that directory goes to the same place as the metadata.
+Note, that a chunk/host configuration is inherited to all children files automatically even if not using the prefix.
+In this example, `/mdt-hard/file1` is therefore also using the same distribution as the `/mdt-hard` directory.
+If no prefix is used, the Simple Hash distributor is used.
+
+##### Guided configuration file
+
+Creating a guided configuration file is based on an I/O trace file of a previous execution of the application.
+For this the `trace_reads` tracing module is used (see above).
+
+The `trace_reads` module enables a `TRACE_READS` level log at the clients writing the I/O information of the client
+which is used as the input for a script that creates the guided distributor setting.
+Note that capturing the necessary trace records can involve performance degradation.
+To capture the I/O of each client within a SLURM environment, i.e., enabling the `trace_reads` module and print its
+output to a user-defined path, the following example can be used:
+`srun -N 10 -n 320 --export="ALL" /bin/bash -c "export LIBGKFS_LOG=trace_reads;LIBGKFS_LOG_OUTPUT=${HOME}/test/GLOBAL.txt;LD_PRELOAD=${GKFS_PRLD} <app>"`
+
+Then, the `examples/distributors/guided/generate.py` scrpt is used to create the guided distributor configuration file:
+
+* `python examples/distributors/guided/generate.py ~/test/GLOBAL.txt >> guided_config.txt`
+
+Finally, modify `guided_config.txt` to your distribution requirements.
+
+### Metadata Backends
+
+There are two different metadata backends in GekkoFS. The default one uses `rocksdb`, however an alternative based
+on `PARALLAX` from `FORTH`
+is available. To enable it use the `-DGKFS_ENABLE_PARALLAX:BOOL=ON` option, you can also disable `rocksdb`
+with `-DGKFS_ENABLE_ROCKSDB:BOOL=OFF`.
+
+Once it is enabled, `--dbbackend` option will be functional.
+
+### Statistics
+
+GekkoFS daemons are able to output general operations (`--enable-collection`) and data chunk
+statistics (`--enable-chunkstats`) to a specified output file via `--output-stats <FILE>`. Prometheus can also be used
+instead or in addition to the output file. It must be enabled at compile time via the CMake
+argument `-DGKFS_ENABLE_PROMETHEUS` and the daemon argument `--enable-prometheus`. The corresponding statistics are then
+pushed to the Prometheus instance.
+
+### Advanced experimental features
+
+#### Rename
+
+`-DGKFS_RENAME_SUPPORT` allows the application to rename files.
+This is an experimental feature, and some scenarios may not work properly.
+Support for fstat in renamed files is included.
+
+This is disabled by default.
+
+#### Replication
+
+The user can enable the data replication feature by setting the replication environment variable:
+`LIBGKFS_NUM_REPL=<num repl>`.
+The number of replicas should go from `0` to the `number of servers - 1`. The replication environment variable can be
+set up for each client independently.

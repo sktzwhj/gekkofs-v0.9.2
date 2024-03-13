@@ -51,12 +51,14 @@ namespace gkfs::rpc {
  * Send an RPC for a create request
  * @param path
  * @param mode
+ * @param copy Number of replica to create
  * @return error code
  */
 int
-forward_create(const std::string& path, const mode_t mode) {
+forward_create(const std::string& path, const mode_t mode, const int copy) {
 
-    auto endp = CTX->hosts().at(CTX->distributor()->locate_file_metadata(path));
+    auto endp = CTX->hosts().at(
+            CTX->distributor()->locate_file_metadata(path, copy));
 
     try {
         LOG(DEBUG, "Sending RPC ...");
@@ -81,12 +83,14 @@ forward_create(const std::string& path, const mode_t mode) {
  * Send an RPC for a stat request
  * @param path
  * @param attr
+ * @param copy metadata replica to read from
  * @return error code
  */
 int
-forward_stat(const std::string& path, string& attr) {
+forward_stat(const std::string& path, string& attr, const int copy) {
 
-    auto endp = CTX->hosts().at(CTX->distributor()->locate_file_metadata(path));
+    auto endp = CTX->hosts().at(
+            CTX->distributor()->locate_file_metadata(path, copy));
 
     try {
         LOG(DEBUG, "Sending RPC ...");
@@ -121,40 +125,44 @@ forward_stat(const std::string& path, string& attr) {
  * This function only attempts data removal if data exists (determined when
  * metadata is removed)
  * @param path
+ * @param num_copies Replication scenarios with many replicas
  * @return error code
  */
 int
-forward_remove(const std::string& path) {
-
-    auto endp = CTX->hosts().at(CTX->distributor()->locate_file_metadata(path));
+forward_remove(const std::string& path, const int8_t num_copies) {
     int64_t size = 0;
     uint32_t mode = 0;
 
-    /*
-     * Send one RPC to metadata destination and remove metadata while retrieving
-     * size and mode to determine if data needs to removed too
-     */
-    try {
-        LOG(DEBUG, "Sending RPC ...");
-        // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that we
-        // can retry for RPC_TRIES (see old commits with margo)
-        // TODO(amiranda): hermes will eventually provide a post(endpoint)
-        // returning one result and a broadcast(endpoint_set) returning a
-        // result_set. When that happens we can remove the .at(0) :/
-        auto out =
-                ld_network_service->post<gkfs::rpc::remove_metadata>(endp, path)
-                        .get()
-                        .at(0);
+    for(auto copy = 0; copy < (num_copies + 1); copy++) {
+        auto endp = CTX->hosts().at(
+                CTX->distributor()->locate_file_metadata(path, copy));
 
-        LOG(DEBUG, "Got response success: {}", out.err());
+        /*
+         * Send one RPC to metadata destination and remove metadata while
+         * retrieving size and mode to determine if data needs to removed too
+         */
+        try {
+            LOG(DEBUG, "Sending RPC ...");
+            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that
+            // we can retry for RPC_TRIES (see old commits with margo)
+            // TODO(amiranda): hermes will eventually provide a post(endpoint)
+            // returning one result and a broadcast(endpoint_set) returning a
+            // result_set. When that happens we can remove the .at(0) :/
+            auto out = ld_network_service
+                               ->post<gkfs::rpc::remove_metadata>(endp, path)
+                               .get()
+                               .at(0);
 
-        if(out.err())
-            return out.err();
-        size = out.size();
-        mode = out.mode();
-    } catch(const std::exception& ex) {
-        LOG(ERROR, "while getting rpc output");
-        return EBUSY;
+            LOG(DEBUG, "Got response success: {}", out.err());
+
+            if(out.err())
+                return out.err();
+            size = out.size();
+            mode = out.mode();
+        } catch(const std::exception& ex) {
+            LOG(ERROR, "while getting rpc output");
+            return EBUSY;
+        }
     }
     // if file is not a regular file and it's size is 0, data does not need to
     // be removed, thus, we exit
@@ -167,44 +175,54 @@ forward_remove(const std::string& path) {
     // Small files
     if(static_cast<std::size_t>(size / gkfs::config::rpc::chunksize) <
        CTX->hosts().size()) {
-        const auto metadata_host_id =
-                CTX->distributor()->locate_file_metadata(path);
-        const auto endp_metadata = CTX->hosts().at(metadata_host_id);
+        for(auto copymd = 0; copymd < (num_copies + 1); copymd++) {
+            const auto metadata_host_id =
+                    CTX->distributor()->locate_file_metadata(path, copymd);
+            const auto endp_metadata = CTX->hosts().at(metadata_host_id);
 
-        try {
-            LOG(DEBUG, "Sending RPC to host: {}", endp_metadata.to_string());
-            gkfs::rpc::remove_data::input in(path);
-            handles.emplace_back(
-                    ld_network_service->post<gkfs::rpc::remove_data>(
-                            endp_metadata, in));
-
-            uint64_t chnk_start = 0;
-            uint64_t chnk_end = size / gkfs::config::rpc::chunksize;
-
-            for(uint64_t chnk_id = chnk_start; chnk_id <= chnk_end; chnk_id++) {
-                const auto chnk_host_id =
-                        CTX->distributor()->locate_data(path, chnk_id);
-                if constexpr(gkfs::config::metadata::implicit_data_removal) {
-                    /*
-                     * If the chnk host matches the metadata host the remove
-                     * request as already been sent as part of the metadata
-                     * remove request.
-                     */
-                    if(chnk_host_id == metadata_host_id)
-                        continue;
-                }
-                const auto endp_chnk = CTX->hosts().at(chnk_host_id);
-
-                LOG(DEBUG, "Sending RPC to host: {}", endp_chnk.to_string());
-
+            try {
+                LOG(DEBUG, "Sending RPC to host: {}",
+                    endp_metadata.to_string());
+                gkfs::rpc::remove_data::input in(path);
                 handles.emplace_back(
                         ld_network_service->post<gkfs::rpc::remove_data>(
-                                endp_chnk, in));
+                                endp_metadata, in));
+
+                uint64_t chnk_start = 0;
+                uint64_t chnk_end = size / gkfs::config::rpc::chunksize;
+
+                for(uint64_t chnk_id = chnk_start; chnk_id <= chnk_end;
+                    chnk_id++) {
+                    for(auto copy = 0; copy < (num_copies + 1); copy++) {
+                        const auto chnk_host_id =
+                                CTX->distributor()->locate_data(path, chnk_id,
+                                                                copy);
+                        if constexpr(gkfs::config::metadata::
+                                             implicit_data_removal) {
+                            /*
+                             * If the chnk host matches the metadata host the
+                             * remove request as already been sent as part of
+                             * the metadata remove request.
+                             */
+                            if(chnk_host_id == metadata_host_id)
+                                continue;
+                        }
+                        const auto endp_chnk = CTX->hosts().at(chnk_host_id);
+
+                        LOG(DEBUG, "Sending RPC to host: {}",
+                            endp_chnk.to_string());
+
+                        handles.emplace_back(
+                                ld_network_service
+                                        ->post<gkfs::rpc::remove_data>(
+                                                endp_chnk, in));
+                    }
+                }
+            } catch(const std::exception& ex) {
+                LOG(ERROR,
+                    "Failed to forward non-blocking rpc request reduced remove requests");
+                return EBUSY;
             }
-        } catch(const std::exception& ex) {
-            LOG(ERROR,
-                "Failed to forward non-blocking rpc request reduced remove requests");
-            return EBUSY;
         }
     } else { // "Big" files
         for(const auto& endp : CTX->hosts()) {
@@ -260,12 +278,14 @@ forward_remove(const std::string& path) {
  * during a truncate() call.
  * @param path
  * @param length
+ * @param copy Target replica (0 original)
  * @return error code
  */
 int
-forward_decr_size(const std::string& path, size_t length) {
+forward_decr_size(const std::string& path, size_t length, const int copy) {
 
-    auto endp = CTX->hosts().at(CTX->distributor()->locate_file_metadata(path));
+    auto endp = CTX->hosts().at(
+            CTX->distributor()->locate_file_metadata(path, copy));
 
     try {
         LOG(DEBUG, "Sending RPC ...");
@@ -295,14 +315,17 @@ forward_decr_size(const std::string& path, size_t length) {
  * @param path
  * @param md
  * @param md_flags
+ * @param copy Target replica (0 original)
  * @return error code
  */
 int
-forward_update_metadentry(
-        const string& path, const gkfs::metadata::Metadata& md,
-        const gkfs::metadata::MetadentryUpdateFlags& md_flags) {
+forward_update_metadentry(const string& path,
+                          const gkfs::metadata::Metadata& md,
+                          const gkfs::metadata::MetadentryUpdateFlags& md_flags,
+                          const int copy) {
 
-    auto endp = CTX->hosts().at(CTX->distributor()->locate_file_metadata(path));
+    auto endp = CTX->hosts().at(
+            CTX->distributor()->locate_file_metadata(path, copy));
 
     try {
         LOG(DEBUG, "Sending RPC ...");
@@ -348,6 +371,7 @@ forward_update_metadentry(
  * This marks that this file doesn't have to be accessed directly
  * Create a new md with the new name, which should have as value the old name
  * All operations should check blockcnt and extract a NOTEXISTS
+ * The operations does not support replication
  * @param oldpath
  * @param newpath
  * @param md
@@ -358,8 +382,8 @@ int
 forward_rename(const string& oldpath, const string& newpath,
                const gkfs::metadata::Metadata& md) {
 
-    auto endp =
-            CTX->hosts().at(CTX->distributor()->locate_file_metadata(oldpath));
+    auto endp = CTX->hosts().at(
+            CTX->distributor()->locate_file_metadata(oldpath, 0));
 
     try {
         LOG(DEBUG, "Sending RPC ...");
@@ -405,8 +429,8 @@ forward_rename(const string& oldpath, const string& newpath,
     // TODO(amiranda): hermes will eventually provide a post(endpoint)
     // returning one result and a broadcast(endpoint_set) returning a
     // result_set. When that happens we can remove the .at(0) :/
-    auto endp2 =
-            CTX->hosts().at(CTX->distributor()->locate_file_metadata(newpath));
+    auto endp2 = CTX->hosts().at(
+            CTX->distributor()->locate_file_metadata(newpath, 0));
 
     try {
         LOG(DEBUG, "Sending RPC ...");
@@ -479,53 +503,85 @@ forward_rename(const string& oldpath, const string& newpath,
 /**
  * Send an RPC request for an update to the file size.
  * This is called during a write() call or similar
+ * A single correct call is needed only to progress.
  * @param path
  * @param size
  * @param offset
  * @param append_flag
+ * @param num_copies number of replicas
  * @return pair<error code, size after update>
  */
 pair<int, off64_t>
 forward_update_metadentry_size(const string& path, const size_t size,
-                               const off64_t offset, const bool append_flag) {
+                               const off64_t offset, const bool append_flag,
+                               const int num_copies) {
 
-    auto endp = CTX->hosts().at(CTX->distributor()->locate_file_metadata(path));
-    try {
-        LOG(DEBUG, "Sending RPC ...");
-        // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that we
-        // can retry for RPC_TRIES (see old commits with margo)
-        // TODO(amiranda): hermes will eventually provide a post(endpoint)
-        // returning one result and a broadcast(endpoint_set) returning a
-        // result_set. When that happens we can remove the .at(0) :/
-        auto out = ld_network_service
-                           ->post<gkfs::rpc::update_metadentry_size>(
-                                   endp, path, size, offset,
-                                   bool_to_merc_bool(append_flag))
-                           .get()
-                           .at(0);
+    std::vector<hermes::rpc_handle<gkfs::rpc::update_metadentry_size>> handles;
 
-        LOG(DEBUG, "Got response success: {}", out.err());
-
-        if(out.err())
-            return make_pair(out.err(), 0);
-        else
-            return make_pair(0, out.ret_size());
-    } catch(const std::exception& ex) {
-        LOG(ERROR, "while getting rpc output");
-        return make_pair(EBUSY, 0);
+    for(auto copy = 0; copy < num_copies + 1; copy++) {
+        auto endp = CTX->hosts().at(
+                CTX->distributor()->locate_file_metadata(path, copy));
+        try {
+            LOG(DEBUG, "Sending RPC ...");
+            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that
+            // we can retry for RPC_TRIES (see old commits with margo)
+            // TODO(amiranda): hermes will eventually provide a post(endpoint)
+            // returning one result and a broadcast(endpoint_set) returning a
+            // result_set. When that happens we can remove the .at(0) :/
+            handles.emplace_back(
+                    ld_network_service->post<gkfs::rpc::update_metadentry_size>(
+                            endp, path, size, offset,
+                            bool_to_merc_bool(append_flag)));
+        } catch(const std::exception& ex) {
+            LOG(ERROR, "while getting rpc output");
+            return make_pair(EBUSY, 0);
+        }
     }
+    auto err = 0;
+    ssize_t out_size = 0;
+    auto idx = 0;
+    bool valid = false;
+    for(const auto& h : handles) {
+        try {
+            // XXX We might need a timeout here to not wait forever for an
+            // output that never comes?
+            auto out = h.get().at(0);
+
+            if(out.err() != 0) {
+                LOG(ERROR, "Daemon {} reported error: {}", idx, out.err());
+            } else {
+                valid = true;
+                out_size = out.ret_size();
+            }
+
+        } catch(const std::exception& ex) {
+            LOG(ERROR, "Failed to get rpc output");
+            if(!valid) {
+                err = EIO;
+            }
+        }
+        idx++;
+    }
+
+    if(!valid)
+        return make_pair(err, 0);
+    else
+        return make_pair(0, out_size);
 }
+
 
 /**
  * Send an RPC request to get the current file size.
  * This is called during a lseek() call
  * @param path
+ * @param copy Target replica (0 original)
  * @return pair<error code, file size>
  */
 pair<int, off64_t>
-forward_get_metadentry_size(const std::string& path) {
+forward_get_metadentry_size(const std::string& path, const int copy) {
 
-    auto endp = CTX->hosts().at(CTX->distributor()->locate_file_metadata(path));
+    auto endp = CTX->hosts().at(
+            CTX->distributor()->locate_file_metadata(path, copy));
 
     try {
         LOG(DEBUG, "Sending RPC ...");
@@ -831,7 +887,8 @@ forward_get_dirents_single(const string& path, int server) {
 int
 forward_mk_symlink(const std::string& path, const std::string& target_path) {
 
-    auto endp = CTX->hosts().at(CTX->distributor()->locate_file_metadata(path));
+    auto endp =
+            CTX->hosts().at(CTX->distributor()->locate_file_metadata(path, 0));
 
     try {
         LOG(DEBUG, "Sending RPC ...");

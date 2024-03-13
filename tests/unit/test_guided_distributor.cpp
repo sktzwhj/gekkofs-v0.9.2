@@ -39,23 +39,23 @@ TEST_CASE( "Guided distributor Testing", "[Distributor]" ) {
         // The distributor should return 3 for all the tested files
         auto d = gkfs::rpc::GuidedDistributor();
 
-        REQUIRE( d.locate_data("/t.c01",1,10) == 3 );
-        REQUIRE( d.locate_data("/t.c02",1,10) == 3 );
-        REQUIRE( d.locate_data("/t.c03",1,10) == 3 );
-        REQUIRE( d.locate_data("/t.c04",1,10) == 3 );
-        REQUIRE( d.locate_data("/t.c05",1,10) == 3 );
-        REQUIRE( d.locate_data("/t.c06",1,10) == 3 );
-        REQUIRE( d.locate_data("/t.c07",1,10) == 3 );
+        REQUIRE( d.locate_data("/t.c01",1,10,0) == 3 );
+        REQUIRE( d.locate_data("/t.c02",1,10,0) == 3 );
+        REQUIRE( d.locate_data("/t.c03",1,10,0) == 3 );
+        REQUIRE( d.locate_data("/t.c04",1,10,0) == 3 );
+        REQUIRE( d.locate_data("/t.c05",1,10,0) == 3 );
+        REQUIRE( d.locate_data("/t.c06",1,10,0) == 3 );
+        REQUIRE( d.locate_data("/t.c07",1,10,0) == 3 );
 
         // Next result is random, but with the same seed is consistent
         // We ask for chunk 5 that is distributed randomly between the
         // 10 servers.
-        REQUIRE ( (d.locate_data("/t.c01",5,10) +
-                  d.locate_data("/t.c02",5,10) +
-                  d.locate_data("/t.c03",5,10) +
-                  d.locate_data("/t.c04",5,10) +
-                  d.locate_data("/t.c05",5,10) +
-                  d.locate_data("/t.c06",5,10) +
-                  d.locate_data("/t.c07",5,10) ) == 42);
+        REQUIRE ( (d.locate_data("/t.c01",5,10,0) +
+                  d.locate_data("/t.c02",5,10,0) +
+                  d.locate_data("/t.c03",5,10,0) +
+                  d.locate_data("/t.c04",5,10,0) +
+                  d.locate_data("/t.c05",5,10,0) +
+                  d.locate_data("/t.c06",5,10,0) +
+                  d.locate_data("/t.c07",5,10,0) ) == 42);
     }
 }

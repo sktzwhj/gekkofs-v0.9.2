@@ -45,18 +45,29 @@ forward_get_fs_config() {
     auto endp = CTX->hosts().at(CTX->local_host_id());
     gkfs::rpc::fs_config::output out;
 
-    try {
-        LOG(DEBUG, "Retrieving file system configurations from daemon");
-        // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that we
-        // can retry for RPC_TRIES (see old commits with margo)
-        // TODO(amiranda): hermes will eventually provide a post(endpoint)
-        // returning one result and a broadcast(endpoint_set) returning a
-        // result_set. When that happens we can remove the .at(0) :/
-        out = ld_network_service->post<gkfs::rpc::fs_config>(endp).get().at(0);
-    } catch(const std::exception& ex) {
-        LOG(ERROR, "Retrieving fs configurations from daemon");
-        return false;
+    bool found = false;
+    size_t idx = 0;
+    while(!found && idx <= CTX->hosts().size()) {
+        try {
+            LOG(DEBUG, "Retrieving file system configurations from daemon");
+            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that
+            // we can retry for RPC_TRIES (see old commits with margo)
+            // TODO(amiranda): hermes will eventually provide a post(endpoint)
+            // returning one result and a broadcast(endpoint_set) returning a
+            // result_set. When that happens we can remove the .at(0) :/
+            out = ld_network_service->post<gkfs::rpc::fs_config>(endp).get().at(
+                    0);
+            found = true;
+        } catch(const std::exception& ex) {
+            LOG(ERROR,
+                "Retrieving fs configurations from daemon, possible reattempt at peer: {}",
+                idx);
+            endp = CTX->hosts().at(idx++);
+        }
     }
+
+    if(!found)
+        return false;
 
     CTX->mountdir(out.mountdir());
     LOG(INFO, "Mountdir: '{}'", CTX->mountdir());

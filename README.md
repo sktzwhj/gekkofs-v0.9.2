@@ -320,6 +320,13 @@ Support for fstat in renamed files is included.
 
 This is disabled by default.
 
+### Replication
+
+The user can enable the data replication feature by setting the replication environment variable:
+`LIBGKFS_NUM_REPL=<num repl>`.
+The number of replicas should go from `0` to the `number of servers - 1`. The replication environment variable can be
+set up for each client independently.
+
 ## Acknowledgment
 
 This software was partially supported by the EC H2020 funded NEXTGenIO project (Project ID: 671951, www.nextgenio.eu).
@@ -330,7 +337,8 @@ the DFG.
 This software is partially supported by the FIDIUM project funded by the DFG.
 
 This work was partially funded by the European Union’s Horizon 2020 and the German Ministry of Education and Research (
-BMBF) under the ``Adaptive multi-tier intelligent data manager for Exascale (ADMIRE)'' project (https://www.admire-eurohpc.eu/); Grant Agreement number:
+BMBF) under the ``Adaptive multi-tier intelligent data manager for Exascale (ADMIRE)''
+project (https://www.admire-eurohpc.eu/); Grant Agreement number:
 956748-ADMIRE-H2020-JTI-EuroHPC-2019-1. Further, this work was partially supported by the Spanish Ministry of Economy
 and Competitiveness (MINECO) under grants PID2019-107255GB, and the Generalitat de Catalunya under contract
 2021-SGR-00412. This publication is part of the project ADMIRE PCI2021-121952, funded by MCIN/AEI/10.13039/501100011033.

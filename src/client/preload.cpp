@@ -37,6 +37,8 @@
 #include <common/rpc/distributor.hpp>
 #include <common/common_defs.hpp>
 
+#include <ctime>
+#include <cstdlib>
 #include <fstream>
 
 #include <hermes.hpp>
@@ -238,6 +240,11 @@ init_environment() {
                 EXIT_FAILURE,
                 "Unable to fetch file system configurations from daemon process through RPC.");
     }
+    // Initialize random number generator and seed for replica selection
+    // in case of failure, a new replica will be selected
+    if(CTX->get_replicas() > 0) {
+        srand(time(nullptr));
+    }
 
     LOG(INFO, "Environment initialization successful.");
 }
@@ -277,6 +284,7 @@ init_preload() {
     gkfs::path::init_cwd();
 
     LOG(DEBUG, "Current working directory: '{}'", CTX->cwd());
+    LOG(DEBUG, "Number of replicas : '{}'", CTX->get_replicas());
     gkfs::preload::init_environment();
     CTX->enable_interception();
 

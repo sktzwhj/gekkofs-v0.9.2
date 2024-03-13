@@ -65,6 +65,8 @@ PreloadContext::PreloadContext()
     char host[255];
     gethostname(host, 255);
     hostname = host;
+    PreloadContext::set_replicas(
+            std::stoi(gkfs::env::get_var(gkfs::env::NUM_REPL, "0")));
 }
 
 void
@@ -450,6 +452,16 @@ PreloadContext::unprotect_user_fds() {
 std::string
 PreloadContext::get_hostname() {
     return hostname;
+}
+
+void
+PreloadContext::set_replicas(const int repl) {
+    replicas_ = repl;
+}
+
+int
+PreloadContext::get_replicas() {
+    return replicas_;
 }
 
 } // namespace preload

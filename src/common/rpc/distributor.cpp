@@ -47,27 +47,34 @@ SimpleHashDistributor::localhost() const {
     return localhost_;
 }
 
-host_t
-SimpleHashDistributor::locate_data(const string& path,
-                                   const chunkid_t& chnk_id) const {
-    return str_hash(path + ::to_string(chnk_id)) % hosts_size_;
+unsigned int
+SimpleHashDistributor::hosts_size() const {
+    return hosts_size_;
 }
 
 host_t
 SimpleHashDistributor::locate_data(const string& path, const chunkid_t& chnk_id,
-                                   unsigned int hosts_size) {
+                                   const int num_copy) const {
+    return (str_hash(path + ::to_string(chnk_id)) + num_copy) % hosts_size_;
+}
+
+host_t
+SimpleHashDistributor::locate_data(const string& path, const chunkid_t& chnk_id,
+                                   unsigned int hosts_size,
+                                   const int num_copy) {
     if(hosts_size_ != hosts_size) {
         hosts_size_ = hosts_size;
         all_hosts_ = std::vector<unsigned int>(hosts_size);
         ::iota(all_hosts_.begin(), all_hosts_.end(), 0);
     }
 
-    return str_hash(path + ::to_string(chnk_id)) % hosts_size_;
+    return (str_hash(path + ::to_string(chnk_id)) + num_copy) % hosts_size_;
 }
 
 host_t
-SimpleHashDistributor::locate_file_metadata(const string& path) const {
-    return str_hash(path) % hosts_size_;
+SimpleHashDistributor::locate_file_metadata(const string& path,
+                                            const int num_copy) const {
+    return (str_hash(path) + num_copy) % hosts_size_;
 }
 
 ::vector<host_t>
@@ -83,14 +90,20 @@ LocalOnlyDistributor::localhost() const {
     return localhost_;
 }
 
+unsigned int
+LocalOnlyDistributor::hosts_size() const {
+    return hosts_size_;
+}
+
 host_t
-LocalOnlyDistributor::locate_data(const string& path,
-                                  const chunkid_t& chnk_id) const {
+LocalOnlyDistributor::locate_data(const string& path, const chunkid_t& chnk_id,
+                                  const int num_copy) const {
     return localhost_;
 }
 
 host_t
-LocalOnlyDistributor::locate_file_metadata(const string& path) const {
+LocalOnlyDistributor::locate_file_metadata(const string& path,
+                                           const int num_copy) const {
     return localhost_;
 }
 
@@ -110,23 +123,31 @@ ForwarderDistributor::localhost() const {
     return fwd_host_;
 }
 
+unsigned int
+ForwarderDistributor::hosts_size() const {
+    return hosts_size_;
+}
+
 host_t
 ForwarderDistributor::locate_data(const std::string& path,
-                                  const chunkid_t& chnk_id) const {
+                                  const chunkid_t& chnk_id,
+                                  const int num_copy) const {
     return fwd_host_;
 }
 
 host_t
 ForwarderDistributor::locate_data(const std::string& path,
                                   const chunkid_t& chnk_id,
-                                  unsigned int host_size) {
+                                  unsigned int host_size, const int num_copy) {
     return fwd_host_;
 }
 
 host_t
-ForwarderDistributor::locate_file_metadata(const std::string& path) const {
-    return str_hash(path) % hosts_size_;
+ForwarderDistributor::locate_file_metadata(const std::string& path,
+                                           const int num_copy) const {
+    return (str_hash(path) + num_copy) % hosts_size_;
 }
+
 
 std::vector<host_t>
 ForwarderDistributor::locate_directory_metadata(const std::string& path) const {
@@ -213,21 +234,26 @@ GuidedDistributor::localhost() const {
     return localhost_;
 }
 
+unsigned int
+GuidedDistributor::hosts_size() const {
+    return hosts_size_;
+}
+
 host_t
 GuidedDistributor::locate_data(const string& path, const chunkid_t& chnk_id,
-                               unsigned int hosts_size) {
+                               unsigned int hosts_size, const int num_copy) {
     if(hosts_size_ != hosts_size) {
         hosts_size_ = hosts_size;
         all_hosts_ = std::vector<unsigned int>(hosts_size);
         ::iota(all_hosts_.begin(), all_hosts_.end(), 0);
     }
 
-    return (locate_data(path, chnk_id));
+    return (locate_data(path, chnk_id, num_copy));
 }
 
 host_t
-GuidedDistributor::locate_data(const string& path,
-                               const chunkid_t& chnk_id) const {
+GuidedDistributor::locate_data(const string& path, const chunkid_t& chnk_id,
+                               const int num_copy) const {
     auto it = map_interval.find(path);
     if(it != map_interval.end()) {
         auto it_f = it->second.first.IsInsideInterval(chnk_id);
@@ -245,13 +271,15 @@ GuidedDistributor::locate_data(const string& path,
     }
 
     auto locate = path + ::to_string(chnk_id);
-    return str_hash(locate) % hosts_size_;
+    return (str_hash(locate) + num_copy) % hosts_size_;
 }
 
 host_t
-GuidedDistributor::locate_file_metadata(const string& path) const {
-    return str_hash(path) % hosts_size_;
+GuidedDistributor::locate_file_metadata(const string& path,
+                                        const int num_copy) const {
+    return (str_hash(path) + num_copy) % hosts_size_;
 }
+
 
 ::vector<host_t>
 GuidedDistributor::locate_directory_metadata(const string& path) const {

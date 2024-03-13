@@ -52,7 +52,7 @@ static constexpr auto HOSTS_FILE = ADD_PREFIX("HOSTS_FILE");
 #ifdef GKFS_ENABLE_FORWARDING
 static constexpr auto FORWARDING_MAP_FILE = ADD_PREFIX("FORWARDING_MAP_FILE");
 #endif
-
+static constexpr auto NUM_REPL = ADD_PREFIX("NUM_REPL");
 } // namespace gkfs::env
 
 #undef ADD_PREFIX

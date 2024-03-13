@@ -34,6 +34,7 @@
 
 #include <common/rpc/distributor.hpp>
 #include <common/arithmetic/arithmetic.hpp>
+#include <common/rpc/rpc_util.hpp>
 
 #include <unordered_set>
 
@@ -42,21 +43,26 @@ using namespace std;
 namespace gkfs::rpc {
 
 /*
- * This file includes all metadata RPC calls.
+ * This file includes all data RPC calls.
  * NOTE: No errno is defined here!
  */
 
 /**
  * Send an RPC request to write from a buffer.
+ * There is a bitset of 1024 chunks to tell the server
+ * which chunks to process. Exceeding this value will work without
+ * replication. Another way is to leverage mercury segments.
+ * TODO: Decide how to manage a write to a replica that doesn't exist
  * @param path
  * @param buf
  * @param append_flag
  * @param write_size
+ * @param num_copies number of replicas
  * @return pair<error code, written size>
  */
 pair<int, ssize_t>
 forward_write(const string& path, const void* buf, const off64_t offset,
-              const size_t write_size) {
+              const size_t write_size, const int8_t num_copies) {
 
     // import pow2-optimized arithmetic functions
     using namespace gkfs::utils::arithmetic;
@@ -69,35 +75,50 @@ forward_write(const string& path, const void* buf, const off64_t offset,
     auto chnk_end = block_index((offset + write_size) - 1,
                                 gkfs::config::rpc::chunksize);
 
+    auto chnk_total = (chnk_end - chnk_start) + 1;
+
     // Collect all chunk ids within count that have the same destination so
     // that those are send in one rpc bulk transfer
     std::map<uint64_t, std::vector<uint64_t>> target_chnks{};
+
     // contains the target ids, used to access the target_chnks map.
     // First idx is chunk with potential offset
     std::vector<uint64_t> targets{};
 
     // targets for the first and last chunk as they need special treatment
-    uint64_t chnk_start_target = 0;
-    uint64_t chnk_end_target = 0;
+    // We need a set to manage replicas.
+    std::set<uint64_t> chnk_start_target{};
+    std::set<uint64_t> chnk_end_target{};
 
+    std::unordered_map<uint64_t, std::vector<uint8_t>> write_ops_vect;
+
+    // If num_copies is 0, we do the normal write operation. Otherwise
+    // we process all the replicas.
     for(uint64_t chnk_id = chnk_start; chnk_id <= chnk_end; chnk_id++) {
-        auto target = CTX->distributor()->locate_data(path, chnk_id);
+        for(auto copy = num_copies ? 1 : 0; copy < num_copies + 1; copy++) {
+            auto target = CTX->distributor()->locate_data(path, chnk_id, copy);
 
-        if(target_chnks.count(target) == 0) {
-            target_chnks.insert(
-                    std::make_pair(target, std::vector<uint64_t>{chnk_id}));
-            targets.push_back(target);
-        } else {
-            target_chnks[target].push_back(chnk_id);
-        }
+            if(write_ops_vect.find(target) == write_ops_vect.end())
+                write_ops_vect[target] =
+                        std::vector<uint8_t>(((chnk_total + 7) / 8));
+            gkfs::rpc::set_bitset(write_ops_vect[target], chnk_id - chnk_start);
 
-        // set first and last chnk targets
-        if(chnk_id == chnk_start) {
-            chnk_start_target = target;
-        }
+            if(target_chnks.count(target) == 0) {
+                target_chnks.insert(
+                        std::make_pair(target, std::vector<uint64_t>{chnk_id}));
+                targets.push_back(target);
+            } else {
+                target_chnks[target].push_back(chnk_id);
+            }
 
-        if(chnk_id == chnk_end) {
-            chnk_end_target = target;
+            // set first and last chnk targets
+            if(chnk_id == chnk_start) {
+                chnk_start_target.insert(target);
+            }
+
+            if(chnk_id == chnk_end) {
+                chnk_end_target.insert(target);
+            }
         }
     }
 
@@ -133,13 +154,13 @@ forward_write(const string& path, const void* buf, const off64_t offset,
                 target_chnks[target].size() * gkfs::config::rpc::chunksize;
 
         // receiver of first chunk must subtract the offset from first chunk
-        if(target == chnk_start_target) {
+        if(chnk_start_target.end() != chnk_start_target.find(target)) {
             total_chunk_size -=
                     block_overrun(offset, gkfs::config::rpc::chunksize);
         }
 
         // receiver of last chunk must subtract
-        if(target == chnk_end_target &&
+        if(chnk_end_target.end() != chnk_end_target.find(target) &&
            !is_aligned(offset + write_size, gkfs::config::rpc::chunksize)) {
             total_chunk_size -= block_underrun(offset + write_size,
                                                gkfs::config::rpc::chunksize);
@@ -148,7 +169,6 @@ forward_write(const string& path, const void* buf, const off64_t offset,
         auto endp = CTX->hosts().at(target);
 
         try {
-
             LOG(DEBUG, "Sending RPC ...");
 
             gkfs::rpc::write_data::input in(
@@ -158,6 +178,7 @@ forward_write(const string& path, const void* buf, const off64_t offset,
                     block_overrun(offset, gkfs::config::rpc::chunksize), target,
                     CTX->hosts().size(),
                     // number of chunks handled by that destination
+                    gkfs::rpc::compress_bitset(write_ops_vect[target]),
                     target_chnks[target].size(),
                     // chunk start id of this write
                     chnk_start,
@@ -175,25 +196,26 @@ forward_write(const string& path, const void* buf, const off64_t offset,
                     ld_network_service->post<gkfs::rpc::write_data>(endp, in));
 
             LOG(DEBUG,
-                "host: {}, path: \"{}\", chunks: {}, size: {}, offset: {}",
-                target, path, in.chunk_n(), total_chunk_size, in.offset());
-
+                "host: {}, path: \"{}\", chunk_start: {}, chunk_end: {}, chunks: {}, size: {}, offset: {}",
+                target, path, chnk_start, chnk_end, in.chunk_n(),
+                total_chunk_size, in.offset());
         } catch(const std::exception& ex) {
             LOG(ERROR,
                 "Unable to send non-blocking rpc for "
                 "path \"{}\" [peer: {}]",
                 path, target);
-            return make_pair(EBUSY, 0);
+            if(num_copies == 0)
+                return make_pair(EBUSY, 0);
         }
     }
 
-    // Wait for RPC responses and then get response and add it to out_size
-    // which is the written size All potential outputs are served to free
-    // resources regardless of errors, although an errorcode is set.
     auto err = 0;
     ssize_t out_size = 0;
     std::size_t idx = 0;
-
+#ifdef REPLICA_CHECK
+    std::vector<uint8_t> fill(chnk_total);
+    auto write_ops = write_ops_vect.begin();
+#endif
     for(const auto& h : handles) {
         try {
             // XXX We might need a timeout here to not wait forever for an
@@ -203,17 +225,51 @@ forward_write(const string& path, const void* buf, const off64_t offset,
             if(out.err() != 0) {
                 LOG(ERROR, "Daemon reported error: {}", out.err());
                 err = out.err();
+            } else {
+                out_size += static_cast<size_t>(out.io_size());
+#ifdef REPLICA_CHECK
+                if(num_copies) {
+                    if(fill.size() == 0) {
+                        fill = write_ops->second;
+                    } else {
+                        for(size_t i = 0; i < fill.size(); i++) {
+                            fill[i] |= write_ops->second[i];
+                        }
+                    }
+                }
+                write_ops++;
+#endif
             }
-
-            out_size += static_cast<size_t>(out.io_size());
-
         } catch(const std::exception& ex) {
             LOG(ERROR, "Failed to get rpc output for path \"{}\" [peer: {}]",
                 path, targets[idx]);
             err = EIO;
         }
-
         idx++;
+    }
+    // As servers can fail (and we cannot know if the total data is written), we
+    // send the updated size but check that at least one copy of all chunks are
+    // processed.
+    if(num_copies) {
+        // A bit-wise or should show that all the chunks are written (255)
+        out_size = write_size;
+#ifdef REPLICA_CHECK
+        for(size_t i = 0; i < fill.size() - 1; i++) {
+            if(fill[i] != 255) {
+                err = EIO;
+                break;
+            }
+        }
+        // Process the leftover bytes
+        for(uint64_t chnk_id = (chnk_start + (fill.size() - 1) * 8);
+            chnk_id <= chnk_end; chnk_id++) {
+            if(!(fill[(chnk_id - chnk_start) / 8] &
+                 (1 << ((chnk_id - chnk_start) % 8)))) {
+                err = EIO;
+                break;
+            }
+        }
+#endif
     }
     /*
      * Typically file systems return the size even if only a part of it was
@@ -232,11 +288,14 @@ forward_write(const string& path, const void* buf, const off64_t offset,
  * @param buf
  * @param offset
  * @param read_size
+ * @param num_copies number of copies available (0 is no replication)
+ * @param failed nodes failed that should not be used
  * @return pair<error code, read size>
  */
 pair<int, ssize_t>
 forward_read(const string& path, void* buf, const off64_t offset,
-             const size_t read_size) {
+             const size_t read_size, const int8_t num_copies,
+             std::set<int8_t>& failed) {
 
     // import pow2-optimized arithmetic functions
     using namespace gkfs::utils::arithmetic;
@@ -246,19 +305,35 @@ forward_read(const string& path, void* buf, const off64_t offset,
     auto chnk_start = block_index(offset, gkfs::config::rpc::chunksize);
     auto chnk_end =
             block_index((offset + read_size - 1), gkfs::config::rpc::chunksize);
-
+    auto chnk_total = (chnk_end - chnk_start) + 1;
     // Collect all chunk ids within count that have the same destination so
     // that those are send in one rpc bulk transfer
     std::map<uint64_t, std::vector<uint64_t>> target_chnks{};
+
     // contains the recipient ids, used to access the target_chnks map.
     // First idx is chunk with potential offset
     std::vector<uint64_t> targets{};
     // targets for the first and last chunk as they need special treatment
     uint64_t chnk_start_target = 0;
     uint64_t chnk_end_target = 0;
+    std::unordered_map<uint64_t, std::vector<uint8_t>> read_bitset_vect;
 
     for(uint64_t chnk_id = chnk_start; chnk_id <= chnk_end; chnk_id++) {
-        auto target = CTX->distributor()->locate_data(path, chnk_id);
+        auto target = CTX->distributor()->locate_data(path, chnk_id, 0);
+        if(num_copies > 0) {
+            // If we have some failures we select another copy (randomly).
+            while(failed.find(target) != failed.end()) {
+                LOG(DEBUG, "Selecting another node, target: {} down", target);
+                target = CTX->distributor()->locate_data(path, chnk_id,
+                                                         rand() % num_copies);
+            }
+        }
+
+        if(read_bitset_vect.find(target) == read_bitset_vect.end())
+            read_bitset_vect[target] =
+                    std::vector<uint8_t>(((chnk_total + 7) / 8));
+        read_bitset_vect[target][(chnk_id - chnk_start) / 8] |=
+                1 << ((chnk_id - chnk_start) % 8); // set
 
         if(target_chnks.count(target) == 0) {
             target_chnks.insert(
@@ -303,6 +378,7 @@ forward_read(const string& path, void* buf, const off64_t offset,
     // TODO(amiranda): This could be simplified by adding a vector of inputs
     // to async_engine::broadcast(). This would allow us to avoid manually
     // looping over handles as we do below
+
     for(const auto& target : targets) {
 
         // total chunk_size for target
@@ -334,6 +410,7 @@ forward_read(const string& path, void* buf, const off64_t offset,
                     // a potential offset
                     block_overrun(offset, gkfs::config::rpc::chunksize), target,
                     CTX->hosts().size(),
+                    gkfs::rpc::compress_bitset(read_bitset_vect[target]),
                     // number of chunks handled by that destination
                     target_chnks[target].size(),
                     // chunk start id of this write
@@ -343,11 +420,12 @@ forward_read(const string& path, void* buf, const off64_t offset,
                     // total size to write
                     total_chunk_size, local_buffers);
 
-            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that
-            // we can retry for RPC_TRIES (see old commits with margo)
-            // TODO(amiranda): hermes will eventually provide a post(endpoint)
-            // returning one result and a broadcast(endpoint_set) returning a
-            // result_set. When that happens we can remove the .at(0) :/
+            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so
+            // that we can retry for RPC_TRIES (see old commits with margo)
+            // TODO(amiranda): hermes will eventually provide a
+            // post(endpoint) returning one result and a
+            // broadcast(endpoint_set) returning a result_set. When that
+            // happens we can remove the .at(0) :/
             handles.emplace_back(
                     ld_network_service->post<gkfs::rpc::read_data>(endp, in));
 
@@ -394,9 +472,15 @@ forward_read(const string& path, void* buf, const off64_t offset,
             LOG(ERROR, "Failed to get rpc output for path \"{}\" [peer: {}]",
                 path, targets[idx]);
             err = EIO;
+            // We should get targets[idx] and remove from the list of peers
+            failed.insert(targets[idx]);
+            // Then repeat the read with another peer (We repear the full
+            // read, this can be optimised but it is a cornercase)
         }
         idx++;
     }
+
+
     /*
      * Typically file systems return the size even if only a part of it was
      * read. In our case, we do not keep track which daemon fully read its
@@ -413,11 +497,12 @@ forward_read(const string& path, void* buf, const off64_t offset,
  * @param path
  * @param current_size
  * @param new_size
+ * @param num_copies Number of replicas
  * @return error code
  */
 int
-forward_truncate(const std::string& path, size_t current_size,
-                 size_t new_size) {
+forward_truncate(const std::string& path, size_t current_size, size_t new_size,
+                 const int8_t num_copies) {
 
     // import pow2-optimized arithmetic functions
     using namespace gkfs::utils::arithmetic;
@@ -434,7 +519,9 @@ forward_truncate(const std::string& path, size_t current_size,
     std::unordered_set<unsigned int> hosts;
     for(unsigned int chunk_id = chunk_start; chunk_id <= chunk_end;
         ++chunk_id) {
-        hosts.insert(CTX->distributor()->locate_data(path, chunk_id));
+        for(auto copy = 0; copy < (num_copies + 1); ++copy) {
+            hosts.insert(CTX->distributor()->locate_data(path, chunk_id, copy));
+        }
     }
 
     std::vector<hermes::rpc_handle<gkfs::rpc::trunc_data>> handles;
@@ -450,20 +537,23 @@ forward_truncate(const std::string& path, size_t current_size,
 
             gkfs::rpc::trunc_data::input in(path, new_size);
 
-            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that
-            // we can retry for RPC_TRIES (see old commits with margo)
-            // TODO(amiranda): hermes will eventually provide a post(endpoint)
-            // returning one result and a broadcast(endpoint_set) returning a
-            // result_set. When that happens we can remove the .at(0) :/
+            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so
+            // that we can retry for RPC_TRIES (see old commits with margo)
+            // TODO(amiranda): hermes will eventually provide a
+            // post(endpoint) returning one result and a
+            // broadcast(endpoint_set) returning a result_set. When that
+            // happens we can remove the .at(0) :/
             handles.emplace_back(
                     ld_network_service->post<gkfs::rpc::trunc_data>(endp, in));
 
         } catch(const std::exception& ex) {
-            // TODO(amiranda): we should cancel all previously posted requests
-            // here, unfortunately, Hermes does not support it yet :/
+            // TODO(amiranda): we should cancel all previously posted
+            // requests here, unfortunately, Hermes does not support it yet
+            // :/
             LOG(ERROR, "Failed to send request to host: {}", host);
             err = EIO;
-            break; // We need to gather all responses so we can't return here
+            break; // We need to gather all responses so we can't return
+                   // here
         }
     }
 
@@ -503,20 +593,23 @@ forward_get_chunk_stat() {
 
             gkfs::rpc::chunk_stat::input in(0);
 
-            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that
-            // we can retry for RPC_TRIES (see old commits with margo)
-            // TODO(amiranda): hermes will eventually provide a post(endpoint)
-            // returning one result and a broadcast(endpoint_set) returning a
-            // result_set. When that happens we can remove the .at(0) :/
+            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so
+            // that we can retry for RPC_TRIES (see old commits with margo)
+            // TODO(amiranda): hermes will eventually provide a
+            // post(endpoint) returning one result and a
+            // broadcast(endpoint_set) returning a result_set. When that
+            // happens we can remove the .at(0) :/
             handles.emplace_back(
                     ld_network_service->post<gkfs::rpc::chunk_stat>(endp, in));
 
         } catch(const std::exception& ex) {
-            // TODO(amiranda): we should cancel all previously posted requests
-            // here, unfortunately, Hermes does not support it yet :/
+            // TODO(amiranda): we should cancel all previously posted
+            // requests here, unfortunately, Hermes does not support it yet
+            // :/
             LOG(ERROR, "Failed to send request to host: {}", endp.to_string());
             err = EBUSY;
-            break; // We need to gather all responses so we can't return here
+            break; // We need to gather all responses so we can't return
+                   // here
         }
     }
 
@@ -547,9 +640,11 @@ forward_get_chunk_stat() {
             chunk_free += out.chunk_free();
         } catch(const std::exception& ex) {
             LOG(ERROR, "Failed to get RPC output from host: {}", i);
-            err = EBUSY;
+            // Avoid setting err if a server fails.
+            // err = EBUSY;
         }
     }
+
     if(err)
         return make_pair(err, ChunkStat{});
     else
