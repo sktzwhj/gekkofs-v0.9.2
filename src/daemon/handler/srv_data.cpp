@@ -244,8 +244,6 @@ rpc_srv_write(hg_handle_t handle) {
             GKFS_DATA->stats()->add_write(in.path, chnk_id_file);
         }
 
-        GKFS_DATA->spdlogger()->error("{}() Processing at host {} -> {}",
-                                      __func__, host_id, chnk_id_file);
         chnk_ids_host[chnk_id_curr] =
                 chnk_id_file; // save this id to host chunk list
         // offset case. Only relevant in the first iteration of the loop and if
