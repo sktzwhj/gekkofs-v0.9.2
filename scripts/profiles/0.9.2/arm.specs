@@ -50,7 +50,7 @@ clonedeps=(
     ["libfabric"]="HEAD@v1.13.2"
     ["mercury"]="v2.1.0"
     ["margo"]="v0.9.6"
-    ["syscall_intercept"]="fb73c3924b502e2840a5dc8a18746e395b06a8a6"
+    ["syscall_intercept"]="68e6f804a21788738202faab693701720fecdd0b@arm"
     ["date"]="e7e1482087f58913b80a20b04d5c58d9d6d90155"
 )
 

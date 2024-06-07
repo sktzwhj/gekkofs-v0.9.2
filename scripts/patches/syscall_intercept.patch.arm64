@@ -1,30 +1,3 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 13fcdb9..11b621a 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -220,14 +220,14 @@ install(TARGETS syscall_intercept_shared
- 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
- 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
- 
--if (NOT SUBMOUDLE_BUILD)
--	install(TARGETS syscall_intercept_static
--		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
--		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
--	install(PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
--	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libsyscall_intercept.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
--	add_subdirectory(doc)
--endif()
-+# if (NOT SUBMOUDLE_BUILD)
-+# 	install(TARGETS syscall_intercept_static
-+# 		LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-+# 		ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-+# 	install(PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-+# 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libsyscall_intercept.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-+# 	add_subdirectory(doc)
-+# endif()
- 
- configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
- 	"${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
 diff --git a/arch/aarch64/include/libsyscall_intercept_hook_point.h b/arch/aarch64/include/libsyscall_intercept_hook_point.h
 index 2fe7d57..46f7eff 100644
 --- a/arch/aarch64/include/libsyscall_intercept_hook_point.h
@@ -54,18 +27,21 @@ index 2fe7d57..46f7eff 100644
  /*
   * syscall_no_intercept - syscall without interception
 diff --git a/arch/aarch64/src/intercept.c b/arch/aarch64/src/intercept.c
-index a15aa97..72e4b7a 100644
+index a15aa97..9b9d27a 100644
 --- a/arch/aarch64/src/intercept.c
 +++ b/arch/aarch64/src/intercept.c
-@@ -68,11 +68,24 @@ int (*intercept_hook_point)(long syscall_number,
+@@ -66,12 +66,26 @@ int (*intercept_hook_point)(long syscall_number,
+ 			long arg2, long arg3,
+ 			long arg4, long arg5,
  			long *result)
- 	__attribute__((visibility("default")));
- 
+-	__attribute__((visibility("default")));
+-
 -void (*intercept_hook_point_clone_child)(void)
 -	__attribute__((visibility("default")));
 -void (*intercept_hook_point_clone_parent)(long)
 -	__attribute__((visibility("default")));
--
++__attribute__((visibility("default")));
++
 +void (*intercept_hook_point_clone_child)(
 +		unsigned long flags, void *child_stack,
 +		int *ptid, int *ctid,
@@ -84,10 +60,10 @@ index a15aa97..72e4b7a 100644
 +		long arg4, long arg5,
 +		long result)
 +__attribute__((visibility("default")));
+ 
  bool debug_dumps_on;
  
- void
-@@ -630,7 +643,15 @@ intercept_routine(struct context *context)
+@@ -630,18 +644,27 @@ intercept_routine(struct context *context)
  
  	if (handle_magic_syscalls(&desc, &result) == 0)
  		return (struct wrapper_ret){.x0 = result, .x1 = 1 };
@@ -102,9 +78,30 @@ index a15aa97..72e4b7a 100644
 +				desc.args[5],
 +				result);
  	intercept_log_syscall(patch, &desc, UNKNOWN, 0);
+-
+-	if (intercept_hook_point != NULL)
++	if (intercept_hook_point != NULL) {
+ 		forward_to_kernel = intercept_hook_point(desc.nr,
+-		    desc.args[0],
+-		    desc.args[1],
+-		    desc.args[2],
+-		    desc.args[3],
+-		    desc.args[4],
+-		    desc.args[5],
+-		    &result);
++		desc.args[0],
++		desc.args[1],
++		desc.args[2],
++		desc.args[3],
++		desc.args[4],
++		desc.args[5],
++		&result);
++	}
++
  
- 	if (intercept_hook_point != NULL)
-@@ -693,12 +714,25 @@ intercept_routine(struct context *context)
+ #ifdef SYS_vfork
+ 	if (desc.nr == SYS_vfork) {
+@@ -693,12 +716,25 @@ intercept_routine(struct context *context)
  struct wrapper_ret
  intercept_routine_post_clone(struct context *context)
  {
@@ -132,27 +129,3 @@ index a15aa97..72e4b7a 100644
  	}
  
  	return (struct wrapper_ret){.x0 = context->x0, .x1 = 1 };
-diff --git a/arch/aarch64/src/intercept.h b/arch/aarch64/src/intercept.h
-index be593a5..7408f10 100644
---- a/arch/aarch64/src/intercept.h
-+++ b/arch/aarch64/src/intercept.h
-@@ -202,6 +202,6 @@ bool is_overwritable_nop(const struct intercept_disasm_result *ins);
- 
- unsigned char *create_jump(unsigned char *from, void *to);
- 
--const char *cmdline;
-+extern const char *cmdline;
- extern size_t page_size;
- #endif
-diff --git a/src/intercept.h b/src/intercept.h
-index 3c40795..d04629c 100644
---- a/src/intercept.h
-+++ b/src/intercept.h
-@@ -229,6 +229,6 @@ bool is_overwritable_nop(const struct intercept_disasm_result *ins);
- 
- void create_jump(unsigned char opcode, unsigned char *from, void *to);
- 
--const char *cmdline;
-+extern const char *cmdline;
- 
- #endif
