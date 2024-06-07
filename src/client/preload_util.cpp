@@ -111,6 +111,8 @@ extract_protocol(const string& uri) {
         protocol = gkfs::rpc::protocol::ofi_psm2;
     } else if(uri.find(gkfs::rpc::protocol::ofi_verbs) != string::npos) {
         protocol = gkfs::rpc::protocol::ofi_verbs;
+    } else if(uri.find(gkfs::rpc::protocol::ofi_verbs) != string::npos) {
+    	protocol = gkfs::rpc::protocol::na_ucx;
     }
     // check for shared memory protocol. Can be plain shared memory or real ofi
     // protocol + auto_sm

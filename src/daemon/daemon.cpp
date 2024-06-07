@@ -498,7 +498,8 @@ parse_input(const cli_options& opts, const CLI::App& desc) {
         rpc_protocol = opts.rpc_protocol;
         if(rpc_protocol != gkfs::rpc::protocol::ofi_verbs &&
            rpc_protocol != gkfs::rpc::protocol::ofi_sockets &&
-           rpc_protocol != gkfs::rpc::protocol::ofi_psm2) {
+           rpc_protocol != gkfs::rpc::protocol::ofi_psm2 &&
+	   rpc_protocol != gkfs::rpc::protocol::na_ucx) {
             throw runtime_error(fmt::format(
                     "Given RPC protocol '{}' not supported. Check --help for supported protocols.",
                     rpc_protocol));

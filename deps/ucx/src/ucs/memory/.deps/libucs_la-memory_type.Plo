@@ -1,0 +1,15 @@
+memory/libucs_la-memory_type.lo: memory/memory_type.c \
+ /usr/include/stdc-predef.h /home/whj/gekkofs/gekkofs/deps/ucx/config.h \
+ memory/memory_type.h \
+ /home/whj/gekkofs/gekkofs/deps/ucx/src/ucs/sys/compiler_def.h \
+ /usr/lib/gcc/aarch64-linux-gnu/8/include/stddef.h
+
+/usr/include/stdc-predef.h:
+
+/home/whj/gekkofs/gekkofs/deps/ucx/config.h:
+
+memory/memory_type.h:
+
+/home/whj/gekkofs/gekkofs/deps/ucx/src/ucs/sys/compiler_def.h:
+
+/usr/lib/gcc/aarch64-linux-gnu/8/include/stddef.h:

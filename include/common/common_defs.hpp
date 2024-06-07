@@ -63,6 +63,7 @@ constexpr auto ofi_sockets = "ofi+sockets";
 constexpr auto ofi_tcp = "ofi+tcp";
 constexpr auto ofi_verbs = "ofi+verbs";
 constexpr auto na_sm = "na+sm";
+constexpr auto na_ucx = "ucx+all";
 } // namespace protocol
 } // namespace gkfs::rpc
 

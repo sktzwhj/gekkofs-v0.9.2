@@ -1,0 +1,9 @@
+type/libucs_la-thread_mode.lo: type/thread_mode.c \
+ /usr/include/stdc-predef.h /home/whj/gekkofs/gekkofs/deps/ucx/config.h \
+ type/thread_mode.h
+
+/usr/include/stdc-predef.h:
+
+/home/whj/gekkofs/gekkofs/deps/ucx/config.h:
+
+type/thread_mode.h:
