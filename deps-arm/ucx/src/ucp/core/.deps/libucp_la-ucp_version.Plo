@@ -1,0 +1,4 @@
+core/libucp_la-ucp_version.lo: core/ucp_version.c \
+ /usr/include/stdc-predef.h
+
+/usr/include/stdc-predef.h:

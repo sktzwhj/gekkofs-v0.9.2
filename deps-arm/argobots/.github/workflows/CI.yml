@@ -1,0 +1,55 @@
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  whitespace:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: cleanup
+      run: |
+        maint/code-cleanup.sh --all --recursive
+        git --no-pager diff
+        if [ x"$(git --no-pager diff)" != x ]; then
+           exit 1
+        fi
+
+  build-basic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CFLAGS: "-std=gnu90 -Werror -Wextra"
+    steps:
+    - uses: actions/checkout@v2
+    - name: autogen
+      run: |
+        ./autogen.sh
+    - name: configure
+      run: |
+        ./configure
+    - name: make
+      run: |
+        make -j 2
+        cd test
+        make -j 2
+        cd ../examples
+        make -j 2
+        cd ../
+    - name: run_test
+      run: |
+        cd test
+        make check -j 2
+        cd ../
+    - name: run_examples
+      run: |
+        cd examples
+        make check -j 2
+        cd ../

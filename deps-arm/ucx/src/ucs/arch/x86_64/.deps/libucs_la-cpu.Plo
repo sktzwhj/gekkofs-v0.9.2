@@ -1,0 +1,4 @@
+arch/x86_64/libucs_la-cpu.lo: arch/x86_64/cpu.c \
+ /usr/include/stdc-predef.h
+
+/usr/include/stdc-predef.h:

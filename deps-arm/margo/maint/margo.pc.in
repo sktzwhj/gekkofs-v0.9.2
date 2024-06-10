@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: margo
+Description: Argobots bindings for Mercury RPC library
+Version: @PACKAGE_VERSION@
+URL: https://xgitlab.cels.anl.gov/sds/margo
+Requires: @PC_REQUIRES@
+Libs: -L${libdir} -lmargo
+Cflags: -I${includedir}

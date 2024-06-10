@@ -1,0 +1,6 @@
+bistro/libucm_la-bistro_ppc64.lo: bistro/bistro_ppc64.c \
+ /usr/include/stdc-predef.h ../../config.h
+
+/usr/include/stdc-predef.h:
+
+../../config.h:
