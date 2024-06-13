@@ -38,6 +38,8 @@ using chnk_id_t = unsigned long;
 namespace tag {
 
 constexpr auto fs_config = "rpc_srv_fs_config";
+constexpr auto registry_request = "rpc_srv_registry_request";
+constexpr auto registry_register = "rpc_srv_registry_register";
 constexpr auto create = "rpc_srv_mk_node";
 constexpr auto stat = "rpc_srv_stat";
 constexpr auto remove_metadata = "rpc_srv_rm_metadata";

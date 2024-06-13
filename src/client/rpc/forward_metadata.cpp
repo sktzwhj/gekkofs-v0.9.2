@@ -47,6 +47,20 @@ namespace gkfs::rpc {
  * NOTE: No errno is defined here!
  */
 
+/* --Multiple GekkoFS--
+*  Struct for foward_stat to determine fsId
+*/
+struct forward_stat_fs_args{
+    int fsId;
+    int hostsize_single;
+    int prefix_num;
+    int result;
+    int copy;
+    string err;
+    string path;
+    string attr;
+};
+
 /**
  * Send an RPC for a create request
  * @param path
@@ -78,6 +92,39 @@ forward_create(const std::string& path, const mode_t mode, const int copy) {
         return EBUSY;
     }
 }
+/**
+ * --Multiple GekkoFS--
+ * Thread function to make forward_stat request
+ */
+void *
+forward_getSuccessResponseThread(void* data){
+    struct forward_stat_fs_args *statfs_args;
+    statfs_args = (struct forward_stat_fs_args *) data;
+
+    int prefix_num = statfs_args->prefix_num;
+    int hostsize_single = statfs_args->hostsize_single;
+    int copy = statfs_args->copy;
+    
+    int hostid = prefix_num + (CTX->distributor()->locate(statfs_args->path, hostsize_single, copy));
+    auto endp = CTX->hosts().at(hostid);
+  
+    try {
+            //cout<<"--forward_getResponseThread() -Sending RPC--"<<endl;
+            auto out = ld_network_service->post<gkfs::rpc::stat>(endp, statfs_args->path)
+                            .get()
+                            .at(0);
+            LOG(DEBUG, "Got response success: {}", out.err());
+            if(!out.err()){
+                statfs_args->attr = out.db_val();
+            }
+            statfs_args->result = out.err();
+        } catch(const std::exception& ex) {
+            LOG(ERROR, "while getting rpc output");
+            statfs_args->err = EBUSY;
+        }
+   pthread_exit(NULL);
+
+}
 
 /**
  * Send an RPC for a stat request
@@ -88,31 +135,85 @@ forward_create(const std::string& path, const mode_t mode, const int copy) {
  */
 int
 forward_stat(const std::string& path, string& attr, const int copy) {
+    /* --Multiple GekkoFS--*/
+    auto hostsconfig_array = CTX->hostsconfig(); //Vector: Number of host(Daemon) of all Single GekkoFS
+    auto priority_array = CTX->fspriority(); // Vector: FsPriorityV of all Single GekkoFS
+    int total_fs_num = hostsconfig_array.size(); // Number of all Single GekkoFS
+    LOG(DEBUG, "{}(), path: {}", __func__, path);
+    if(total_fs_num > 1){ 
+        std::vector<int> prefix_num_array;
+        for(int i = 0; i < total_fs_num; i++){
+            if(i > 0){
+                prefix_num_array.push_back(prefix_num_array[i-1]+hostsconfig_array[i-1]);
+            }else{
+                prefix_num_array.push_back(0);
+            }
+        }
 
-    auto endp = CTX->hosts().at(
-            CTX->distributor()->locate_file_metadata(path, copy));
+        pthread_t threads[total_fs_num];
+        forward_stat_fs_args statfs_args[total_fs_num];
+        vector<pair<unsigned int, string>> founds;
 
-    try {
-        LOG(DEBUG, "Sending RPC ...");
-        // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that we
-        // can retry for RPC_TRIES (see old commits with margo)
-        // TODO(amiranda): hermes will eventually provide a post(endpoint)
-        // returning one result and a broadcast(endpoint_set) returning a
-        // result_set. When that happens we can remove the .at(0) :/
-        auto out = ld_network_service->post<gkfs::rpc::stat>(endp, path)
-                           .get()
-                           .at(0);
-        LOG(DEBUG, "Got response success: {}", out.err());
+        for(int i = 0; i < total_fs_num; i++){
+            statfs_args[i].fsId = i;
+            statfs_args[i].hostsize_single = hostsconfig_array[i];
+            statfs_args[i].prefix_num = prefix_num_array[i];
+            statfs_args[i].path = path;
+            statfs_args[i].attr = attr;
+            statfs_args[i].copy = copy;
+            pthread_create(&threads[i], NULL, forward_getSuccessResponseThread, &statfs_args[i]);
+        }
+        int failedCount=0;
+        for(int i = 0; i < total_fs_num; i++){
+            if (pthread_join(threads[i], NULL) != 0) {
+                LOG(ERROR, "Error joining thread to GekkoFS ID: '{}'", i);
+            }
+            if(!statfs_args[i].result) {
+                founds.push_back({i,statfs_args[i].attr});
+                CTX->pathfs()[path] = i;
+                attr = statfs_args[i].attr;
+            } else {
+                failedCount++;
+                if(failedCount == total_fs_num){
+                    return statfs_args[i].result;
+                }
+            }
+        }
+        // data consistency based on fspriority
+        for(auto find : founds) {
+            auto fsid = CTX->pathfs()[path];
+            if(priority_array[find.first] < priority_array[fsid]){
+                CTX->pathfs()[path] = find.first;
+                attr = find.second;
+            }
+        }
+    /* --Multiple GekkoFS--*/
+    } else {
+        auto endp = CTX->hosts().at(
+                CTX->distributor()->locate_file_metadata(path, copy));
 
-        if(out.err())
-            return out.err();
+        try {
+            LOG(DEBUG, "Sending RPC ...");
+            // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so that we
+            // can retry for RPC_TRIES (see old commits with margo)
+            // TODO(amiranda): hermes will eventually provide a post(endpoint)
+            // returning one result and a broadcast(endpoint_set) returning a
+            // result_set. When that happens we can remove the .at(0) :/
+            auto out = ld_network_service->post<gkfs::rpc::stat>(endp, path)
+                            .get()
+                            .at(0);
+            LOG(DEBUG, "Got response success: {}", out.err());
 
-        attr = out.db_val();
-    } catch(const std::exception& ex) {
-        LOG(ERROR, "while getting rpc output");
-        return EBUSY;
+            if(out.err())
+                return out.err();
+
+            attr = out.db_val();
+        } catch(const std::exception& ex) {
+            LOG(ERROR, "while getting rpc output");
+            return EBUSY;
+        }
+        return 0;
     }
-    return 0;
 }
 
 /**
@@ -680,6 +781,8 @@ forward_get_dirents(const string& path) {
 
     auto send_error = err != 0;
     auto open_dir = make_shared<gkfs::filemap::OpenDir>(path);
+    /*--Multiple GekkoFS--*/
+    std::set<std::pair<std::string, gkfs::filemap::FileType>>dir_record; //only used for / to solve metadata consistency
     // wait for RPC responses
     for(std::size_t i = 0; i < handles.size(); ++i) {
 
@@ -739,7 +842,10 @@ forward_get_dirents(const string& path) {
             auto name = std::string(names_ptr);
             // number of characters in entry + \0 terminator
             names_ptr += name.size() + 1;
-
+            if(path == "/"){ //only for / to avoid repetition
+                if(dir_record.count({name,ftype})) continue;
+                dir_record.insert({name,ftype});
+            }
             open_dir->add(name, ftype);
         }
     }

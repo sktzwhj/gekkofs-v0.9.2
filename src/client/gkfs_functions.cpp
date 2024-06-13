@@ -90,6 +90,27 @@ struct dirent_extended {
 namespace {
 
 /**
+ * --Multiple GekkoFS--
+ * Clear cache rudely
+ */
+static void clear_all_pathfs(){
+    if(CTX->pathfs().size() > 8192){
+        CTX->pathfs().clear();
+    }
+}
+
+/**
+ * --Multiple GekkoFS--
+ * Cache fs id where path exists through get_metadata(path)
+ * @param path
+ */
+static void add_one_pathfs(std::string path){
+    if(CTX->hostsconfig().size() > 1 && !CTX->pathfs().count(path)){
+        gkfs::utils::get_metadata(path);
+    }
+}
+
+/**
  * Checks if metadata for parent directory exists (can be disabled with
  * GKFS_CREATE_CHECK_PARENTS). errno may be set
  * @param path
@@ -180,6 +201,7 @@ gkfs_open(const std::string& path, mode_t mode, int flags) {
                 return -1;
             }
         } else {
+            clear_all_pathfs();
             // file was successfully created. Add to filemap
             return CTX->file_map()->add(
                     std::make_shared<gkfs::filemap::OpenFile>(path, flags));
@@ -239,7 +261,7 @@ gkfs_open(const std::string& path, mode_t mode, int flags) {
                     return -1;
                 }
             }
-
+            clear_all_pathfs();
             return CTX->file_map()->add(
                     std::make_shared<gkfs::filemap::OpenFile>(new_path, flags));
         }
@@ -259,7 +281,7 @@ gkfs_open(const std::string& path, mode_t mode, int flags) {
             return -1;
         }
     }
-
+    clear_all_pathfs();
     return CTX->file_map()->add(
             std::make_shared<gkfs::filemap::OpenFile>(path, flags));
 }
@@ -300,6 +322,7 @@ gkfs_create(const std::string& path, mode_t mode) {
     }
     // Write to all replicas, at least one need to success
     bool success = false;
+    add_one_pathfs(path);
     for(auto copy = 0; copy < CTX->get_replicas() + 1; copy++) {
         auto err = gkfs::rpc::forward_create(path, mode, copy);
         if(err) {
@@ -312,7 +335,7 @@ gkfs_create(const std::string& path, mode_t mode) {
     if(!success) {
         return -1;
     }
-
+    clear_all_pathfs();
     return 0;
 }
 
@@ -365,6 +388,7 @@ gkfs_remove(const std::string& path) {
         errno = err;
         return -1;
     }
+    clear_all_pathfs();
     return 0;
 }
 
@@ -405,6 +429,7 @@ gkfs_access(const std::string& path, const int mask, bool follow_links) {
     }
 #endif // HAS_RENAME
 #endif // HAS_SYMLINKS
+    clear_all_pathfs();
     return 0;
 }
 
@@ -464,8 +489,10 @@ gkfs_rename(const string& old_path, const string& new_path) {
                 errno = err;
                 return -1;
             }
+            clear_all_pathfs();
             return 0;
         }
+        clear_all_pathfs();
         return -1;
     }
 
@@ -510,6 +537,7 @@ gkfs_stat(const string& path, struct stat* buf, bool follow_links) {
 #endif
 #endif
     gkfs::utils::metadata_to_stat(path, *md, *buf);
+    clear_all_pathfs();
     return 0;
 }
 
@@ -575,7 +603,7 @@ gkfs_statx(int dirfs, const std::string& path, int flags, unsigned int mask,
     buf->stx_ctime.tv_nsec = tmp.st_ctim.tv_nsec;
 
     buf->stx_btime = buf->stx_atime;
-
+    clear_all_pathfs();
     return 0;
 }
 
@@ -685,6 +713,7 @@ gkfs_lseek(shared_ptr<gkfs::filemap::OpenFile> gkfs_fd, off_t offset,
             gkfs_fd->pos(gkfs_fd->pos() + offset);
             break;
         case SEEK_END: {
+            add_one_pathfs(gkfs_fd->path());
             // TODO: handle replicas
             auto ret =
                     gkfs::rpc::forward_get_metadentry_size(gkfs_fd->path(), 0);
@@ -717,6 +746,7 @@ gkfs_lseek(shared_ptr<gkfs::filemap::OpenFile> gkfs_fd, off_t offset,
             errno = EINVAL;
             return -1;
     }
+    clear_all_pathfs();
     return gkfs_fd->pos();
 }
 
@@ -752,6 +782,7 @@ gkfs_truncate(const std::string& path, off_t old_size, off_t new_size) {
         errno = err;
         return -1;
     }
+    clear_all_pathfs();
     return 0;
 }
 
@@ -882,7 +913,7 @@ gkfs_pwrite(std::shared_ptr<gkfs::filemap::OpenFile> file, const char* buf,
     auto is_append = file->get_flag(gkfs::filemap::OpenFile_flags::append);
     auto write_size = 0;
     auto num_replicas = CTX->get_replicas();
-
+    add_one_pathfs(*path);
     auto ret_offset = gkfs::rpc::forward_update_metadentry_size(
             *path, count, offset, is_append, num_replicas);
     auto err = ret_offset.first;
@@ -936,6 +967,7 @@ gkfs_pwrite(std::shared_ptr<gkfs::filemap::OpenFile> file, const char* buf,
             "gkfs::rpc::forward_write() wrote '{}' bytes instead of '{}'",
             write_size, count);
     }
+    clear_all_pathfs();
     return write_size; // return written size
 }
 
@@ -1058,6 +1090,7 @@ gkfs_pread(std::shared_ptr<gkfs::filemap::OpenFile> file, char* buf,
     }
     std::pair<int, off_t> ret;
     std::set<int8_t> failed; // set with failed targets.
+    add_one_pathfs(file->path());
     if(CTX->get_replicas() != 0) {
 
         ret = gkfs::rpc::forward_read(file->path(), buf, offset, count,
@@ -1080,6 +1113,7 @@ gkfs_pread(std::shared_ptr<gkfs::filemap::OpenFile> file, char* buf,
         errno = err;
         return -1;
     }
+    clear_all_pathfs();
     // XXX check that we don't try to read past end of the file
     return ret.second; // return read size
 }
@@ -1207,6 +1241,7 @@ gkfs_opendir(const std::string& path) {
         return -1;
     }
     assert(ret.second);
+    clear_all_pathfs();
     return CTX->file_map()->add(ret.second);
 }
 
@@ -1246,6 +1281,7 @@ gkfs_rmdir(const std::string& path) {
         errno = err;
         return -1;
     }
+    clear_all_pathfs();
     return 0;
 }
 
@@ -1441,6 +1477,7 @@ gkfs_mk_symlink(const std::string& path, const std::string& target_path) {
         errno = err;
         return -1;
     }
+    clear_all_pathfs();
     return 0;
 }
 
@@ -1477,6 +1514,7 @@ gkfs_readlink(const std::string& path, char* buf, int bufsize) {
 
     CTX->mountdir().copy(buf, CTX->mountdir().size());
     std::strcpy(buf + CTX->mountdir().size(), md->target_path().c_str());
+    clear_all_pathfs();
     return path_size;
 }
 #endif
@@ -1491,7 +1529,7 @@ gkfs_readlink(const std::string& path, char* buf, int bufsize) {
 extern "C" int
 gkfs_getsingleserverdir(const char* path, struct dirent_extended* dirp,
                         unsigned int count, int server) {
-
+    add_one_pathfs(path);                        
     auto ret = gkfs::rpc::forward_get_dirents_single(path, server);
     auto err = ret.first;
     if(err) {
@@ -1536,5 +1574,6 @@ gkfs_getsingleserverdir(const char* path, struct dirent_extended* dirp,
         errno = EINVAL;
         return -1;
     }
+    clear_all_pathfs();
     return written;
 }

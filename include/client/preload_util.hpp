@@ -89,6 +89,26 @@ read_hosts_file();
 void
 connect_to_hosts(const std::vector<std::pair<std::string, std::string>>& hosts);
 
+/* --Multiple GekkoFS-- */
+
+std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
+read_hosts_config_file();
+
+std::string
+read_registry_file();
+
+void read_env(std::string &workflow,std::string &hostfile,
+              std::string &hostconfigfile);
+
+bool
+CheckMerge(std::string &workflows,std::string &hostfile,
+           std::string &hostconfigfile);
+
+void
+connect_to_registry(const std::string addr);
+
+/* --Multiple GekkoFS-- */
+
 } // namespace gkfs::utils
 
 #endif // GEKKOFS_PRELOAD_UTIL_HPP

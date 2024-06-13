@@ -167,7 +167,15 @@ forward_write(const string& path, const void* buf, const off64_t offset,
         }
 
         auto endp = CTX->hosts().at(target);
-
+        /* --Multiple GekkoFS--*/
+        // Client HostID global view -> target
+        // Daemon HostID local  view -> target - prefix
+        unsigned int prefix = 0;
+        for(unsigned int FSID = 0; FSID < CTX->distributor()->locate_fs(path); FSID ++){
+            prefix += CTX->hostsconfig().at(FSID);
+        }
+        prefix = prefix > target? target:prefix;
+        /* --Multiple GekkoFS--*/
         try {
             LOG(DEBUG, "Sending RPC ...");
 
@@ -175,8 +183,11 @@ forward_write(const string& path, const void* buf, const off64_t offset,
                     path,
                     // first offset in targets is the chunk with
                     // a potential offset
-                    block_overrun(offset, gkfs::config::rpc::chunksize), target,
-                    CTX->hosts().size(),
+                    block_overrun(offset, gkfs::config::rpc::chunksize),
+                    /* --Multiple GekkoFS--*/
+                    target - prefix,
+                    CTX->hostsconfig().at(CTX->distributor()->locate_fs(path)), 
+                    /* --Multiple GekkoFS--*/
                     // number of chunks handled by that destination
                     gkfs::rpc::compress_bitset(write_ops_vect[target]),
                     target_chnks[target].size(),
@@ -399,7 +410,15 @@ forward_read(const string& path, void* buf, const off64_t offset,
         }
 
         auto endp = CTX->hosts().at(target);
-
+        /* --Multiple GekkoFS--*/
+        // Client HostID global view -> target
+        // Daemon HostID local  view -> target - prefix
+        unsigned int prefix = 0;
+        for(unsigned int FSID = 0; FSID < CTX->distributor()->locate_fs(path); FSID ++){
+            prefix += CTX->hostsconfig().at(FSID);
+        }
+        prefix = prefix > target? target:prefix;
+        /* --Multiple GekkoFS--*/
         try {
 
             LOG(DEBUG, "Sending RPC ...");
@@ -408,8 +427,11 @@ forward_read(const string& path, void* buf, const off64_t offset,
                     path,
                     // first offset in targets is the chunk with
                     // a potential offset
-                    block_overrun(offset, gkfs::config::rpc::chunksize), target,
-                    CTX->hosts().size(),
+                    block_overrun(offset, gkfs::config::rpc::chunksize), 
+                    /* --Multiple GekkoFS--*/
+                    target - prefix,
+                    CTX->hostsconfig().at(CTX->distributor()->locate_fs(path)),
+                    /* --Multiple GekkoFS--*/
                     gkfs::rpc::compress_bitset(read_bitset_vect[target]),
                     // number of chunks handled by that destination
                     target_chnks[target].size(),

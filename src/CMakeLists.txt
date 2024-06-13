@@ -32,4 +32,6 @@ add_subdirectory(common)
 add_subdirectory(daemon)
 # Client library
 add_subdirectory(client)
+# Registry
+add_subdirectory(registry)
 

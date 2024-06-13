@@ -92,6 +92,14 @@ private:
     std::vector<std::string> mountdir_components_;
     std::string mountdir_;
 
+    /* --Multiple GekkoFS-- */
+    hermes::endpoint registry_; // Registry endp
+    std::vector<unsigned int> hostsconfig_; // Host(Daemon) size of Each GekkoFS
+    std::vector<unsigned int> fspriority_;  // FsPriority of Each GekkoFS -- used for data consistency
+    std::map<std::string, unsigned int> pathfs_; // Cache of GekkoFS id where path exists
+    uint64_t local_fs_id_; // Id of GekkoFS having local host(daemon)
+    /* --Multiple GekkoFS-- */
+
     std::vector<hermes::endpoint> hosts_;
     uint64_t local_host_id_;
     uint64_t fwd_host_id_;
@@ -142,6 +150,37 @@ public:
 
     void
     hosts(const std::vector<hermes::endpoint>& addrs);
+
+    /* --Multiple GekkoFS-- */
+    
+    const hermes::endpoint
+    registry() const;
+
+    void
+    registry(const hermes::endpoint &registry);
+
+    const std::vector<unsigned int>&
+    hostsconfig() const;
+
+    void
+    hostsconfig(const std::vector<unsigned int>& hostsconfig);
+
+    const std::vector<unsigned int>&
+    fspriority() const;
+
+    void
+    fspriority(const std::vector<unsigned int>& hostsconfig);
+
+
+    std::map<std::string, unsigned int>&
+    pathfs() ; 
+
+    uint64_t
+    local_fs_id() const;
+
+    void
+    local_fs_id(uint64_t id);
+    /* --Multiple GekkoFS-- */
 
     void
     clear_hosts();

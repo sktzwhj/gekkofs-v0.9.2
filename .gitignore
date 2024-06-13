@@ -91,6 +91,7 @@ playground
 test/build/
 build/
 builds/
+external/
 .run/
 
 # Allow users to provide their own CMake presets

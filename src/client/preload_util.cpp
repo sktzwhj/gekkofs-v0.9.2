@@ -175,9 +175,11 @@ load_hostfile(const std::string& path) {
         throw runtime_error(
                 "Hosts file found but no suitable addresses could be extracted");
     }
-    extract_protocol(hosts[0].second);
+    /* --Multiple GekkoFS-- 
+    *  Protocol is extracted in Registry Connection */
+    //extract_protocol(hosts[0].second);
     // sort hosts so that data always hashes to the same place during restart
-    std::sort(hosts.begin(), hosts.end());
+    //std::sort(hosts.begin(), hosts.end());
     // remove rootdir suffix from host after sorting as no longer required
     for(auto& h : hosts) {
         auto idx = h.first.rfind("#");
@@ -363,6 +365,111 @@ load_forwarding_map() {
 }
 #endif
 
+/**
+ * --Mulitple GekkoFS--
+ * Read environment variables
+ * @param workflow 
+ * @param hostfile 
+ * @param hostconfigfile
+ */
+void read_env(string &workflow,string &hostfile,string &hostconfigfile){
+    hostfile = gkfs::env::get_var(gkfs::env::HOSTS_FILE,
+                                  gkfs::config::hostfile_path);  
+    hostconfigfile = gkfs::env::get_var(gkfs::env::HOSTS_CONFIG_FILE,
+                                  gkfs::config::hostfile_config_path);
+    workflow = gkfs::env::get_var(gkfs::env::WORK_FLOW,
+                                  "default_job");//todo default name of work flow
+}
+
+/**
+ * --Mulitple GekkoFS--
+ * Check whether making merge request to Registry
+ * @param mergeflows flows to merge
+ * @param hostfile  hostfile to generate
+ * @param hostconfigfile hostconfigfile to generate
+ * @return bool
+ */
+bool CheckMerge(string &mergeflows,string &hostfile,string &hostconfigfile) {
+
+    auto merge = gkfs::env::get_var(gkfs::env::MERGE,
+                                  gkfs::config::merge_default);
+    hostfile = gkfs::env::get_var(gkfs::env::HOSTS_FILE,
+                                  gkfs::config::hostfile_path);  
+    hostconfigfile = gkfs::env::get_var(gkfs::env::HOSTS_CONFIG_FILE,
+                                  gkfs::config::hostfile_config_path);
+    mergeflows = gkfs::env::get_var(gkfs::env::MERGE_FLOWS,
+                                  "");
+
+    bool hfexist = !access(hostfile.c_str(), F_OK);
+    bool hcexist = !access(hostconfigfile.c_str(), F_OK);
+    std::transform(merge.begin(), merge.end(), merge.begin(), ::tolower);
+    if(merge == "on"){
+        if(hfexist && hcexist) return false;
+        if(!hfexist && !hcexist) {
+            if(!mergeflows.length())
+                throw runtime_error("Trying to merge empty workflows");
+            return true;
+        }else{
+            throw runtime_error("Please make sure hostfile or hostconfigfile not existing before first merge");
+        }
+    }
+    return false;
+}
+
+/**
+ * --Mulitple GekkoFS--
+ * Get Registry Address
+ * Set rpc protocol
+ * @return string
+ */
+string
+read_registry_file() {
+    string registryfile;
+    registryfile = gkfs::env::get_var(gkfs::env::REGISTRY_FILE,
+                                  gkfs::config::registryfile_path);
+    
+    ifstream lf(registryfile);
+    string addr;
+    getline(lf, addr);
+    if(addr.empty()) {
+        throw runtime_error(fmt::format("Registryfile empty: '{}'", registryfile));
+    }
+    extract_protocol(addr);
+    LOG(INFO, "Getting registry addr: {}",addr);
+    return addr;
+}
+
+/**
+ * --Mulitple GekkoFS--
+ * Get HostSize(number of daemon) and FsPriority of Each GekkoFS
+ * @return pair<hostsize_vector, priority_vector>
+ */
+pair<vector<unsigned int>,vector<unsigned int> >
+read_hosts_config_file() {
+    string hostconfigfile;
+    hostconfigfile = gkfs::env::get_var(gkfs::env::HOSTS_CONFIG_FILE,
+                                  gkfs::config::hostfile_config_path);
+    ifstream lf(hostconfigfile);
+    string line;
+    vector<unsigned int> hcfile,fspriority;
+    while (getline(lf, line)){
+        std::istringstream iss(line);
+        unsigned int x,y;
+        if(!(iss >> x >> y)){
+            throw runtime_error(fmt::format("Invalid file format: '{}'", hostconfigfile));
+        }
+        hcfile.push_back(x);
+        fspriority.push_back(y);
+    }
+    
+    if(hcfile.empty()) {
+        throw runtime_error(fmt::format("HostConfigfile empty: '{}'", hostconfigfile));
+    }
+
+    LOG(INFO, "Hosts config pool size: {}", hcfile.size());
+    return {hcfile,fspriority};
+}
+
 vector<pair<string, string>>
 read_hosts_file() {
     string hostfile;
@@ -402,6 +509,14 @@ connect_to_hosts(const vector<pair<string, string>>& hosts) {
     vector<uint64_t> host_ids(hosts.size());
     // populate vector with [0, ..., host_size - 1]
     ::iota(::begin(host_ids), ::end(host_ids), 0);
+    for(const auto& id : host_ids) {
+        const auto& hostname = hosts.at(id).first;
+        if(!local_host_found && hostname == local_hostname) {
+            LOG(DEBUG, "Found local host: {}", hostname);
+            CTX->local_host_id(id);
+            local_host_found = true;
+        }
+    }
     /*
      * Shuffle hosts to balance addr lookups to all hosts
      * Too many concurrent lookups send to same host
@@ -416,15 +531,7 @@ connect_to_hosts(const vector<pair<string, string>>& hosts) {
     for(const auto& id : host_ids) {
         const auto& hostname = hosts.at(id).first;
         const auto& uri = hosts.at(id).second;
-
         addrs[id] = lookup_endpoint(uri);
-
-        if(!local_host_found && hostname == local_hostname) {
-            LOG(DEBUG, "Found local host: {}", hostname);
-            CTX->local_host_id(id);
-            local_host_found = true;
-        }
-
         LOG(DEBUG, "Found peer: {}", addrs[id].to_string());
     }
 
@@ -432,8 +539,28 @@ connect_to_hosts(const vector<pair<string, string>>& hosts) {
         LOG(WARNING, "Failed to find local host. Using host '0' as local host");
         CTX->local_host_id(0);
     }
-
+    int id = CTX->local_host_id();
+    CTX->local_fs_id(0);
+    for(unsigned int fs = 0;fs < CTX->hostsconfig().size(); fs++){
+        id -= CTX->hostsconfig()[fs];
+        if(id < 0) {
+            CTX->local_fs_id(fs);
+            break;
+        }
+    }
     CTX->hosts(addrs);
+}
+
+/**
+ * --Multiple GekkoFS--
+ * Connect to registry --- lookup Mercury URI addresses via Hermes
+ * @param addr Registry Address
+ */
+void
+connect_to_registry(std::string addr) {
+    hermes::endpoint endp = lookup_endpoint(addr);
+    LOG(DEBUG, "Found registry: {}", endp.to_string());
+    CTX->registry(endp);
 }
 
 } // namespace gkfs::utils
