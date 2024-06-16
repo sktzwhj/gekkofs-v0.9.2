@@ -2,7 +2,8 @@
 
 machine=TH
 if [ $machine == "TH" ];then
-	export GKFS_HOME=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614
+	echo "setting GKFS_HOME to ",$(dirname `realpath "${BASH_SOURCE[0]}"`)
+	export GKFS_HOME=$(dirname `realpath "${BASH_SOURCE[0]}"`)
 	MPI_PATH=/thfs3/home/wuhuijun/mpich4/
 	export PATH=${MPI_PATH}/bin:$PATH
 fi	
