@@ -1,0 +1,257 @@
+/* src/include/abt_config.h.in.  Generated from configure.ac by autoheader.  */
+
+
+/* -*- Mode: C; c-basic-offset:4 ; indent-tabs-mode:nil ; -*- */
+/*
+ * See COPYRIGHT in top-level directory.
+ */
+
+#ifndef ABT_CONFIG_H_INCLUDED
+#define ABT_CONFIG_H_INCLUDED
+
+
+/* Define to 1 if we preserve fpu registers */
+#undef ABTD_FCONTEXT_PRESERVE_FPU
+
+/* Define to enable the active wait policy */
+#undef ABT_CONFIG_ACTIVE_WAIT_POLICY
+
+/* Define to disable error check */
+#undef ABT_CONFIG_DISABLE_ERROR_CHECK
+
+/* Define to disable supporting external threads */
+#undef ABT_CONFIG_DISABLE_EXT_THREAD
+
+/* Define to disable ULT migration */
+#undef ABT_CONFIG_DISABLE_MIGRATION
+
+/* Define to disable pool consumer check */
+#undef ABT_CONFIG_DISABLE_POOL_CONSUMER_CHECK
+
+/* Define to disable pool producer check */
+#undef ABT_CONFIG_DISABLE_POOL_PRODUCER_CHECK
+
+/* Define to disable tasklet cancellation */
+#undef ABT_CONFIG_DISABLE_TASK_CANCEL
+
+/* Define to disable ULT cancellation */
+#undef ABT_CONFIG_DISABLE_THREAD_CANCEL
+
+/* Define to use the tool interface */
+#undef ABT_CONFIG_DISABLE_TOOL_INTERFACE
+
+/* Define to use the stack unwinding feature. */
+#undef ABT_CONFIG_ENABLE_STACK_UNWIND
+
+/* Define to enable Argobots 2.0 API */
+#undef ABT_CONFIG_ENABLE_VER_20_API
+
+/* Define to 1 if you have the `alignof' operator. */
+#undef ABT_CONFIG_HAVE_ALIGNOF_C11
+
+/* Define to 1 if you have the `__alignof__' operator. */
+#undef ABT_CONFIG_HAVE_ALIGNOF_GCC
+
+/* Define if __atomic builtins are supported */
+#undef ABT_CONFIG_HAVE_ATOMIC_BUILTIN
+
+/* Define if 128-bit CAS is supported. */
+#undef ABT_CONFIG_HAVE_ATOMIC_INT128
+
+/* Define to enable printing abt_errno upon abt call error */
+#undef ABT_CONFIG_PRINT_ABT_ERRNO
+
+/* Define the size of a stack canary when it is enabled */
+#undef ABT_CONFIG_STACK_CHECK_CANARY_SIZE
+
+/* Define an algorithm of a stack overflow check */
+#undef ABT_CONFIG_STACK_CHECK_TYPE
+
+/* Define to use static cache-line size */
+#undef ABT_CONFIG_STATIC_CACHELINE_SIZE
+
+/* Define the default system huge page size detected at configure time */
+#undef ABT_CONFIG_SYS_HUGE_PAGE_SIZE
+
+/* Define to use the dynamic promotion technique for ULT */
+#undef ABT_CONFIG_THREAD_TYPE
+
+/* Define to allocate objects aligned to the cache line size */
+#undef ABT_CONFIG_USE_ALIGNED_ALLOC
+
+/* Define to use clock_gettime */
+#undef ABT_CONFIG_USE_CLOCK_GETTIME
+
+/* Define to enable debug logging */
+#undef ABT_CONFIG_USE_DEBUG_LOG
+
+/* Define to discard debug log messages */
+#undef ABT_CONFIG_USE_DEBUG_LOG_DISCARD
+
+/* Define to enable printing debug log messages */
+#undef ABT_CONFIG_USE_DEBUG_LOG_PRINT
+
+/* Define to use fcontext */
+#undef ABT_CONFIG_USE_FCONTEXT
+
+/* Define to use gettimeofday */
+#undef ABT_CONFIG_USE_GETTIMEOFDAY
+
+/* Define if huge page is usable. */
+#undef ABT_CONFIG_USE_HUGE_PAGE_DEFAULT
+
+/* Define to use Linux-type futex */
+#undef ABT_CONFIG_USE_LINUX_FUTEX
+
+/* Define to use mach_absolute_time */
+#undef ABT_CONFIG_USE_MACH_ABSOLUTE_TIME
+
+/* Define to use memory pools for ULT and tasklet creation */
+#undef ABT_CONFIG_USE_MEM_POOL
+
+/* Define to make the scheduler sleep when its pools are empty */
+#undef ABT_CONFIG_USE_SCHED_SLEEP
+
+/* Define to use a simple mutex implementation */
+#undef ABT_CONFIG_USE_SIMPLE_MUTEX
+
+/* Whether C compiler supports symbol visibility or not */
+#undef ABT_C_HAVE_VISIBILITY
+
+/* Define to 1 if you have the <clh.h> header file. */
+#undef HAVE_CLH_H
+
+/* Define to 1 if you have the `clock_gettime' function. */
+#undef HAVE_CLOCK_GETTIME
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if the system has the `deprecated' function attribute */
+#undef HAVE_FUNC_ATTRIBUTE_DEPRECATED
+
+/* Define to 1 if the system has the `noreturn' function attribute */
+#undef HAVE_FUNC_ATTRIBUTE_NORETURN
+
+/* Define to 1 if the system has the `warn_unused_result' function attribute
+   */
+#undef HAVE_FUNC_ATTRIBUTE_WARN_UNUSED_RESULT
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <lh_lock.h> header file. */
+#undef HAVE_LH_LOCK_H
+
+/* Define to 1 if you have the `dl' library (-ldl). */
+#undef HAVE_LIBDL
+
+/* Define to 1 if you have the `hugetlbfs' library (-lhugetlbfs). */
+#undef HAVE_LIBHUGETLBFS
+
+/* Define to 1 if you have the `pthread' library (-lpthread). */
+#undef HAVE_LIBPTHREAD
+
+/* Define to 1 if you have the `rt' library (-lrt). */
+#undef HAVE_LIBRT
+
+/* Define to 1 if you have the `unwind' library (-lunwind). */
+#undef HAVE_LIBUNWIND
+
+/* Define to 1 if you have the <libunwind.h> header file. */
+#undef HAVE_LIBUNWIND_H
+
+/* Define to 1 if you have the `mach_absolute_time' function. */
+#undef HAVE_MACH_ABSOLUTE_TIME
+
+/* Define if MAP_ANON is defined */
+#undef HAVE_MAP_ANON
+
+/* Define if MAP_ANONYMOUS is defined */
+#undef HAVE_MAP_ANONYMOUS
+
+/* Define if MAP_HUGETLB is supported */
+#undef HAVE_MAP_HUGETLB
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `pthread_barrier_init' function. */
+#undef HAVE_PTHREAD_BARRIER_INIT
+
+/* Define to 1 if you have the <pthread.h> header file. */
+#undef HAVE_PTHREAD_H
+
+/* Define if pthread_setaffinity_np is available */
+#undef HAVE_PTHREAD_SETAFFINITY_NP
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define valgrind support */
+#undef HAVE_VALGRIND_SUPPORT
+
+/* Define to 1 if the system has the `__builtin_expect' built-in function */
+#undef HAVE___BUILTIN_EXPECT
+
+/* Define to 1 if the system has the `__builtin_unreachable' built-in function
+   */
+#undef HAVE___BUILTIN_UNREACHABLE
+
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
+#undef LT_OBJDIR
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* The size of `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Version number of package */
+#undef VERSION
+
+
+#endif /* ABT_CONFIG_H_INCLUDED */
+

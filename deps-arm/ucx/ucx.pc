@@ -1,0 +1,11 @@
+prefix = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install
+exec_prefix = ${prefix}
+bindir = ${prefix}/bin
+libdir = ${exec_prefix}/lib
+includedir = ${prefix}/include
+
+Name: ucx
+Description:  Unified Communication X Library
+Version: 1.12
+Cflags: -I${includedir} 
+Libs: -L${libdir} -lucs -luct -lucp

@@ -50,7 +50,7 @@ pkg_install() {
     cd "${CURR}"
     ./autogen.sh
     cd "${CURR}/build"
-    OFI_CONFIG="../configure --prefix=${INSTALL_DIR} --enable-tcp=yes"
+    OFI_CONFIG="../configure --prefix=${INSTALL_DIR} --enable-verbs=no --enable-tcp=yes --enable-psm2=no --enable-psm3=no --enable-psm=no"
 
     EXTRA_INSTALL_ARGS="${PROFILE_EXTRA_INSTALL_ARGS[${ID}]}"
 

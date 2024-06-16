@@ -1,0 +1,7 @@
+AC_INIT(testver,1.0)
+AC_CONFIG_AUX_DIR([m4])
+AC_CONFIG_MACRO_DIR([m4])
+m4_ifdef([LT_PREREQ],,[m4_fatal([LT_PREREQ not defined])])
+LT_PREREQ(2.4)
+LT_INIT()
+AC_MSG_RESULT([A message])

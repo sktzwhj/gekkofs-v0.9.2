@@ -264,7 +264,7 @@ gkfs_define_option(
 ################################################################################
 
 ## Maximum number of internal file descriptors reserved for GekkoFS
-gkfs_define_variable(GKFS_MAX_INTERNAL_FDS 256
+gkfs_define_variable(GKFS_MAX_INTERNAL_FDS 8192
   STRING "Number of file descriptors reserved for internal use" ADVANCED
 )
 

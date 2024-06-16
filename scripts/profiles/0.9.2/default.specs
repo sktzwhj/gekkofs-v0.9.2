@@ -65,7 +65,7 @@ clonedeps_patches=(
 
 # Ordering that MUST be followed when downloading
 order=(
-    "lz4" "capstone" "json-c" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date"
+    "ucx"  "lz4" "capstone" "json-c" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date"
 )
 
 # Extra arguments passed to the installation script. As such, they can

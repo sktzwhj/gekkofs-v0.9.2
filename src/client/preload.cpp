@@ -90,7 +90,6 @@ init_hermes_client() {
         }
 
         opts |= hermes::process_may_fork;
-
         ld_network_service = std::make_unique<hermes::async_engine>(
                 hermes::get_transport_type(CTX->rpc_protocol()), opts);
         ld_network_service->run();

@@ -1,0 +1,10 @@
+type/libucs_la-thread_mode.lo: type/thread_mode.c \
+ /usr/include/stdc-predef.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/config.h \
+ type/thread_mode.h
+
+/usr/include/stdc-predef.h:
+
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/config.h:
+
+type/thread_mode.h:

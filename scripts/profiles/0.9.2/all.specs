@@ -70,7 +70,7 @@ clonedeps_patches=(
 
 # Ordering that MUST be followed when downloading
 order=(
-    "lz4" "capstone" "json-c" "psm2" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date"
+    "ucx" "lz4" "capstone" "json-c" "psm2" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date"
     "agios" "curl" "prometheus-cpp" "parallax"
 )
 
