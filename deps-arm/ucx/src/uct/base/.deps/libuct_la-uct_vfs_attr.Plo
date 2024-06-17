@@ -14,12 +14,12 @@ base/libuct_la-uct_vfs_attr.lo: base/uct_vfs_attr.c \
  /usr/include/aarch64-linux-gnu/bits/wchar.h \
  /usr/include/aarch64-linux-gnu/bits/stdint-intn.h \
  /usr/include/aarch64-linux-gnu/bits/stdint-uintn.h \
- /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/vfs/base/vfs_obj.h \
- /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/datastruct/string_buffer.h \
- /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/sys/compiler_def.h \
- /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/type/status.h \
- /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/datastruct/array.h \
- /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/sys/preprocessor.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/vfs/base/vfs_obj.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/datastruct/string_buffer.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/sys/compiler_def.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/type/status.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/datastruct/array.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/sys/preprocessor.h \
  /usr/include/aarch64-linux-gnu/sys/uio.h \
  /usr/include/aarch64-linux-gnu/sys/types.h \
  /usr/include/aarch64-linux-gnu/bits/types/clock_t.h \
@@ -94,17 +94,17 @@ base/uct_vfs_attr.h:
 
 /usr/include/aarch64-linux-gnu/bits/stdint-uintn.h:
 
-/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/vfs/base/vfs_obj.h:
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/vfs/base/vfs_obj.h:
 
-/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/datastruct/string_buffer.h:
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/datastruct/string_buffer.h:
 
-/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/sys/compiler_def.h:
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/sys/compiler_def.h:
 
-/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/type/status.h:
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/type/status.h:
 
-/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/datastruct/array.h:
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/datastruct/array.h:
 
-/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/sys/preprocessor.h:
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/sys/preprocessor.h:
 
 /usr/include/aarch64-linux-gnu/sys/uio.h:
 

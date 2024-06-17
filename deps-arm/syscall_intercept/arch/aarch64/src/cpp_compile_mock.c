@@ -1,1 +1,0 @@
-../../../src/cpp_compile_mock.c

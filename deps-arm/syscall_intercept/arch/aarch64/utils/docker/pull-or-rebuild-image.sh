@@ -1,1 +1,0 @@
-../../../../utils/docker/pull-or-rebuild-image.sh

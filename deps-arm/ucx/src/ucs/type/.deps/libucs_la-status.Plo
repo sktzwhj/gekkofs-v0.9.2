@@ -1,7 +1,7 @@
 type/libucs_la-status.lo: type/status.c /usr/include/stdc-predef.h \
- /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/config.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/config.h \
  type/status.h \
- /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/sys/compiler_def.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/sys/compiler_def.h \
  /usr/include/stdio.h \
  /usr/include/aarch64-linux-gnu/bits/libc-header-start.h \
  /usr/include/features.h /usr/include/aarch64-linux-gnu/sys/cdefs.h \
@@ -27,11 +27,11 @@ type/libucs_la-status.lo: type/status.c /usr/include/stdc-predef.h \
 
 /usr/include/stdc-predef.h:
 
-/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/config.h:
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/config.h:
 
 type/status.h:
 
-/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/sys/compiler_def.h:
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/sys/compiler_def.h:
 
 /usr/include/stdio.h:
 

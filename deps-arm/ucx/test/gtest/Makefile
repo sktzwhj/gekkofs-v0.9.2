@@ -101,39 +101,39 @@ POST_UNINSTALL = :
 build_triplet = aarch64-unknown-linux-gnu
 host_triplet = aarch64-unknown-linux-gnu
 #noinst_PROGRAMS = gtest$(EXEEXT)
-#am__append_1 = \
-#	uct/ib/test_ib.cc \
-#	uct/ib/test_ib_md.cc \
-#	uct/ib/test_cq_moderation.cc \
-#	uct/ib/test_ib_xfer.cc \
-#	uct/ib/test_ib_pkey.cc \
-#	uct/ib/test_ib_event.cc
+##am__append_1 = \
+##	uct/ib/test_ib.cc \
+##	uct/ib/test_ib_md.cc \
+##	uct/ib/test_cq_moderation.cc \
+##	uct/ib/test_ib_xfer.cc \
+##	uct/ib/test_ib_pkey.cc \
+##	uct/ib/test_ib_event.cc
 
-#am__append_2 = \
-#	$(IBVERBS_CPPFLAGS)
+##am__append_2 = \
+##	$(IBVERBS_CPPFLAGS)
 
-#am__append_3 = \
-#	$(IBVERBS_LDFLAGS) \
-#	$(top_builddir)/src/uct/ib/libuct_ib.la
+##am__append_3 = \
+##	$(IBVERBS_LDFLAGS) \
+##	$(top_builddir)/src/uct/ib/libuct_ib.la
 
-#am__append_4 = \
-#	uct/ib/test_devx.cc
+###am__append_4 = \
+###	uct/ib/test_devx.cc
 
-#am__append_5 = \
-#	uct/ib/ud_base.cc \
-#	uct/ib/test_ud.cc \
-#	uct/ib/test_ud_timer.cc \
-#	uct/ib/test_ud_pending.cc \
-#	uct/ib/test_ud_ds.cc
+###am__append_5 = \
+###	uct/ib/ud_base.cc \
+###	uct/ib/test_ud.cc \
+###	uct/ib/test_ud_timer.cc \
+###	uct/ib/test_ud_pending.cc \
+###	uct/ib/test_ud_ds.cc
 
-#am__append_6 = \
-#	uct/ib/test_rc.cc
+###am__append_6 = \
+###	uct/ib/test_rc.cc
 
-#am__append_7 = \
-#	uct/ib/test_dc.cc
+###am__append_7 = \
+###	uct/ib/test_dc.cc
 
-##am__append_8 = \
-##	uct/ib/test_sockaddr.cc
+###am__append_8 = \
+###	uct/ib/test_sockaddr.cc
 
 ##am__append_9 = \
 ##	ucm/cuda_hooks.cc
@@ -273,22 +273,22 @@ am__gtest_SOURCES_DIST = common/main.cc common/test_gtest_cmn.cc \
 	uct/ib/test_ud_ds.cc uct/ib/test_rc.cc uct/ib/test_dc.cc \
 	uct/ib/test_sockaddr.cc ucm/cuda_hooks.cc ucm/rocm_hooks.cc
 am__dirstamp = $(am__leading_dot)dirstamp
-#am__objects_1 =  \
-#	uct/ib/gtest-test_ib.$(OBJEXT) \
-#	uct/ib/gtest-test_ib_md.$(OBJEXT) \
-#	uct/ib/gtest-test_cq_moderation.$(OBJEXT) \
-#	uct/ib/gtest-test_ib_xfer.$(OBJEXT) \
-#	uct/ib/gtest-test_ib_pkey.$(OBJEXT) \
-#	uct/ib/gtest-test_ib_event.$(OBJEXT)
-#am__objects_2 = uct/ib/gtest-test_devx.$(OBJEXT)
-#am__objects_3 = uct/ib/gtest-ud_base.$(OBJEXT) \
-#	uct/ib/gtest-test_ud.$(OBJEXT) \
-#	uct/ib/gtest-test_ud_timer.$(OBJEXT) \
-#	uct/ib/gtest-test_ud_pending.$(OBJEXT) \
-#	uct/ib/gtest-test_ud_ds.$(OBJEXT)
-#am__objects_4 = uct/ib/gtest-test_rc.$(OBJEXT)
-#am__objects_5 = uct/ib/gtest-test_dc.$(OBJEXT)
-##am__objects_6 = uct/ib/gtest-test_sockaddr.$(OBJEXT)
+##am__objects_1 =  \
+##	uct/ib/gtest-test_ib.$(OBJEXT) \
+##	uct/ib/gtest-test_ib_md.$(OBJEXT) \
+##	uct/ib/gtest-test_cq_moderation.$(OBJEXT) \
+##	uct/ib/gtest-test_ib_xfer.$(OBJEXT) \
+##	uct/ib/gtest-test_ib_pkey.$(OBJEXT) \
+##	uct/ib/gtest-test_ib_event.$(OBJEXT)
+###am__objects_2 = uct/ib/gtest-test_devx.$(OBJEXT)
+###am__objects_3 = uct/ib/gtest-ud_base.$(OBJEXT) \
+###	uct/ib/gtest-test_ud.$(OBJEXT) \
+###	uct/ib/gtest-test_ud_timer.$(OBJEXT) \
+###	uct/ib/gtest-test_ud_pending.$(OBJEXT) \
+###	uct/ib/gtest-test_ud_ds.$(OBJEXT)
+###am__objects_4 = uct/ib/gtest-test_rc.$(OBJEXT)
+###am__objects_5 = uct/ib/gtest-test_dc.$(OBJEXT)
+###am__objects_6 = uct/ib/gtest-test_sockaddr.$(OBJEXT)
 ##am__objects_7 = ucm/gtest-cuda_hooks.$(OBJEXT)
 ##am__objects_8 = ucm/gtest-rocm_hooks.$(OBJEXT)
 #am_gtest_OBJECTS = common/gtest-main.$(OBJEXT) \
@@ -403,9 +403,9 @@ am__dirstamp = $(am__leading_dot)dirstamp
 #	$(am__objects_7) $(am__objects_8)
 gtest_OBJECTS = $(am_gtest_OBJECTS)
 am__DEPENDENCIES_1 =
-#am__DEPENDENCIES_2 =  \
-#	$(am__DEPENDENCIES_1) \
-#	$(top_builddir)/src/uct/ib/libuct_ib.la
+##am__DEPENDENCIES_2 =  \
+##	$(am__DEPENDENCIES_1) \
+##	$(top_builddir)/src/uct/ib/libuct_ib.la
 ##am__DEPENDENCIES_3 =  \
 ##	$(am__DEPENDENCIES_1) \
 ##	$(top_builddir)/src/uct/cuda/libuct_cuda.la
@@ -663,14 +663,14 @@ am__relativize = \
     dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
   done; \
   reldir="$$dir2"
-ACLOCAL = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing aclocal-1.16
+ACLOCAL = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing aclocal-1.16
 ALLOCA = 
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = ar
-AUTOCONF = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing autoconf
-AUTOHEADER = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing autoheader
-AUTOMAKE = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing automake-1.16
+AUTOCONF = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing autoconf
+AUTOHEADER = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing autoheader
+AUTOMAKE = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing automake-1.16
 AWK = gawk
 BASE_CFLAGS = -O0 -D_DEBUG -g -Wall -Werror -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement
 BASE_CPPFLAGS = -DCPU_FLAGS="" -I${abs_top_srcdir}/src -I${abs_top_builddir} -I${abs_top_builddir}/src
@@ -751,8 +751,8 @@ HIP_LDFLAGS = -L/opt/rocm/hip/lib -L/opt/rocm/lib
 HIP_LIBS = -lamdhip64
 IBVERBS_CFLAGS = 
 IBVERBS_CPPFLAGS = 
-IBVERBS_DIR = /usr
-IBVERBS_LDFLAGS =  -libverbs
+IBVERBS_DIR = 
+IBVERBS_LDFLAGS = 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -767,7 +767,7 @@ LIBM = -lm
 LIBOBJS = 
 LIBS = -lpthread -lrt -lrt  -ldl
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
-LIB_MLX5 = -lmlx5
+LIB_MLX5 = 
 LIPO = 
 LN_RS = ln -s --relative
 LN_S = ln -s
@@ -775,7 +775,7 @@ LTLIBOBJS =
 LT_SYS_LIBRARY_PATH = 
 MAINT = #
 MAJOR_VERSION = 1
-MAKEINFO = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing makeinfo
+MAKEINFO = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing makeinfo
 MANIFEST_TOOL = :
 MINOR_VERSION = 12
 MKDIR_P = /usr/bin/mkdir -p
@@ -834,10 +834,10 @@ VALGRIND_LIBPATH =
 VERSION = 1.12.0
 XPMEM_CFLAGS = -I/usr/local/xpmem/include
 XPMEM_LIBS = -L/usr/local/xpmem/lib -lxpmem
-abs_builddir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/test/gtest
-abs_srcdir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/test/gtest
-abs_top_builddir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx
-abs_top_srcdir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx
+abs_builddir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/test/gtest
+abs_srcdir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/test/gtest
+abs_top_builddir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx
+abs_top_srcdir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -852,7 +852,7 @@ build = aarch64-unknown-linux-gnu
 build_alias = 
 build_bindings = 
 build_cpu = aarch64
-build_modules = :ib:cma:xpmem:glex
+build_modules = :cma:xpmem:glex
 build_os = linux-gnu
 build_vendor = unknown
 builddir = .
@@ -869,7 +869,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/install-sh
+install_sh = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -882,7 +882,7 @@ modulesubdir = ucx
 objdir = .libs
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-install-arm
+prefix = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install
 program_transform_name = s,x,x,
 psdir = ${docdir}
 runstatedir = ${localstatedir}/run

@@ -39,9 +39,9 @@
     <gpg.defaultKeyring>false</gpg.defaultKeyring>
     <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ucx.src.dir>/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src</ucx.src.dir>
+    <ucx.src.dir>/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src</ucx.src.dir>
     <jucx.src.dir>${ucx.src.dir}/../bindings/java</jucx.src.dir>
-    <ucx.build.dir>/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx</ucx.build.dir>
+    <ucx.build.dir>/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx</ucx.build.dir>
     <native.dir>${ucx.build.dir}/bindings/java/src/main/native</native.dir>
     <ucm.lib.path>${ucx.build.dir}/src/ucm/.libs</ucm.lib.path>
     <ucs.lib.path>${ucx.build.dir}/src/ucs/.libs</ucs.lib.path>

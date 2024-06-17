@@ -281,7 +281,7 @@ finish_eval=""
 hardcode_into_libs=yes
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/usr/lib/gcc/aarch64-linux-gnu/9 /usr/lib/aarch64-linux-gnu /usr/lib /lib/aarch64-linux-gnu /lib "
+sys_lib_search_path_spec="/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install/lib /usr/lib/gcc/aarch64-linux-gnu/9 /usr/lib/aarch64-linux-gnu /usr/lib /lib/aarch64-linux-gnu /lib "
 
 # Detected run-time system search path for libraries.
 sys_lib_dlsearch_path_spec="/lib /usr/lib /usr/local/lib/aarch64-linux-gnu /lib/aarch64-linux-gnu /usr/lib/aarch64-linux-gnu /usr/lib/aarch64-linux-gnu/libfakeroot /usr/local/lib "
@@ -11893,7 +11893,7 @@ file_list_spec=""
 hardcode_action=immediate
 
 # The directories searched by this compiler when creating a shared library.
-compiler_lib_search_dirs="/usr/lib/gcc/aarch64-linux-gnu/9 /usr/lib/gcc/aarch64-linux-gnu/9/../../../aarch64-linux-gnu /usr/lib/gcc/aarch64-linux-gnu/9/../../../../lib /lib/aarch64-linux-gnu /lib/../lib /usr/lib/aarch64-linux-gnu /usr/lib/../lib /usr/lib/gcc/aarch64-linux-gnu/9/../../.."
+compiler_lib_search_dirs="/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install/lib/../lib /usr/lib/gcc/aarch64-linux-gnu/9 /usr/lib/gcc/aarch64-linux-gnu/9/../../../aarch64-linux-gnu /usr/lib/gcc/aarch64-linux-gnu/9/../../../../lib /lib/aarch64-linux-gnu /lib/../lib /usr/lib/aarch64-linux-gnu /usr/lib/../lib . /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install/lib /usr/lib/gcc/aarch64-linux-gnu/9/../../.."
 
 # Dependencies to place before and after the objects being linked to
 # create a shared library.
@@ -11904,6 +11904,6 @@ postdeps="-lstdc++ -lm -lgcc_s -lc -lgcc_s"
 
 # The library search path used internally by the compiler when linking
 # a shared library.
-compiler_lib_search_path="-L/usr/lib/gcc/aarch64-linux-gnu/9 -L/usr/lib/gcc/aarch64-linux-gnu/9/../../../aarch64-linux-gnu -L/usr/lib/gcc/aarch64-linux-gnu/9/../../../../lib -L/lib/aarch64-linux-gnu -L/lib/../lib -L/usr/lib/aarch64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/aarch64-linux-gnu/9/../../.."
+compiler_lib_search_path="-L/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install/lib/../lib -L/usr/lib/gcc/aarch64-linux-gnu/9 -L/usr/lib/gcc/aarch64-linux-gnu/9/../../../aarch64-linux-gnu -L/usr/lib/gcc/aarch64-linux-gnu/9/../../../../lib -L/lib/aarch64-linux-gnu -L/lib/../lib -L/usr/lib/aarch64-linux-gnu -L/usr/lib/../lib -L. -L/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install/lib -L/usr/lib/gcc/aarch64-linux-gnu/9/../../.."
 
 # ### END LIBTOOL TAG CONFIG: CXX

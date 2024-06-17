@@ -1,2 +1,2 @@
-build_modules=":ib:cma:xpmem:glex"
+build_modules=":cma:xpmem:glex"
 build_bindings=""

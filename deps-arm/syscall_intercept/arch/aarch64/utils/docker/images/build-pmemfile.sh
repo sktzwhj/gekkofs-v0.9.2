@@ -1,1 +1,0 @@
-../../../../../utils/docker/images/build-pmemfile.sh

@@ -103,7 +103,7 @@
 /* #undef HAVE_CUDA_RUNTIME_H */
 
 /* DC DV support */
-#define HAVE_DC_DV 1
+/* #undef HAVE_DC_DV */
 
 /* DC EXP support */
 /* #undef HAVE_DC_EXP */
@@ -170,83 +170,83 @@
 
 /* Define to 1 if you have the declaration of `IBV_ACCESS_ON_DEMAND', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_ACCESS_ON_DEMAND 1
+/* #undef HAVE_DECL_IBV_ACCESS_ON_DEMAND */
 
 /* Define to 1 if you have the declaration of `IBV_ACCESS_RELAXED_ORDERING',
    and to 0 if you don't. */
-#define HAVE_DECL_IBV_ACCESS_RELAXED_ORDERING 1
+/* #undef HAVE_DECL_IBV_ACCESS_RELAXED_ORDERING */
 
 /* Define to 1 if you have the declaration of `ibv_advise_mr', and to 0 if you
    don't. */
-#define HAVE_DECL_IBV_ADVISE_MR 1
+/* #undef HAVE_DECL_IBV_ADVISE_MR */
 
 /* Define to 1 if you have the declaration of `ibv_alloc_dm', and to 0 if you
    don't. */
-#define HAVE_DECL_IBV_ALLOC_DM 1
+/* #undef HAVE_DECL_IBV_ALLOC_DM */
 
 /* Define to 1 if you have the declaration of `ibv_alloc_td', and to 0 if you
    don't. */
-#define HAVE_DECL_IBV_ALLOC_TD 1
+/* #undef HAVE_DECL_IBV_ALLOC_TD */
 
 /* Define to 1 if you have the declaration of `ibv_cmd_modify_qp', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_CMD_MODIFY_QP 0
+/* #undef HAVE_DECL_IBV_CMD_MODIFY_QP */
 
 /* Define to 1 if you have the declaration of
    `IBV_CREATE_CQ_ATTR_IGNORE_OVERRUN', and to 0 if you don't. */
-#define HAVE_DECL_IBV_CREATE_CQ_ATTR_IGNORE_OVERRUN 1
+/* #undef HAVE_DECL_IBV_CREATE_CQ_ATTR_IGNORE_OVERRUN */
 
 /* Define to 1 if you have the declaration of `ibv_create_cq_ex', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_CREATE_CQ_EX 1
+/* #undef HAVE_DECL_IBV_CREATE_CQ_EX */
 
 /* Define to 1 if you have the declaration of `ibv_create_qp_ex', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_CREATE_QP_EX 1
+/* #undef HAVE_DECL_IBV_CREATE_QP_EX */
 
 /* Define to 1 if you have the declaration of `ibv_create_srq', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_CREATE_SRQ 1
+/* #undef HAVE_DECL_IBV_CREATE_SRQ */
 
 /* Define to 1 if you have the declaration of `ibv_create_srq_ex', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_CREATE_SRQ_EX 1
+/* #undef HAVE_DECL_IBV_CREATE_SRQ_EX */
 
 /* Define to 1 if you have the declaration of `IBV_EVENT_GID_CHANGE', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_EVENT_GID_CHANGE 1
+/* #undef HAVE_DECL_IBV_EVENT_GID_CHANGE */
 
 /* Define to 1 if you have the declaration of `ibv_event_type_str', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_EVENT_TYPE_STR 1
+/* #undef HAVE_DECL_IBV_EVENT_TYPE_STR */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_ACCESS_ALLOCATE_MR',
    and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_ACCESS_ALLOCATE_MR 0
+/* #undef HAVE_DECL_IBV_EXP_ACCESS_ALLOCATE_MR */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_ACCESS_ON_DEMAND', and
    to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_ACCESS_ON_DEMAND 0
+/* #undef HAVE_DECL_IBV_EXP_ACCESS_ON_DEMAND */
 
 /* Define to 1 if you have the declaration of `ibv_exp_alloc_dm', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_EXP_ALLOC_DM 0
+/* #undef HAVE_DECL_IBV_EXP_ALLOC_DM */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_ATOMIC_HCA_REPLY_BE',
    and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_ATOMIC_HCA_REPLY_BE 0
+/* #undef HAVE_DECL_IBV_EXP_ATOMIC_HCA_REPLY_BE */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_CQ_IGNORE_OVERRUN', and
    to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_CQ_IGNORE_OVERRUN 0
+/* #undef HAVE_DECL_IBV_EXP_CQ_IGNORE_OVERRUN */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_CQ_MODERATION', and to
    0 if you don't. */
-#define HAVE_DECL_IBV_EXP_CQ_MODERATION 0
+/* #undef HAVE_DECL_IBV_EXP_CQ_MODERATION */
 
 /* Define to 1 if you have the declaration of `ibv_exp_create_qp', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_EXP_CREATE_QP 0
+/* #undef HAVE_DECL_IBV_EXP_CREATE_QP */
 
 /* Define to 1 if you have the declaration of `ibv_exp_create_res_domain', and
    to 0 if you don't. */
@@ -254,11 +254,11 @@
 
 /* Define to 1 if you have the declaration of `ibv_exp_create_srq', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_EXP_CREATE_SRQ 0
+/* #undef HAVE_DECL_IBV_EXP_CREATE_SRQ */
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_DCT_OOO_RW_DATA_PLACEMENT', and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_DCT_OOO_RW_DATA_PLACEMENT 0
+/* #undef HAVE_DECL_IBV_EXP_DCT_OOO_RW_DATA_PLACEMENT */
 
 /* Define to 1 if you have the declaration of `ibv_exp_destroy_res_domain',
    and to 0 if you don't. */
@@ -266,55 +266,55 @@
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_DEVICE_ATTR_PCI_ATOMIC_CAPS', and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_DEVICE_ATTR_PCI_ATOMIC_CAPS 0
+/* #undef HAVE_DECL_IBV_EXP_DEVICE_ATTR_PCI_ATOMIC_CAPS */
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_DEVICE_ATTR_RESERVED_2', and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_DEVICE_ATTR_RESERVED_2 0
+/* #undef HAVE_DECL_IBV_EXP_DEVICE_ATTR_RESERVED_2 */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_DEVICE_DC_TRANSPORT',
    and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_DEVICE_DC_TRANSPORT 0
+/* #undef HAVE_DECL_IBV_EXP_DEVICE_DC_TRANSPORT */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_DEVICE_MR_ALLOCATE',
    and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_DEVICE_MR_ALLOCATE 0
+/* #undef HAVE_DECL_IBV_EXP_DEVICE_MR_ALLOCATE */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_MR_FIXED_BUFFER_SIZE',
    and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_MR_FIXED_BUFFER_SIZE 0
+/* #undef HAVE_DECL_IBV_EXP_MR_FIXED_BUFFER_SIZE */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_MR_INDIRECT_KLMS', and
    to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_MR_INDIRECT_KLMS 0
+/* #undef HAVE_DECL_IBV_EXP_MR_INDIRECT_KLMS */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_ODP_SUPPORT_IMPLICIT',
    and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_ODP_SUPPORT_IMPLICIT 0
+/* #undef HAVE_DECL_IBV_EXP_ODP_SUPPORT_IMPLICIT */
 
 /* Define to 1 if you have the declaration of `ibv_exp_post_send', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_EXP_POST_SEND 0
+/* #undef HAVE_DECL_IBV_EXP_POST_SEND */
 
 /* Define to 1 if you have the declaration of `ibv_exp_prefetch_mr', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_EXP_PREFETCH_MR 0
+/* #undef HAVE_DECL_IBV_EXP_PREFETCH_MR */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_PREFETCH_WRITE_ACCESS',
    and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_PREFETCH_WRITE_ACCESS 0
+/* #undef HAVE_DECL_IBV_EXP_PREFETCH_WRITE_ACCESS */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_QPT_DC_INI', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_EXP_QPT_DC_INI 0
+/* #undef HAVE_DECL_IBV_EXP_QPT_DC_INI */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_QP_CREATE_UMR', and to
    0 if you don't. */
-#define HAVE_DECL_IBV_EXP_QP_CREATE_UMR 0
+/* #undef HAVE_DECL_IBV_EXP_QP_CREATE_UMR */
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_QP_INIT_ATTR_ATOMICS_ARG', and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_QP_INIT_ATTR_ATOMICS_ARG 0
+/* #undef HAVE_DECL_IBV_EXP_QP_INIT_ATTR_ATOMICS_ARG */
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_QP_INIT_ATTR_RES_DOMAIN', and to 0 if you don't. */
@@ -322,19 +322,19 @@
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_QP_OOO_RW_DATA_PLACEMENT', and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_QP_OOO_RW_DATA_PLACEMENT 0
+/* #undef HAVE_DECL_IBV_EXP_QP_OOO_RW_DATA_PLACEMENT */
 
 /* Define to 1 if you have the declaration of `ibv_exp_query_device', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_EXP_QUERY_DEVICE 0
+/* #undef HAVE_DECL_IBV_EXP_QUERY_DEVICE */
 
 /* Define to 1 if you have the declaration of `ibv_exp_query_gid_attr', and to
    0 if you don't. */
-#define HAVE_DECL_IBV_EXP_QUERY_GID_ATTR 0
+/* #undef HAVE_DECL_IBV_EXP_QUERY_GID_ATTR */
 
 /* Define to 1 if you have the declaration of `ibv_exp_reg_mr', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_EXP_REG_MR 0
+/* #undef HAVE_DECL_IBV_EXP_REG_MR */
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_RES_DOMAIN_THREAD_MODEL', and to 0 if you don't. */
@@ -342,39 +342,39 @@
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_SEND_EXT_ATOMIC_INLINE', and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_SEND_EXT_ATOMIC_INLINE 0
+/* #undef HAVE_DECL_IBV_EXP_SEND_EXT_ATOMIC_INLINE */
 
 /* Define to 1 if you have the declaration of `ibv_exp_setenv', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_EXP_SETENV 0
+/* #undef HAVE_DECL_IBV_EXP_SETENV */
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_WR_EXT_MASKED_ATOMIC_CMP_AND_SWP', and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_WR_EXT_MASKED_ATOMIC_CMP_AND_SWP 0
+/* #undef HAVE_DECL_IBV_EXP_WR_EXT_MASKED_ATOMIC_CMP_AND_SWP */
 
 /* Define to 1 if you have the declaration of
    `IBV_EXP_WR_EXT_MASKED_ATOMIC_FETCH_AND_ADD', and to 0 if you don't. */
-#define HAVE_DECL_IBV_EXP_WR_EXT_MASKED_ATOMIC_FETCH_AND_ADD 0
+/* #undef HAVE_DECL_IBV_EXP_WR_EXT_MASKED_ATOMIC_FETCH_AND_ADD */
 
 /* Define to 1 if you have the declaration of `IBV_EXP_WR_NOP', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_EXP_WR_NOP 0
+/* #undef HAVE_DECL_IBV_EXP_WR_NOP */
 
 /* Define to 1 if you have the declaration of `ibv_get_async_event', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_GET_ASYNC_EVENT 1
+/* #undef HAVE_DECL_IBV_GET_ASYNC_EVENT */
 
 /* Define to 1 if you have the declaration of `ibv_get_device_name', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_GET_DEVICE_NAME 1
+/* #undef HAVE_DECL_IBV_GET_DEVICE_NAME */
 
 /* Define to 1 if you have the declaration of `IBV_LINK_LAYER_ETHERNET', and
    to 0 if you don't. */
-#define HAVE_DECL_IBV_LINK_LAYER_ETHERNET 1
+/* #undef HAVE_DECL_IBV_LINK_LAYER_ETHERNET */
 
 /* Define to 1 if you have the declaration of `IBV_LINK_LAYER_INFINIBAND', and
    to 0 if you don't. */
-#define HAVE_DECL_IBV_LINK_LAYER_INFINIBAND 1
+/* #undef HAVE_DECL_IBV_LINK_LAYER_INFINIBAND */
 
 /* Define to 1 if you have the declaration of `ibv_mlx5_exp_get_cq_info', and
    to 0 if you don't. */
@@ -394,22 +394,22 @@
 
 /* Define to 1 if you have the declaration of `IBV_ODP_SUPPORT_IMPLICIT', and
    to 0 if you don't. */
-#define HAVE_DECL_IBV_ODP_SUPPORT_IMPLICIT 1
+/* #undef HAVE_DECL_IBV_ODP_SUPPORT_IMPLICIT */
 
 /* Define to 1 if you have the declaration of `IBV_QPF_GRH_REQUIRED', and to 0
    if you don't. */
-#define HAVE_DECL_IBV_QPF_GRH_REQUIRED 1
+/* #undef HAVE_DECL_IBV_QPF_GRH_REQUIRED */
 
 /* have upstream ibv_query_device_ex */
-#define HAVE_DECL_IBV_QUERY_DEVICE_EX 1
+/* #undef HAVE_DECL_IBV_QUERY_DEVICE_EX */
 
 /* Define to 1 if you have the declaration of `ibv_query_gid', and to 0 if you
    don't. */
-#define HAVE_DECL_IBV_QUERY_GID 1
+/* #undef HAVE_DECL_IBV_QUERY_GID */
 
 /* Define to 1 if you have the declaration of `ibv_wc_status_str', and to 0 if
    you don't. */
-#define HAVE_DECL_IBV_WC_STATUS_STR 1
+/* #undef HAVE_DECL_IBV_WC_STATUS_STR */
 
 /* Define to 1 if you have the declaration of `inotify_add_watch', and to 0 if
    you don't. */
@@ -437,43 +437,43 @@
 
 /* Define to 1 if you have the declaration of
    `MLX5DV_CQ_INIT_ATTR_MASK_CQE_SIZE', and to 0 if you don't. */
-#define HAVE_DECL_MLX5DV_CQ_INIT_ATTR_MASK_CQE_SIZE 1
+/* #undef HAVE_DECL_MLX5DV_CQ_INIT_ATTR_MASK_CQE_SIZE */
 
 /* Define to 1 if you have the declaration of `mlx5dv_create_qp', and to 0 if
    you don't. */
-#define HAVE_DECL_MLX5DV_CREATE_QP 1
+/* #undef HAVE_DECL_MLX5DV_CREATE_QP */
 
 /* Define to 1 if you have the declaration of `MLX5DV_DCTYPE_DCT', and to 0 if
    you don't. */
-#define HAVE_DECL_MLX5DV_DCTYPE_DCT 1
+/* #undef HAVE_DECL_MLX5DV_DCTYPE_DCT */
 
 /* Define to 1 if you have the declaration of
    `mlx5dv_devx_subscribe_devx_event', and to 0 if you don't. */
-#define HAVE_DECL_MLX5DV_DEVX_SUBSCRIBE_DEVX_EVENT 1
+/* #undef HAVE_DECL_MLX5DV_DEVX_SUBSCRIBE_DEVX_EVENT */
 
 /* Define to 1 if you have the declaration of `mlx5dv_init_obj', and to 0 if
    you don't. */
-#define HAVE_DECL_MLX5DV_INIT_OBJ 1
+/* #undef HAVE_DECL_MLX5DV_INIT_OBJ */
 
 /* Define to 1 if you have the declaration of `mlx5dv_is_supported', and to 0
    if you don't. */
-#define HAVE_DECL_MLX5DV_IS_SUPPORTED 1
+/* #undef HAVE_DECL_MLX5DV_IS_SUPPORTED */
 
 /* Define to 1 if you have the declaration of `MLX5DV_OBJ_AH', and to 0 if you
    don't. */
-#define HAVE_DECL_MLX5DV_OBJ_AH 1
+/* #undef HAVE_DECL_MLX5DV_OBJ_AH */
 
 /* Define to 1 if you have the declaration of
    `MLX5DV_QP_CREATE_ALLOW_SCATTER_TO_CQE', and to 0 if you don't. */
-#define HAVE_DECL_MLX5DV_QP_CREATE_ALLOW_SCATTER_TO_CQE 1
+/* #undef HAVE_DECL_MLX5DV_QP_CREATE_ALLOW_SCATTER_TO_CQE */
 
 /* Define to 1 if you have the declaration of `MLX5DV_UAR_ALLOC_TYPE_BF', and
    to 0 if you don't. */
-#define HAVE_DECL_MLX5DV_UAR_ALLOC_TYPE_BF 1
+/* #undef HAVE_DECL_MLX5DV_UAR_ALLOC_TYPE_BF */
 
 /* Define to 1 if you have the declaration of `MLX5DV_UAR_ALLOC_TYPE_NC', and
    to 0 if you don't. */
-#define HAVE_DECL_MLX5DV_UAR_ALLOC_TYPE_NC 1
+/* #undef HAVE_DECL_MLX5DV_UAR_ALLOC_TYPE_NC */
 
 /* Define to 1 if you have the declaration of `MLX5_WQE_CTRL_SOLICITED', and
    to 0 if you don't. */
@@ -555,7 +555,7 @@
 /* #undef HAVE_DETAILED_BACKTRACE */
 
 /* DEVX support */
-#define HAVE_DEVX 1
+/* #undef HAVE_DEVX */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
@@ -603,10 +603,10 @@
 #define HAVE_HW_TIMER 1
 
 /* IB support */
-#define HAVE_IB 1
+/* #undef HAVE_IB */
 
 /* Device Memory support */
-#define HAVE_IBV_DM 1
+/* #undef HAVE_IBV_DM */
 
 /* Device Memory support (EXP) */
 /* #undef HAVE_IBV_EXP_DM */
@@ -630,13 +630,13 @@
 /* #undef HAVE_IN6_ADDR_U6_ADDR32 */
 
 /* Define to 1 if you have the <infiniband/mlx5dv.h> header file. */
-#define HAVE_INFINIBAND_MLX5DV_H 1
+/* #undef HAVE_INFINIBAND_MLX5DV_H */
 
 /* Define to 1 if you have the <infiniband/mlx5_hw.h> header file. */
 /* #undef HAVE_INFINIBAND_MLX5_HW_H */
 
 /* Define to 1 if you have the <infiniband/tm_types.h> header file. */
-#define HAVE_INFINIBAND_TM_TYPES_H 1
+/* #undef HAVE_INFINIBAND_TM_TYPES_H */
 
 /* Enable inotify support */
 #define HAVE_INOTIFY 1
@@ -699,10 +699,10 @@
 #define HAVE_MEMORY_H 1
 
 /* mlx5 bare-metal support */
-#define HAVE_MLX5_HW 1
+/* #undef HAVE_MLX5_HW */
 
 /* mlx5 UD bare-metal support */
-#define HAVE_MLX5_HW_UD 1
+/* #undef HAVE_MLX5_HW_UD */
 
 /* MPI support */
 /* #undef HAVE_MPI */
@@ -726,10 +726,10 @@
 #define HAVE_NUMA_H 1
 
 /* ODP support */
-#define HAVE_ODP 1
+/* #undef HAVE_ODP */
 
 /* Implicit ODP support */
-#define HAVE_ODP_IMPLICIT 1
+/* #undef HAVE_ODP_IMPLICIT */
 
 /* PMI support */
 /* #undef HAVE_PMI */
@@ -744,7 +744,7 @@
 #define HAVE_POSIX_MEMALIGN 1
 
 /* Prefetch support */
-#define HAVE_PREFETCH 1
+/* #undef HAVE_PREFETCH */
 
 /* Enable profiling */
 /* #undef HAVE_PROFILING */
@@ -802,7 +802,7 @@
 
 /* Define to 1 if `pci_atomic_caps' is a member of `struct
    ibv_device_attr_ex'. */
-#define HAVE_STRUCT_IBV_DEVICE_ATTR_EX_PCI_ATOMIC_CAPS 1
+/* #undef HAVE_STRUCT_IBV_DEVICE_ATTR_EX_PCI_ATOMIC_CAPS */
 
 /* Define to 1 if `dc_offload_params' is a member of `struct
    ibv_exp_create_srq_attr'. */
@@ -834,10 +834,10 @@
 /* #undef HAVE_STRUCT_IBV_MLX5_QP_INFO_BF_NEED_LOCK */
 
 /* Define to 1 if `flags' is a member of `struct ibv_tm_caps'. */
-#define HAVE_STRUCT_IBV_TM_CAPS_FLAGS 1
+/* #undef HAVE_STRUCT_IBV_TM_CAPS_FLAGS */
 
 /* Define to 1 if `cq_uar' is a member of `struct mlx5dv_cq'. */
-#define HAVE_STRUCT_MLX5DV_CQ_CQ_UAR 1
+/* #undef HAVE_STRUCT_MLX5DV_CQ_CQ_UAR */
 
 /* Define to 1 if `ibv_ah' is a member of `struct mlx5_ah'. */
 /* #undef HAVE_STRUCT_MLX5_AH_IBV_AH */
@@ -888,13 +888,13 @@
 #define HAVE_SYS_UIO_H 1
 
 /* DC transport support */
-#define HAVE_TL_DC 1
+/* #undef HAVE_TL_DC */
 
 /* RC transport support */
-#define HAVE_TL_RC 1
+/* #undef HAVE_TL_RC */
 
 /* UD transport support */
-#define HAVE_TL_UD 1
+/* #undef HAVE_TL_UD */
 
 /* Defined if UGNI transport exists */
 /* #undef HAVE_TL_UGNI */
@@ -921,7 +921,7 @@
 #define HAVE___SIGHANDLER_T 1
 
 /* IB Tag Matching support */
-#define IBV_HW_TM 1
+/* #undef IBV_HW_TM */
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
@@ -1001,7 +1001,7 @@
 /* #undef UCX_ALLOC_ALIGN */
 
 /* UCX configure flags */
-#define UCX_CONFIGURE_FLAGS "--disable-assertions --disable-params-check --prefix=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-install-arm --with-glex=/usr/local/glex --without-pmix --with-verbs --without-rdmacm --without-valgrind --enable-cma --enable-mt --no-create --no-recursion --enable-debug"
+#define UCX_CONFIGURE_FLAGS "--disable-assertions --disable-params-check --prefix=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install --with-glex=/usr/local/glex --without-pmix --without-verbs --without-rdmacm --without-valgrind --enable-cma --enable-mt --no-create --no-recursion --enable-debug"
 
 /* UCX module sub-directory */
 #define UCX_MODULE_SUBDIR "ucx"
@@ -1071,7 +1071,7 @@
 #define ucs_MODULES ""
 
 /* UCT loadable modules */
-#define uct_MODULES ":ib:cma:xpmem:glex"
+#define uct_MODULES ":cma:xpmem:glex"
 
 /* CUDA loadable modules */
 #define uct_cuda_MODULES ""

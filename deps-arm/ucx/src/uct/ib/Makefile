@@ -102,92 +102,92 @@ build_triplet = aarch64-unknown-linux-gnu
 host_triplet = aarch64-unknown-linux-gnu
 
 # TODO separate module for mlx5
-am__append_1 = -DUCT_IB_LIBMLX5_VER=\"$(libmlx5_ver)\"
-am__append_2 = \
-	mlx5/ib_mlx5_log.h \
-	mlx5/ib_mlx5.h \
-	mlx5/ib_mlx5.inl \
-	mlx5/dv/ib_mlx5_dv.h \
-	mlx5/dv/ib_mlx5_ifc.h \
-	mlx5/exp/ib_mlx5_hw.h
+##am__append_1 = -DUCT_IB_LIBMLX5_VER=\"$(libmlx5_ver)\"
+##am__append_2 = \
+##	mlx5/ib_mlx5_log.h \
+##	mlx5/ib_mlx5.h \
+##	mlx5/ib_mlx5.inl \
+##	mlx5/dv/ib_mlx5_dv.h \
+##	mlx5/dv/ib_mlx5_ifc.h \
+##	mlx5/exp/ib_mlx5_hw.h
 
-am__append_3 = \
-	mlx5/ib_mlx5_log.c \
-	mlx5/ib_mlx5.c
+##am__append_3 = \
+##	mlx5/ib_mlx5_log.c \
+##	mlx5/ib_mlx5.c
 
-#am__append_4 = \
-#	mlx5/exp/ib_exp.h
+##am__append_4 = \
+##	mlx5/exp/ib_exp.h
 
-#am__append_5 = \
-#	mlx5/exp/ib_mlx5_hw.c \
-#	mlx5/exp/ib_exp.c \
-#	mlx5/exp/ib_exp_md.c
+##am__append_5 = \
+##	mlx5/exp/ib_mlx5_hw.c \
+##	mlx5/exp/ib_exp.c \
+##	mlx5/exp/ib_exp_md.c
 
-am__append_6 = $(LIB_MLX5)
-am__append_7 = \
-	mlx5/dv/ib_mlx5_dv.c \
-	mlx5/dv/ib_mlx5dv_md.c
+###am__append_6 = $(LIB_MLX5)
+###am__append_7 = \
+###	mlx5/dv/ib_mlx5_dv.c \
+###	mlx5/dv/ib_mlx5dv_md.c
 
-am__append_8 = \
-	rc/base/rc_def.h \
-	rc/base/rc_ep.h \
-	rc/base/rc_iface.h \
-	rc/verbs/rc_verbs.h \
-	rc/verbs/rc_verbs_impl.h
+##am__append_8 = \
+##	rc/base/rc_def.h \
+##	rc/base/rc_ep.h \
+##	rc/base/rc_iface.h \
+##	rc/verbs/rc_verbs.h \
+##	rc/verbs/rc_verbs_impl.h
 
-am__append_9 = \
-	rc/base/rc_ep.c \
-	rc/base/rc_iface.c \
-	rc/verbs/rc_verbs_ep.c \
-	rc/verbs/rc_verbs_iface.c
+##am__append_9 = \
+##	rc/base/rc_ep.c \
+##	rc/base/rc_iface.c \
+##	rc/verbs/rc_verbs_ep.c \
+##	rc/verbs/rc_verbs_iface.c
 
-am__append_10 = \
-	rc/accel/rc_mlx5.h \
-	rc/accel/rc_mlx5.inl \
-	rc/accel/rc_mlx5_common.h
+###am__append_10 = \
+###	rc/accel/rc_mlx5.h \
+###	rc/accel/rc_mlx5.inl \
+###	rc/accel/rc_mlx5_common.h
 
-am__append_11 = \
-	rc/accel/rc_mlx5_ep.c \
-	rc/accel/rc_mlx5_iface.c \
-	rc/accel/rc_mlx5_common.c
+###am__append_11 = \
+###	rc/accel/rc_mlx5_ep.c \
+###	rc/accel/rc_mlx5_iface.c \
+###	rc/accel/rc_mlx5_common.c
 
-am__append_12 = \
-	rc/accel/rc_mlx5_devx.c
+###am__append_12 = \
+###	rc/accel/rc_mlx5_devx.c
 
-am__append_13 = \
-	dc/dc_mlx5_ep.h \
-	dc/dc_mlx5.inl \
-	dc/dc_mlx5.h
+##am__append_13 = \
+##	dc/dc_mlx5_ep.h \
+##	dc/dc_mlx5.inl \
+##	dc/dc_mlx5.h
 
-am__append_14 = \
-	dc/dc_mlx5_ep.c \
-	dc/dc_mlx5.c
+##am__append_14 = \
+##	dc/dc_mlx5_ep.c \
+##	dc/dc_mlx5.c
 
-am__append_15 = \
-	dc/dc_mlx5_devx.c
+###am__append_15 = \
+###	dc/dc_mlx5_devx.c
 
-am__append_16 = \
-	ud/base/ud_iface_common.h \
-	ud/base/ud_iface.h \
-	ud/base/ud_ep.h \
-	ud/base/ud_def.h \
-	ud/base/ud_inl.h \
-	ud/verbs/ud_verbs.h
+##am__append_16 = \
+##	ud/base/ud_iface_common.h \
+##	ud/base/ud_iface.h \
+##	ud/base/ud_ep.h \
+##	ud/base/ud_def.h \
+##	ud/base/ud_inl.h \
+##	ud/verbs/ud_verbs.h
 
-am__append_17 = \
-	ud/base/ud_iface_common.c \
-	ud/base/ud_iface.c \
-	ud/base/ud_ep.c \
-	ud/base/ud_log.c \
-	ud/verbs/ud_verbs.c
+##am__append_17 = \
+##	ud/base/ud_iface_common.c \
+##	ud/base/ud_iface.c \
+##	ud/base/ud_ep.c \
+##	ud/base/ud_log.c \
+##	ud/verbs/ud_verbs.c
 
-am__append_18 = \
-	ud/accel/ud_mlx5_common.h \
-	ud/accel/ud_mlx5.h
+###am__append_18 = \
+###	ud/accel/ud_mlx5_common.h \
+###	ud/accel/ud_mlx5.h
 
-am__append_19 = \
-	ud/accel/ud_mlx5_common.c \
-	ud/accel/ud_mlx5.c
+###am__append_19 = \
+###	ud/accel/ud_mlx5_common.c \
+###	ud/accel/ud_mlx5.c
 
 subdir = src/uct/ib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -279,9 +279,9 @@ am__uninstall_files_from_dir = { \
   }
 am__installdirs = "$(DESTDIR)$(moduledir)"
 LTLIBRARIES = $(module_LTLIBRARIES)
-libuct_ib_la_DEPENDENCIES =  \
-	$(top_builddir)/src/ucs/libucs.la \
-	$(top_builddir)/src/uct/libuct.la
+#libuct_ib_la_DEPENDENCIES =  \
+#	$(top_builddir)/src/ucs/libucs.la \
+#	$(top_builddir)/src/uct/libuct.la
 am__libuct_ib_la_SOURCES_DIST = base/ib_device.c base/ib_iface.c \
 	base/ib_log.c base/ib_md.c mlx5/ib_mlx5_log.c mlx5/ib_mlx5.c \
 	mlx5/exp/ib_mlx5_hw.c mlx5/exp/ib_exp.c mlx5/exp/ib_exp_md.c \
@@ -294,43 +294,43 @@ am__libuct_ib_la_SOURCES_DIST = base/ib_device.c base/ib_iface.c \
 	ud/base/ud_ep.c ud/base/ud_log.c ud/verbs/ud_verbs.c \
 	ud/accel/ud_mlx5_common.c ud/accel/ud_mlx5.c
 am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_1 = mlx5/libuct_ib_la-ib_mlx5_log.lo \
-	mlx5/libuct_ib_la-ib_mlx5.lo
-#am__objects_2 = mlx5/exp/libuct_ib_la-ib_mlx5_hw.lo \
-#	mlx5/exp/libuct_ib_la-ib_exp.lo \
-#	mlx5/exp/libuct_ib_la-ib_exp_md.lo
-am__objects_3 = mlx5/dv/libuct_ib_la-ib_mlx5_dv.lo \
-	mlx5/dv/libuct_ib_la-ib_mlx5dv_md.lo
-am__objects_4 =  \
-	rc/base/libuct_ib_la-rc_ep.lo \
-	rc/base/libuct_ib_la-rc_iface.lo \
-	rc/verbs/libuct_ib_la-rc_verbs_ep.lo \
-	rc/verbs/libuct_ib_la-rc_verbs_iface.lo
-am__objects_5 = rc/accel/libuct_ib_la-rc_mlx5_ep.lo \
-	rc/accel/libuct_ib_la-rc_mlx5_iface.lo \
-	rc/accel/libuct_ib_la-rc_mlx5_common.lo
-am__objects_6 = rc/accel/libuct_ib_la-rc_mlx5_devx.lo
-am__objects_7 =  \
-	dc/libuct_ib_la-dc_mlx5_ep.lo \
-	dc/libuct_ib_la-dc_mlx5.lo
-am__objects_8 = dc/libuct_ib_la-dc_mlx5_devx.lo
-am__objects_9 = ud/base/libuct_ib_la-ud_iface_common.lo \
-	ud/base/libuct_ib_la-ud_iface.lo \
-	ud/base/libuct_ib_la-ud_ep.lo \
-	ud/base/libuct_ib_la-ud_log.lo \
-	ud/verbs/libuct_ib_la-ud_verbs.lo
-am__objects_10 = ud/accel/libuct_ib_la-ud_mlx5_common.lo \
-	ud/accel/libuct_ib_la-ud_mlx5.lo
-am_libuct_ib_la_OBJECTS =  \
-	base/libuct_ib_la-ib_device.lo \
-	base/libuct_ib_la-ib_iface.lo \
-	base/libuct_ib_la-ib_log.lo \
-	base/libuct_ib_la-ib_md.lo $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) \
-	$(am__objects_4) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) \
-	$(am__objects_8) $(am__objects_9) \
-	$(am__objects_10)
+##am__objects_1 = mlx5/libuct_ib_la-ib_mlx5_log.lo \
+##	mlx5/libuct_ib_la-ib_mlx5.lo
+##am__objects_2 = mlx5/exp/libuct_ib_la-ib_mlx5_hw.lo \
+##	mlx5/exp/libuct_ib_la-ib_exp.lo \
+##	mlx5/exp/libuct_ib_la-ib_exp_md.lo
+###am__objects_3 = mlx5/dv/libuct_ib_la-ib_mlx5_dv.lo \
+###	mlx5/dv/libuct_ib_la-ib_mlx5dv_md.lo
+##am__objects_4 =  \
+##	rc/base/libuct_ib_la-rc_ep.lo \
+##	rc/base/libuct_ib_la-rc_iface.lo \
+##	rc/verbs/libuct_ib_la-rc_verbs_ep.lo \
+##	rc/verbs/libuct_ib_la-rc_verbs_iface.lo
+###am__objects_5 = rc/accel/libuct_ib_la-rc_mlx5_ep.lo \
+###	rc/accel/libuct_ib_la-rc_mlx5_iface.lo \
+###	rc/accel/libuct_ib_la-rc_mlx5_common.lo
+###am__objects_6 = rc/accel/libuct_ib_la-rc_mlx5_devx.lo
+##am__objects_7 =  \
+##	dc/libuct_ib_la-dc_mlx5_ep.lo \
+##	dc/libuct_ib_la-dc_mlx5.lo
+###am__objects_8 = dc/libuct_ib_la-dc_mlx5_devx.lo
+##am__objects_9 = ud/base/libuct_ib_la-ud_iface_common.lo \
+##	ud/base/libuct_ib_la-ud_iface.lo \
+##	ud/base/libuct_ib_la-ud_ep.lo \
+##	ud/base/libuct_ib_la-ud_log.lo \
+##	ud/verbs/libuct_ib_la-ud_verbs.lo
+###am__objects_10 = ud/accel/libuct_ib_la-ud_mlx5_common.lo \
+###	ud/accel/libuct_ib_la-ud_mlx5.lo
+#am_libuct_ib_la_OBJECTS =  \
+#	base/libuct_ib_la-ib_device.lo \
+#	base/libuct_ib_la-ib_iface.lo \
+#	base/libuct_ib_la-ib_log.lo \
+#	base/libuct_ib_la-ib_md.lo $(am__objects_1) \
+#	$(am__objects_2) $(am__objects_3) \
+#	$(am__objects_4) $(am__objects_5) \
+#	$(am__objects_6) $(am__objects_7) \
+#	$(am__objects_8) $(am__objects_9) \
+#	$(am__objects_10)
 libuct_ib_la_OBJECTS = $(am_libuct_ib_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -339,7 +339,7 @@ am__v_lt_1 =
 libuct_ib_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(libuct_ib_la_CFLAGS) \
 	$(CFLAGS) $(libuct_ib_la_LDFLAGS) $(LDFLAGS) -o $@
-am_libuct_ib_la_rpath = -rpath $(moduledir)
+#am_libuct_ib_la_rpath = -rpath $(moduledir)
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -487,14 +487,14 @@ am__relativize = \
     dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
   done; \
   reldir="$$dir2"
-ACLOCAL = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing aclocal-1.16
+ACLOCAL = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing aclocal-1.16
 ALLOCA = 
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 AR = ar
-AUTOCONF = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing autoconf
-AUTOHEADER = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing autoheader
-AUTOMAKE = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing automake-1.16
+AUTOCONF = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing autoconf
+AUTOHEADER = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing autoheader
+AUTOMAKE = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing automake-1.16
 AWK = gawk
 BASE_CFLAGS = -O0 -D_DEBUG -g -Wall -Werror -funwind-tables -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-label -Wno-long-long -Wno-endif-labels -Wno-sign-compare -Wno-multichar -Wno-deprecated-declarations -Winvalid-pch -Wno-pointer-sign -Werror-implicit-function-declaration -Wno-format-zero-length -Wnested-externs -Wshadow -Werror=declaration-after-statement
 BASE_CPPFLAGS = -DCPU_FLAGS="" -I${abs_top_srcdir}/src -I${abs_top_builddir} -I${abs_top_builddir}/src
@@ -575,8 +575,8 @@ HIP_LDFLAGS = -L/opt/rocm/hip/lib -L/opt/rocm/lib
 HIP_LIBS = -lamdhip64
 IBVERBS_CFLAGS = 
 IBVERBS_CPPFLAGS = 
-IBVERBS_DIR = /usr
-IBVERBS_LDFLAGS =  -libverbs
+IBVERBS_DIR = 
+IBVERBS_LDFLAGS = 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
@@ -591,7 +591,7 @@ LIBM = -lm
 LIBOBJS = 
 LIBS = -lpthread -lrt -lrt  -ldl
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
-LIB_MLX5 = -lmlx5
+LIB_MLX5 = 
 LIPO = 
 LN_RS = ln -s --relative
 LN_S = ln -s
@@ -599,7 +599,7 @@ LTLIBOBJS =
 LT_SYS_LIBRARY_PATH = 
 MAINT = #
 MAJOR_VERSION = 1
-MAKEINFO = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/missing makeinfo
+MAKEINFO = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/missing makeinfo
 MANIFEST_TOOL = :
 MINOR_VERSION = 12
 MKDIR_P = /usr/bin/mkdir -p
@@ -658,10 +658,10 @@ VALGRIND_LIBPATH =
 VERSION = 1.12.0
 XPMEM_CFLAGS = -I/usr/local/xpmem/include
 XPMEM_LIBS = -L/usr/local/xpmem/lib -lxpmem
-abs_builddir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/uct/ib
-abs_srcdir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/uct/ib
-abs_top_builddir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx
-abs_top_srcdir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx
+abs_builddir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/uct/ib
+abs_srcdir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/uct/ib
+abs_top_builddir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx
+abs_top_srcdir = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -676,7 +676,7 @@ build = aarch64-unknown-linux-gnu
 build_alias = 
 build_bindings = 
 build_cpu = aarch64
-build_modules = :ib:cma:xpmem:glex
+build_modules = :cma:xpmem:glex
 build_os = linux-gnu
 build_vendor = unknown
 builddir = .
@@ -693,7 +693,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/install-sh
+install_sh = ${SHELL} /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -706,7 +706,7 @@ modulesubdir = ucx
 objdir = .libs
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-install-arm
+prefix = /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install
 program_transform_name = s,x,x,
 psdir = ${docdir}
 runstatedir = ${localstatedir}/run
@@ -721,35 +721,35 @@ top_builddir = ../../..
 top_srcdir = ../../..
 top_top_srcdir = .
 ucx_config_dir = ${prefix}/etc/ucx
-SUBDIRS = . rdmacm
-module_LTLIBRARIES = libuct_ib.la
-libuct_ib_la_CPPFLAGS = $(BASE_CPPFLAGS) \
-	$(IBVERBS_CPPFLAGS) $(am__append_1)
-libuct_ib_la_CFLAGS = $(BASE_CFLAGS)
-libuct_ib_la_LIBADD = $(top_builddir)/src/ucs/libucs.la \
-                        $(top_builddir)/src/uct/libuct.la
+#SUBDIRS = . rdmacm
+#module_LTLIBRARIES = libuct_ib.la
+#libuct_ib_la_CPPFLAGS = $(BASE_CPPFLAGS) \
+#	$(IBVERBS_CPPFLAGS) $(am__append_1)
+#libuct_ib_la_CFLAGS = $(BASE_CFLAGS)
+#libuct_ib_la_LIBADD = $(top_builddir)/src/ucs/libucs.la \
+#                        $(top_builddir)/src/uct/libuct.la
 
-libuct_ib_la_LDFLAGS = $(IBVERBS_LDFLAGS) $(NUMA_LIBS) \
-	-version-info $(SOVERSION) $(am__append_6)
-libmlx5_ver = $(shell (rpm -qf $(IBVERBS_DIR)/include/infiniband/mlx5_hw.h &>/dev/null && rpm -qf /usr/include/infiniband/mlx5_hw.h) | grep -v 'not owned' | head -1)
-noinst_HEADERS = base/ib_device.h base/ib_iface.h \
-	base/ib_log.h base/ib_md.h base/ib_verbs.h \
-	$(am__append_2) $(am__append_4) $(am__append_8) \
-	$(am__append_10) $(am__append_13) \
-	$(am__append_16) $(am__append_18)
-libuct_ib_la_SOURCES = base/ib_device.c base/ib_iface.c \
-	base/ib_log.c base/ib_md.c $(am__append_3) \
-	$(am__append_5) $(am__append_7) $(am__append_9) \
-	$(am__append_11) $(am__append_12) \
-	$(am__append_14) $(am__append_15) \
-	$(am__append_17) $(am__append_19)
+#libuct_ib_la_LDFLAGS = $(IBVERBS_LDFLAGS) $(NUMA_LIBS) \
+#	-version-info $(SOVERSION) $(am__append_6)
+#libmlx5_ver = $(shell (rpm -qf $(IBVERBS_DIR)/include/infiniband/mlx5_hw.h &>/dev/null && rpm -qf /usr/include/infiniband/mlx5_hw.h) | grep -v 'not owned' | head -1)
+#noinst_HEADERS = base/ib_device.h base/ib_iface.h \
+#	base/ib_log.h base/ib_md.h base/ib_verbs.h \
+#	$(am__append_2) $(am__append_4) $(am__append_8) \
+#	$(am__append_10) $(am__append_13) \
+#	$(am__append_16) $(am__append_18)
+#libuct_ib_la_SOURCES = base/ib_device.c base/ib_iface.c \
+#	base/ib_log.c base/ib_md.c $(am__append_3) \
+#	$(am__append_5) $(am__append_7) $(am__append_9) \
+#	$(am__append_11) $(am__append_12) \
+#	$(am__append_14) $(am__append_15) \
+#	$(am__append_17) $(am__append_19)
 
 # Automake silent rules
-AM_V_LN = $(AM_V_LN_$(V))
-AM_V_LN_ = $(AM_V_LN_$(AM_DEFAULT_VERBOSITY))
-AM_V_LN_0 = echo "  LN      "
-AM_V_LN_1 = true
-local_la_modules = $(patsubst %, $(localmoduledir)/%, $(module_LTLIBRARIES))
+#AM_V_LN = $(AM_V_LN_$(V))
+#AM_V_LN_ = $(AM_V_LN_$(AM_DEFAULT_VERBOSITY))
+#AM_V_LN_0 = echo "  LN      "
+#AM_V_LN_1 = true
+#local_la_modules = $(patsubst %, $(localmoduledir)/%, $(module_LTLIBRARIES))
 all: all-recursive
 
 .SUFFIXES:
@@ -1414,7 +1414,7 @@ distdir-am: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-#all-local:
+all-local:
 all-am: Makefile $(LTLIBRARIES) $(HEADERS) all-local
 installdirs: installdirs-recursive
 installdirs-am:
@@ -1621,18 +1621,18 @@ uninstall-am: uninstall-moduleLTLIBRARIES
 .PRECIOUS: Makefile
 
 
-all-local: $(local_la_modules)
+#all-local: $(local_la_modules)
 
 # Create symbolic links for the built modules under $(localmoduledir)
 # Link also *.la files to create proper makefile dependencies
-$(local_la_modules): $(module_LTLIBRARIES)
-	$(AM_V_at)$(MKDIR_P) $(localmoduledir)
-	$(AM_V_at)for lib in *.la $(objdir)/*$(shrext)*; do \
-		(cd $(localmoduledir) && $(LN_RS) -nf $(shell pwd)/$$lib); \
-	done
-	@for lib in *.la $(objdir)/*$(shrext)*; do \
-		$(AM_V_LN) $$lib; \
-	done
+#$(local_la_modules): $(module_LTLIBRARIES)
+#	$(AM_V_at)$(MKDIR_P) $(localmoduledir)
+#	$(AM_V_at)for lib in *.la $(objdir)/*$(shrext)*; do \
+#		(cd $(localmoduledir) && $(LN_RS) -nf $(shell pwd)/$$lib); \
+#	done
+#	@for lib in *.la $(objdir)/*$(shrext)*; do \
+#		$(AM_V_LN) $$lib; \
+#	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

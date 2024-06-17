@@ -4,7 +4,7 @@
 # See file LICENSE for terms.
 #
 
-set(prefix "/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-install-arm")
+set(prefix "/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm-install")
 set(exec_prefix "${prefix}")
 
 add_library(ucx::ucs SHARED IMPORTED)

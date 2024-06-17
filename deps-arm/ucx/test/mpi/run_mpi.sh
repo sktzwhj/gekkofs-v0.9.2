@@ -63,9 +63,9 @@ usage()
 initialize()
 {
 	export MPIRUN=
-	export LIBUCS=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/.libs/libucs.so
-	export LIBUCT=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/uct/.libs/libuct.so
-	export LIBUCP=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucp/.libs/libucp.so
+	export LIBUCS=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/.libs/libucs.so
+	export LIBUCT=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/uct/.libs/libuct.so
+	export LIBUCP=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucp/.libs/libucp.so
 	export VERBOSE=0
 	export EXE=""
 	export EXE_ARGS=""
@@ -187,7 +187,7 @@ run_open_mpi()
 			--track-origins=yes \
 			--leak-check=yes \
 			--suppressions=${MPI_HOME}/share/openmpi/openmpi-valgrind.supp \
-			--suppressions=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/test/mpi/ompi.supp \
+			--suppressions=/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/test/mpi/ompi.supp \
 			$VALGRIND_ARGS \
 			$EXE"
 		LD_LIBRARY_PATH="$LD_LIBRARY_PATH:"

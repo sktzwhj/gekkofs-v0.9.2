@@ -1,1 +1,0 @@
-../../../doc/libsyscall_intercept.3.md

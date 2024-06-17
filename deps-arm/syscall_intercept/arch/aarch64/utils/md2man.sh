@@ -1,1 +1,0 @@
-../../../utils/md2man.sh

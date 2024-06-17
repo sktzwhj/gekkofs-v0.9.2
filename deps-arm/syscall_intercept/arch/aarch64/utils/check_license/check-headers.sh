@@ -1,1 +1,0 @@
-../../../../utils/check_license/check-headers.sh

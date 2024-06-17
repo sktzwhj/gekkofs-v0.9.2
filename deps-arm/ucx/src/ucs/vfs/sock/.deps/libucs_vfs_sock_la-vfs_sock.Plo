@@ -39,7 +39,7 @@ libucs_vfs_sock_la-vfs_sock.lo: vfs_sock.c /usr/include/stdc-predef.h \
  /usr/include/strings.h /usr/lib/gcc/aarch64-linux-gnu/9/include/stdint.h \
  /usr/include/stdint.h /usr/include/aarch64-linux-gnu/bits/wchar.h \
  /usr/include/aarch64-linux-gnu/bits/stdint-uintn.h \
- /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/sys/compiler_def.h \
+ /thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/sys/compiler_def.h \
  /usr/include/aarch64-linux-gnu/sys/socket.h \
  /usr/include/aarch64-linux-gnu/bits/types/struct_iovec.h \
  /usr/include/aarch64-linux-gnu/bits/socket.h \
@@ -170,7 +170,7 @@ vfs_sock.h:
 
 /usr/include/aarch64-linux-gnu/bits/stdint-uintn.h:
 
-/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240531/deps-arm/ucx/src/ucs/sys/compiler_def.h:
+/thfs3/home/wuhuijun/gekkofs-port-bsc-master-20240614/deps-arm/ucx/src/ucs/sys/compiler_def.h:
 
 /usr/include/aarch64-linux-gnu/sys/socket.h:
 
