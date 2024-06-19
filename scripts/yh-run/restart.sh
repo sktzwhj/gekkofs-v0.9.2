@@ -25,3 +25,4 @@ else
         echo "done"
 fi
 
+clush --conf $WORKDIR/clush.conf -b -w $nodes ps -ef | grep gkfs

@@ -1,6 +1,0 @@
-bistro/libucm_la-bistro_x86_64.lo: bistro/bistro_x86_64.c \
- /usr/include/stdc-predef.h ../../config.h
-
-/usr/include/stdc-predef.h:
-
-../../config.h:

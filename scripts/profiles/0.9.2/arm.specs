@@ -37,6 +37,7 @@ comment="Dependencies for PowerPC supercomputer"
 
 # Dependencies that must be downloaded directly
 wgetdeps=(
+    ["ucx"]="1.12.0"
     ["lz4"]="1.9.3"
     ["capstone"]="4.0.2"
     ["argobots"]="1.1"
@@ -66,7 +67,7 @@ clonedeps_patches=(
 
 # Ordering that MUST be followed when downloading
 order=(
-    "lz4" "capstone" "json-c" "psm2" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date" 
+   "ucx" "lz4" "capstone" "json-c" "psm2" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date" 
 )
 
 # Extra arguments passed to the installation script. As such, they can

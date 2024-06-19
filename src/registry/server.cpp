@@ -41,6 +41,21 @@ int main(int argc, char** argv)
     
     auto rpc_protocol = string(gkfs::rpc::protocol::ofi_sockets);
 
+    std::vector<std::string> params(argv, argv + argc);
+    for (size_t i = 1; i < params.size(); ++i) {
+        if (params[i] == "-P" && i + 1 < params.size()) {
+            rpc_protocol = params[i + 1];
+            break;
+        }
+    }
+    if(rpc_protocol != gkfs::rpc::protocol::ofi_verbs &&
+        rpc_protocol != gkfs::rpc::protocol::ofi_sockets &&
+        rpc_protocol != gkfs::rpc::protocol::ofi_psm2 &&
+        rpc_protocol != gkfs::rpc::protocol::na_ucx){
+            throw runtime_error(fmt::format(
+                    "Given RPC protocol '{}' not supported. ",
+                    rpc_protocol));
+        }
 
     hg_return_t            hret;
     margo_instance_id      mid;
