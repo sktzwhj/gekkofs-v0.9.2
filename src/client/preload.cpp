@@ -205,28 +205,31 @@ init_environment() {
     * Load host(daemon) addresses
     * Load Each GekkoFS Config
     * Connect to hosts(daemons) */
+    gkfs::utils::Set_ctx_vars();
+    if(CTX->use_registry()){
+        string registry_addr = "";
+        try {
+            LOG(INFO, "Loading registry address...");
+            registry_addr = gkfs::utils::read_registry_file();
+        } catch(const std::exception& e) {
+            exit_error_msg(EXIT_FAILURE,
+                        "Failed to load hosts addresses: "s + e.what());
+        }   
+        // initialize Hermes interface to Mercury
+        LOG(INFO, "Initializing RPC subsystem...");
+        if(!init_hermes_client()) { 
+            exit_error_msg(EXIT_FAILURE, "Unable to initialize RPC subsystem");
+        }
+        try {
+            gkfs::utils::connect_to_registry(registry_addr);// find hosts addr and save them to ctx
+        } catch(const std::exception& e) {
+            exit_error_msg(EXIT_FAILURE,
+                        "Failed to connect to hosts: "s + e.what());
+        }
+        // make merge request to Registry
+        request_registry();
+    }
 
-    string registry_addr = "";
-    try {
-        LOG(INFO, "Loading registry address...");
-        registry_addr = gkfs::utils::read_registry_file();
-    } catch(const std::exception& e) {
-        exit_error_msg(EXIT_FAILURE,
-                       "Failed to load hosts addresses: "s + e.what());
-    }   
-    // initialize Hermes interface to Mercury
-    LOG(INFO, "Initializing RPC subsystem...");
-    if(!init_hermes_client()) { 
-        exit_error_msg(EXIT_FAILURE, "Unable to initialize RPC subsystem");
-    }
-    try {
-        gkfs::utils::connect_to_registry(registry_addr);// find hosts addr and save them to ctx
-    } catch(const std::exception& e) {
-        exit_error_msg(EXIT_FAILURE,
-                       "Failed to connect to hosts: "s + e.what());
-    }
-    // make merge request to Registry
-    request_registry();
 
     vector<pair<string, string>> hosts{};
     pair<vector<unsigned int>,vector<unsigned int>> hosts_config{};
@@ -239,13 +242,21 @@ init_environment() {
     }   
     try {
         LOG(INFO, "Loading system config...");
-        hosts_config = gkfs::utils::read_hosts_config_file();
+        hosts_config = gkfs::utils::read_hosts_config_file(hosts.size());
     } catch(const std::exception& e) {
         exit_error_msg(EXIT_FAILURE,
                        "Failed to load system config: "s + e.what());
     }
     CTX->hostsconfig(hosts_config.first);
     CTX->fspriority(hosts_config.second);
+
+    if(!CTX->use_registry()){
+        // initialize Hermes interface to Mercury
+        LOG(INFO, "Initializing RPC subsystem...");
+        if(!init_hermes_client()) { 
+            exit_error_msg(EXIT_FAILURE, "Unable to initialize RPC subsystem");
+        }
+    }
 
     try {
         gkfs::utils::connect_to_hosts(hosts);//find hosts addr and save them to ctx
@@ -303,7 +314,7 @@ init_environment() {
  * This function is only called at preload library destruction
  * Register current work flow to Registry
  */
-int register_registry(){
+int register_registry(){    
     string workflow,hostfile,hostconfigfile;
     gkfs::utils::read_env(workflow,hostfile,hostconfigfile);
     //making register request to registry
@@ -377,7 +388,8 @@ destroy_preload() {
     CTX->clear_hosts();
     LOG(DEBUG, "Peer information deleted");
     //register work flow to registry
-    gkfs::preload::register_registry();/*--Multiple GekkoFS--*/
+    if(CTX->use_registry())
+        gkfs::preload::register_registry();/*--Multiple GekkoFS--*/
 
     ld_network_service.reset();
     LOG(DEBUG, "RPC subsystem shut down");

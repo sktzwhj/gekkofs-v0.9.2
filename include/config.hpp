@@ -43,6 +43,7 @@ constexpr auto hostfile_config_path = "./gkfs_hosts_config.txt";
 constexpr auto forwarding_file_path = "./gkfs_forwarding.map";
 constexpr auto registryfile_path = "./gkfs_registry.txt";
 constexpr auto merge_default = "off";
+constexpr auto use_registry = "on";
 
 namespace io {
 /*

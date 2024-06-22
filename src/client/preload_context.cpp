@@ -156,6 +156,16 @@ PreloadContext::registry(const hermes::endpoint& registry) {
     registry_ = registry;
 }
 
+bool
+PreloadContext::use_registry() const {
+    return use_registry_;
+}
+
+void
+PreloadContext::use_registry(bool use_registry) {
+    use_registry_ = use_registry;
+}
+
 const std::vector<unsigned int>&
 PreloadContext::hostsconfig() const {
     return hostsconfig_;

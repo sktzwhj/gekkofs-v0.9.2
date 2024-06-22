@@ -107,9 +107,8 @@ int main(int argc, char** argv)
     lf.close();
 
     fprintf(stderr, "# accepting RPCs on address \"%s\"\n", addr_self_string);
-    //fprintf(stderr, "# connect to this server with \"./margo-example-client %s\"\n", addr_self_string);
 
-    /* register RPC */
+    /* registry RPC */
     MARGO_REGISTER(mid, gkfs::rpc::tag::registry_request, rpc_registry_request_in_t, rpc_registry_request_out_t, 
                     rpc_srv_registry_request);
     MARGO_REGISTER(mid, gkfs::rpc::tag::registry_register, rpc_registry_register_in_t, rpc_err_out_t, 

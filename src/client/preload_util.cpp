@@ -177,7 +177,8 @@ load_hostfile(const std::string& path) {
     }
     /* --Multiple GekkoFS-- 
     *  Protocol is extracted in Registry Connection */
-    //extract_protocol(hosts[0].second);
+    if(!CTX->use_registry())
+        extract_protocol(hosts[0].second);
     // sort hosts so that data always hashes to the same place during restart
     //std::sort(hosts.begin(), hosts.end());
     // remove rootdir suffix from host after sorting as no longer required
@@ -383,6 +384,18 @@ void read_env(string &workflow,string &hostfile,string &hostconfigfile){
 
 /**
  * --Mulitple GekkoFS--
+ * Set CTX vars according to environment variables at init_envrionment beginning.
+ */
+void Set_ctx_vars(){
+    string use_registry = gkfs::env::get_var(gkfs::env::REGISTRY,
+                                  gkfs::config::use_registry);  
+    std::transform(use_registry.begin(), use_registry.end(), use_registry.begin(), ::tolower);
+    if(use_registry == "on") CTX->use_registry(true);
+    else CTX->use_registry(false);
+}
+
+/**
+ * --Mulitple GekkoFS--
  * Check whether making merge request to Registry
  * @param mergeflows flows to merge
  * @param hostfile  hostfile to generate
@@ -445,8 +458,11 @@ read_registry_file() {
  * @return pair<hostsize_vector, priority_vector>
  */
 pair<vector<unsigned int>,vector<unsigned int> >
-read_hosts_config_file() {
+read_hosts_config_file(unsigned int all_hosts) {
+    if(!CTX->use_registry())
+        return {{all_hosts},{1}};
     string hostconfigfile;
+    unsigned int hostconfigfile_hosts = 0, hostfile_hosts = all_hosts;
     hostconfigfile = gkfs::env::get_var(gkfs::env::HOSTS_CONFIG_FILE,
                                   gkfs::config::hostfile_config_path);
     ifstream lf(hostconfigfile);
@@ -459,6 +475,7 @@ read_hosts_config_file() {
             throw runtime_error(fmt::format("Invalid file format: '{}'", hostconfigfile));
         }
         hcfile.push_back(x);
+        hostconfigfile_hosts += x;
         fspriority.push_back(y);
     }
     
@@ -467,6 +484,9 @@ read_hosts_config_file() {
     }
 
     LOG(INFO, "Hosts config pool size: {}", hcfile.size());
+    if(hostconfigfile_hosts != hostfile_hosts){
+        throw runtime_error(fmt::format("HostConfigfile do not match Hostfile: '{}' daemons  compared to '{}' daemons", hostconfigfile_hosts, hostfile_hosts));
+    }
     return {hcfile,fspriority};
 }
 

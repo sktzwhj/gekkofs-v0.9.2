@@ -94,6 +94,7 @@ private:
 
     /* --Multiple GekkoFS-- */
     hermes::endpoint registry_; // Registry endp
+    bool use_registry_; // Use or not
     std::vector<unsigned int> hostsconfig_; // Host(Daemon) size of Each GekkoFS
     std::vector<unsigned int> fspriority_;  // FsPriority of Each GekkoFS -- used for data consistency
     std::map<std::string, unsigned int> pathfs_; // Cache of GekkoFS id where path exists
@@ -158,6 +159,12 @@ public:
 
     void
     registry(const hermes::endpoint &registry);
+
+    bool
+    use_registry() const;
+
+    void
+    use_registry(bool use);
 
     const std::vector<unsigned int>&
     hostsconfig() const;
