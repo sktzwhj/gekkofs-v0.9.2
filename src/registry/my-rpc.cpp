@@ -112,7 +112,7 @@ rpc_srv_registry_request(hg_handle_t handle)
             out.err = -1;
     }
 
-    std::cout<< "request out err " << out.err <<std::endl;
+    //std::cout<< "request out err " << out.err <<std::endl;
     auto hret = margo_respond(handle, &out);
     if(hret != HG_SUCCESS) {
         std::cout<< "Failed to respond my rpc ult\n";
@@ -133,7 +133,7 @@ DEFINE_MARGO_RPC_HANDLER(rpc_srv_registry_request)
 hg_return_t
 rpc_srv_registry_register(hg_handle_t handle)
 {
-    std::cout<< "succeed in getting flows hfile hcfile " <<std::endl;
+    //std::cout<< "succeed in getting flows hfile hcfile " <<std::endl;
     rpc_registry_register_in_t in;
     rpc_err_out_t out;
 
@@ -145,12 +145,12 @@ rpc_srv_registry_register(hg_handle_t handle)
     auto hcfile = in.hcfile;
     try {
         //Store the hostconfigfile and hostfile of the system where the workflow is located
-        std::cout<< flow<<" " << hcfile <<" "<< hfile <<std::endl;
+        //std::cout<< flow<<" " << hcfile <<" "<< hfile <<std::endl;
         job_flows[flow] = {hcfile,hfile} ;
     } catch(const std::exception& e) {
         out.err = -1;
     }
-    std::cout<< "register out err " << out.err <<std::endl;
+    //std::cout<< "register out err " << out.err <<std::endl;
     auto hret = margo_respond(handle, &out);
     if(hret != HG_SUCCESS) {
         std::cout<< "Failed to respond my rpc ult\n";
