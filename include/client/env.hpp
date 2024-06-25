@@ -49,6 +49,14 @@ static constexpr auto LOG_PER_PROCESS = ADD_PREFIX("LOG_PER_PROCESS");
 static constexpr auto LOG_OUTPUT_TRUNC = ADD_PREFIX("LOG_OUTPUT_TRUNC");
 static constexpr auto CWD = ADD_PREFIX("CWD");
 static constexpr auto HOSTS_FILE = ADD_PREFIX("HOSTS_FILE");
+/* --Multiple GekkoFS-- */
+static constexpr auto WORK_FLOW = ADD_PREFIX("WORK_FLOW");
+static constexpr auto MERGE = ADD_PREFIX("MERGE");
+static constexpr auto MERGE_FLOWS = ADD_PREFIX("MERGE_FLOWS");
+static constexpr auto REGISTRY = ADD_PREFIX("REGISTRY");
+static constexpr auto REGISTRY_FILE = ADD_PREFIX("REGISTRY_FILE");
+static constexpr auto HOSTS_CONFIG_FILE = ADD_PREFIX("HOSTS_CONFIG_FILE");
+/* --Multiple GekkoFS-- */
 #ifdef GKFS_ENABLE_FORWARDING
 static constexpr auto FORWARDING_MAP_FILE = ADD_PREFIX("FORWARDING_MAP_FILE");
 #endif

@@ -126,4 +126,17 @@ MERCURY_GEN_PROC(
         ((hg_int32_t) (err))((hg_uint64_t) (chunk_size))(
                 (hg_uint64_t) (chunk_total))((hg_uint64_t) (chunk_free)))
 
+//registry
+MERCURY_GEN_PROC(
+        rpc_registry_request_out_t,
+        ((hg_int32_t) (err)))
+
+MERCURY_GEN_PROC(
+        rpc_registry_request_in_t,
+        ((hg_const_string_t) (merge_flows))((hg_const_string_t) (merge_hcfile))((hg_const_string_t) (merge_hfile)))
+
+MERCURY_GEN_PROC(
+        rpc_registry_register_in_t,
+        ((hg_const_string_t) (work_flow))((hg_const_string_t) (hcfile))((hg_const_string_t) (hfile)))
+
 #endif // LFS_RPC_TYPES_HPP

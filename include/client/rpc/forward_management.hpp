@@ -29,11 +29,20 @@
 
 #ifndef GEKKOFS_CLIENT_FORWARD_MNGMNT_HPP
 #define GEKKOFS_CLIENT_FORWARD_MNGMNT_HPP
-
+#include <string>
 namespace gkfs::rpc {
 
 bool
 forward_get_fs_config();
+
+/* --Multiple GekkoFS-- */
+
+int
+forward_request_registry(std::string flows, std::string hcfile, std::string hfile);
+
+int
+forward_register_registry(std::string work_flow, std::string hcfile, std::string hfile);
+/* --Multiple GekkoFS-- */
 
 } // namespace gkfs::rpc
 

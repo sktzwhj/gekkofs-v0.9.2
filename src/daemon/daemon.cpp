@@ -70,7 +70,7 @@ namespace fs = std::filesystem;
 
 static condition_variable shutdown_please; // handler for shutdown signaling
 static mutex mtx; // mutex to wait on shutdown conditional variable
-static bool keep_rootdir = true;
+static bool keep_rootdir = false;
 
 struct cli_options {
     string mountdir;
