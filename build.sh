@@ -2,7 +2,7 @@
 
 ARCH=`lscpu | grep Architecture | awk '{print $2}'`
 GKFS_HOME=$PWD
-DEPS_PATH="deps_install"
+DEPS_PATH="deps-install"
 if [ $ARCH == "aarch64" ];then
 	DEPS_PATH="deps-install-arm"
 fi

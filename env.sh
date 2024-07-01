@@ -2,13 +2,15 @@
 
 machine=TH
 if [ $machine == "TH" ];then
-	echo "setting GKFS_HOME to ",$(dirname `realpath "${BASH_SOURCE[0]}"`)
+	echo "setting GKFS_HOME to "$(dirname `realpath "${BASH_SOURCE[0]}"`)
 	export GKFS_HOME=$(dirname `realpath "${BASH_SOURCE[0]}"`)
 	MPI_PATH=/thfs3/home/wuhuijun/mpich4/
 	export PATH=${MPI_PATH}/bin:$PATH
 fi	
 ARCH=`lscpu | grep Architecture | awk '{print $2}'`
-DEPS_PATH="deps_install"
+echo "The CPU architecture is $ARCH"
+
+DEPS_PATH="deps-install"
 if [ $ARCH == "aarch64" ];then
         DEPS_PATH="deps-arm-install"
 fi
@@ -20,3 +22,4 @@ export LD_LIBRARY_PATH=${DEPSROOT}/${DEPS_PATH}/lib:${DEPSROOT}/${DEPS_PATH}/lib
 echo "setting LD_LIBRARY_PATH to ${LD_LIBRARY_PATH}"
 export UCX_TLS=tcp,glex
 export UCX_NET_DEVICES=gn0,gni0
+export PATH=/home/whj/software/cmake/bin:$PATH

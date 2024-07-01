@@ -53,3 +53,4 @@ target_link_libraries(
          Threads::Threads
 )
 
+install(TARGETS gkfs_registry RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

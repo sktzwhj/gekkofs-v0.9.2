@@ -145,7 +145,7 @@ vector<pair<string, string>>
 load_hostfile(const std::string& path) {
 
     LOG(DEBUG, "Loading hosts file: \"{}\"", path);
-
+    //std::cout<<"host file path : " << path <<std::endl; 
     ifstream lf(path);
     if(!lf) {
         throw runtime_error(fmt::format("Failed to open hosts file '{}': {}",
@@ -170,6 +170,7 @@ load_hostfile(const std::string& path) {
         host = match[1];
         uri = match[2];
         hosts.emplace_back(host, uri);
+        //std::cout<<"get daemon uri:" << uri <<std::endl; 
     }
     if(hosts.empty()) {
         throw runtime_error(
