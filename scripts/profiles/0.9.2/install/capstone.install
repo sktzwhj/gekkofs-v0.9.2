@@ -48,6 +48,7 @@ pkg_install() {
     CURR="${SOURCE_DIR}/${ID}"
     prepare_build_dir "${CURR}"
     cd "${CURR}/build"
+    echo "INSTALL_DIR = ${INSTALL_DIR}"
     ${CMAKE} -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" -DCMAKE_BUILD_TYPE:STRING=Release ..
     make -j"${CORES}" install
 }

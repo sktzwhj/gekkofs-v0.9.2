@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-DEPS=$(dirname `dirname \`realpath  $0\``)/deps-arm/
+DEPS=$(dirname `dirname \`realpath  $0\``)/deps/
 
 find "$DEPS" -print | while read -r file; do
  

@@ -37,6 +37,7 @@ comment="All dependencies"
 
 # Dependencies that must be downloaded directly
 wgetdeps=(
+    ["ucx"]="1.12.0"
     ["lz4"]="1.9.3"
     ["capstone"]="4.0.2"
     ["argobots"]="1.1"

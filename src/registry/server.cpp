@@ -40,12 +40,17 @@ int main(int argc, char** argv)
                                         gkfs::config::registryfile_path);
     
     auto rpc_protocol = string(gkfs::rpc::protocol::ofi_sockets);
-
+    string listen = "", bind = "";
     std::vector<std::string> params(argv, argv + argc);
     for (size_t i = 1; i < params.size(); ++i) {
         if (params[i] == "-P" && i + 1 < params.size()) {
             rpc_protocol = params[i + 1];
-            break;
+            i++;
+        }
+        else if (params[i] == "-l" && i + 1 < params.size()) {
+            listen = params[i + 1];
+            bind = "://" + listen;
+            i++;
         }
     }
     if(rpc_protocol != gkfs::rpc::protocol::ofi_verbs &&
@@ -56,7 +61,8 @@ int main(int argc, char** argv)
                     "Given RPC protocol '{}' not supported. ",
                     rpc_protocol));
         }
-
+    bind = rpc_protocol + bind ;
+    
     hg_return_t            hret;
     margo_instance_id      mid;
     hg_addr_t              addr_self;
@@ -67,7 +73,7 @@ int main(int argc, char** argv)
 
     struct margo_init_info args = {nullptr};
     args.json_config = starter_json;
-    mid               = margo_init_ext(rpc_protocol.c_str(), MARGO_SERVER_MODE, &args);
+    mid               = margo_init_ext(bind.c_str(), MARGO_SERVER_MODE, &args);
     if (mid == MARGO_INSTANCE_NULL) {
         fprintf(stderr, "Error: margo_init_ext()\n");
         return (-1);
@@ -105,7 +111,7 @@ int main(int argc, char** argv)
                             registry_file, strerror(errno)));
     }
     lf.close();
-
+    fprintf(stderr, "# bind \"%s\"\n", bind.c_str());
     fprintf(stderr, "# accepting RPCs on address \"%s\"\n", addr_self_string);
 
     /* registry RPC */
