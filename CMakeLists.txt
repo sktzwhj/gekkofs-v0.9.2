@@ -179,6 +179,16 @@ if(GKFS_ENABLE_ROCKSDB)
     message(STATUS "[${PROJECT_NAME}] RocksDB location ${RocksDB_DIR}")
 endif()
 
+### Metadata backends
+if(GKFS_ENABLE_REDIS)
+    message(STATUS "[${PROJECT_NAME}] Checking for Redis")
+    add_compile_definitions(GKFS_ENABLE_REDIS)
+    find_path(HIREDIS_HEADER hiredis)
+    find_library(HIREDIS_LIB hiredis)
+    find_path(REDIS_PLUS_PLUS_HEADER sw)
+    find_library(REDIS_PLUS_PLUS_LIB redis++)
+endif()
+
 if(GKFS_ENABLE_PARALLAX)
     add_compile_definitions(GKFS_ENABLE_PARALLAX)
     # The current version of Parallax has a direct dependency on libyaml and librt.
