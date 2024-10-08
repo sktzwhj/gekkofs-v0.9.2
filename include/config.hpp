@@ -67,7 +67,7 @@ constexpr auto dir = "metadata";
 
 // which metadata should be considered apart from size and mode
 // Blocks are used to store the rename status (-1 is a renamed file)
-constexpr auto use_atime = false;
+constexpr auto use_atime = true;
 constexpr auto use_ctime = false;
 constexpr auto use_mtime = false;
 constexpr auto use_link_cnt = false;

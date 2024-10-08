@@ -25,66 +25,33 @@
 #                                                                              #
 # SPDX-License-Identifier: GPL-3.0-or-later                                    #
 ################################################################################
+# vi: ft=bash
 
-# Define metadata module library first
-add_library(metadata_module STATIC)
-target_sources(
-  metadata_module
-  PUBLIC ${CMAKE_SOURCE_DIR}/include/daemon/backend/metadata/metadata_module.hpp
-  PRIVATE metadata_module.cpp
-)
-target_link_libraries(metadata_module PRIVATE log_util)
+################################################################################
+## The installation script must define both a pkg_install function and
+## pkg_check function that, as their name implies, must specify how
+## a dependency package should be installed and tested.  ## ## The following
+## variables can be used in the installation script:
+## - CMAKE: a variable that expands to the cmake binary
+## - SOURCE_DIR: the directory where the sources for the package were
+##               downloaded
+## - INSTALL_DIR: the directory where the package should be installed
+## - CORES: the number of cores to use when building
+## - COMPILER_NAME: the name of the compiler being used (e.g. g++, clang, etc.)
+## - COMPILER_FULL_VERSION: the compiler's full version (e.g. 9.3.0)
+## - COMPILER_MAJOR_VERSION: the compiler's major version (e.g. 9)
+## - PERFORM_TEST: whether tests for the package should be executed cmake -L -DCMAKE_INSTALL_PREFIX=/home/changqin/cmaketest -DCMAKE_BUILD_TYPE:STRING=Release ..
+################################################################################
 
-# Define metadata_backend and its common dependencies and sources
-add_library(metadata_backend STATIC)
-target_sources(
-  metadata_backend
-  PUBLIC
-    ${CMAKE_SOURCE_DIR}/include/daemon/backend/metadata/db.hpp
-    ${CMAKE_SOURCE_DIR}/include/daemon/backend/exceptions.hpp
-    ${CMAKE_SOURCE_DIR}/include/daemon/backend/metadata/metadata_backend.hpp
-  PRIVATE ${CMAKE_SOURCE_DIR}/include/daemon/backend/metadata/merge.hpp
-          merge.cpp db.cpp
-)
+pkg_install() {
 
-target_link_libraries(
-  metadata_backend
-  PRIVATE metadata_module dl log_util path_util
-)
+    ID="hiredis"
+    CURR="${SOURCE_DIR}/${ID}"
+    cd "${CURR}"
+    ${CMAKE} -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" 
+    make -j"${CORES}" install
+}
 
-if(GKFS_ENABLE_ROCKSDB)
-  target_sources(
-    metadata_backend
-    PUBLIC ${CMAKE_SOURCE_DIR}/include/daemon/backend/metadata/rocksdb_backend.hpp
-    PRIVATE rocksdb_backend.cpp
-  )
-
-  # If liburing is available in the system, RocksDB will have been built
-  # with liburing support. If so, we need to propagate the dependency to
-  # the daemon. Since liburing exports a pkg-config .pc file, we can use it
-  # to retrieve its details.
-  pkg_check_modules(URING IMPORTED_TARGET liburing)
-
-  if(URING_FOUND)
-    target_link_libraries(metadata_backend PUBLIC PkgConfig::URING)
-  endif()
-
-  target_link_libraries(metadata_backend PUBLIC RocksDB::rocksdb)
-endif()
-
-if(GKFS_ENABLE_PARALLAX)
-  target_sources(metadata_backend
-    PUBLIC ${CMAKE_SOURCE_DIR}/include/daemon/backend/metadata/parallax_backend.hpp
-    PRIVATE parallax_backend.cpp
-    )
-  target_link_libraries(metadata_backend PUBLIC Parallax::parallax
-    Parallax::log)
-endif()
-
-if(GKFS_ENABLE_REDIS)
-  target_sources(metadata_backend
-    PUBLIC ${CMAKE_SOURCE_DIR}/include/daemon/backend/metadata/redis_backend.hpp
-    PRIVATE redis_backend.cpp
-    )
-  target_link_libraries(metadata_backend PUBLIC ${HIREDIS_LIB} ${REDIS_PLUS_PLUS_LIB})
-endif()
+pkg_check() {
+    :
+}

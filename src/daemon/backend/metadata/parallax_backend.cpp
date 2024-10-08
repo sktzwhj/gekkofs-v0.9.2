@@ -397,7 +397,7 @@ ParallaxBackend::get_dirents_impl(const std::string& dir) const {
            k.substr(0, root_path.size()) != root_path) {
             break;
         }
-
++
         if(k.size() == root_path.size()) {
             par_get_next(S);
             continue;
