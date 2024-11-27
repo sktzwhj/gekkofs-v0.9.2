@@ -41,7 +41,7 @@
 using namespace std;
 
 namespace gkfs::rpc {
-
+namespace cfg = gkfs::config::rpc;
 /*
  * This file includes all metadata RPC calls.
  * NOTE: No errno is defined here!
@@ -253,7 +253,6 @@ forward_remove(const std::string& path, const int8_t num_copies) {
                                ->post<gkfs::rpc::remove_metadata>(endp, path)
                                .get()
                                .at(0);
-
             LOG(DEBUG, "Got response success: {}", out.err());
 
             if(out.err())
@@ -272,72 +271,15 @@ forward_remove(const std::string& path, const int8_t num_copies) {
 
 
     std::vector<hermes::rpc_handle<gkfs::rpc::remove_data>> handles;
-
-    // Small files
-    if(static_cast<std::size_t>(size / gkfs::config::rpc::chunksize) <
-       CTX->hosts().size()) {
-        for(auto copymd = 0; copymd < (num_copies + 1); copymd++) {
-            const auto metadata_host_id =
-                    CTX->distributor()->locate_file_metadata(path, copymd);
-            const auto endp_metadata = CTX->hosts().at(metadata_host_id);
-
-            try {
-                LOG(DEBUG, "Sending RPC to host: {}",
-                    endp_metadata.to_string());
-                gkfs::rpc::remove_data::input in(path);
-                handles.emplace_back(
-                        ld_network_service->post<gkfs::rpc::remove_data>(
-                                endp_metadata, in));
-
-                uint64_t chnk_start = 0;
-                uint64_t chnk_end = size / gkfs::config::rpc::chunksize;
-
-                for(uint64_t chnk_id = chnk_start; chnk_id <= chnk_end;
-                    chnk_id++) {
-                    for(auto copy = 0; copy < (num_copies + 1); copy++) {
-                        const auto chnk_host_id =
-                                CTX->distributor()->locate_data(path, chnk_id,
-                                                                copy);
-                        if constexpr(gkfs::config::metadata::
-                                             implicit_data_removal) {
-                            /*
-                             * If the chnk host matches the metadata host the
-                             * remove request as already been sent as part of
-                             * the metadata remove request.
-                             */
-                            if(chnk_host_id == metadata_host_id)
-                                continue;
-                        }
-                        const auto endp_chnk = CTX->hosts().at(chnk_host_id);
-
-                        LOG(DEBUG, "Sending RPC to host: {}",
-                            endp_chnk.to_string());
-
-                        handles.emplace_back(
-                                ld_network_service
-                                        ->post<gkfs::rpc::remove_data>(
-                                                endp_chnk, in));
-                    }
-                }
-            } catch(const std::exception& ex) {
-                LOG(ERROR,
-                    "Failed to forward non-blocking rpc request reduced remove requests");
-                return EBUSY;
-            }
-        }
-    } else { // "Big" files
-        for(const auto& endp : CTX->hosts()) {
+    if(cfg::use_PFL){
+        //remove for PFL
+        auto targets = CTX->distributor()->locate_host_set(path, size, num_copies);
+        for(const auto& target : targets) {
+            auto endp = CTX->hosts().at(target);
             try {
                 LOG(DEBUG, "Sending RPC to host: {}", endp.to_string());
 
                 gkfs::rpc::remove_data::input in(path);
-
-                // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so
-                // that we can retry for RPC_TRIES (see old commits with margo)
-                // TODO(amiranda): hermes will eventually provide a
-                // post(endpoint) returning one result and a
-                // broadcast(endpoint_set) returning a result_set. When that
-                // happens we can remove the .at(0) :/
 
                 handles.emplace_back(
                         ld_network_service->post<gkfs::rpc::remove_data>(endp,
@@ -353,7 +295,90 @@ forward_remove(const std::string& path, const int8_t num_copies) {
                 return EBUSY;
             }
         }
+    } else {
+            // Small files
+        if(static_cast<std::size_t>(size / gkfs::config::rpc::chunksize) <
+        CTX->hosts().size()) {
+            for(auto copymd = 0; copymd < (num_copies + 1); copymd++) {
+                const auto metadata_host_id =
+                        CTX->distributor()->locate_file_metadata(path, copymd);
+                const auto endp_metadata = CTX->hosts().at(metadata_host_id);
+
+                try {
+                    LOG(DEBUG, "Sending RPC to host: {}",
+                        endp_metadata.to_string());
+                    gkfs::rpc::remove_data::input in(path);
+                    handles.emplace_back(
+                            ld_network_service->post<gkfs::rpc::remove_data>(
+                                    endp_metadata, in));
+
+                    uint64_t chnk_start = 0;
+                    uint64_t chnk_end = size / gkfs::config::rpc::chunksize;
+
+                    for(uint64_t chnk_id = chnk_start; chnk_id <= chnk_end;
+                        chnk_id++) {
+                        for(auto copy = 0; copy < (num_copies + 1); copy++) {
+                            const auto chnk_host_id =
+                                    CTX->distributor()->locate_data(path, chnk_id,
+                                                                    copy);
+                            if constexpr(gkfs::config::metadata::
+                                                implicit_data_removal) {
+                                /*
+                                * If the chnk host matches the metadata host the
+                                * remove request as already been sent as part of
+                                * the metadata remove request.
+                                */
+                                if(chnk_host_id == metadata_host_id)
+                                    continue;
+                            }
+                            const auto endp_chnk = CTX->hosts().at(chnk_host_id);
+
+                            LOG(DEBUG, "Sending RPC to host: {}",
+                                endp_chnk.to_string());
+
+                            handles.emplace_back(
+                                    ld_network_service
+                                            ->post<gkfs::rpc::remove_data>(
+                                                    endp_chnk, in));
+                        }
+                    }
+                } catch(const std::exception& ex) {
+                    LOG(ERROR,
+                        "Failed to forward non-blocking rpc request reduced remove requests");
+                    return EBUSY;
+                }
+            }
+        } else { // "Big" files
+            for(const auto& endp : CTX->hosts()) {
+                try {
+                    LOG(DEBUG, "Sending RPC to host: {}", endp.to_string());
+
+                    gkfs::rpc::remove_data::input in(path);
+
+                    // TODO(amiranda): add a post() with RPC_TIMEOUT to hermes so
+                    // that we can retry for RPC_TRIES (see old commits with margo)
+                    // TODO(amiranda): hermes will eventually provide a
+                    // post(endpoint) returning one result and a
+                    // broadcast(endpoint_set) returning a result_set. When that
+                    // happens we can remove the .at(0) :/
+
+                    handles.emplace_back(
+                            ld_network_service->post<gkfs::rpc::remove_data>(endp,
+                                                                            in));
+
+                } catch(const std::exception& ex) {
+                    // TODO(amiranda): we should cancel all previously posted
+                    // requests here, unfortunately, Hermes does not support it yet
+                    // :/
+                    LOG(ERROR,
+                        "Failed to forward non-blocking rpc request to host: {}",
+                        endp.to_string());
+                    return EBUSY;
+                }
+            }
+        }
     }
+
     // wait for RPC responses
     auto err = 0;
     for(const auto& h : handles) {

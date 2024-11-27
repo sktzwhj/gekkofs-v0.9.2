@@ -30,12 +30,16 @@
 #define GEKKOFS_CONFIG_HPP
 
 #include <common/cmake_configure.hpp>
-
+#include <array>
+#include <cstdint>
 // environment prefixes (are concatenated in env module at compile time)
 #define CLIENT_ENV_PREFIX "LIBGKFS_"
 #define DAEMON_ENV_PREFIX "GKFS_DAEMON_"
 #define COMMON_ENV_PREFIX "GKFS_"
-
+#define KB *1024
+#define MB *1024*1024
+#define GB *1024*1024*1024
+#define TB *1024*1024*1024*1024
 namespace gkfs::config {
 
 constexpr auto hostfile_path = "./gkfs_hosts.txt";
@@ -43,7 +47,7 @@ constexpr auto hostfile_config_path = "./gkfs_hosts_config.txt";
 constexpr auto forwarding_file_path = "./gkfs_forwarding.map";
 constexpr auto registryfile_path = "./gkfs_registry.txt";
 constexpr auto merge_default = "off";
-constexpr auto use_registry = "on";
+constexpr auto use_registry = "off";
 
 namespace io {
 /*
@@ -96,6 +100,26 @@ constexpr auto chunk_dir = "chunks";
 
 namespace rpc {
 constexpr auto chunksize = 524288; // in bytes (e.g., 524288 == 512KB)
+/* PFL configuration */
+constexpr auto use_PFL = true;
+constexpr auto PFLcomponents = 6; //number of regions to seperate
+constexpr std::array<uint64_t, PFLcomponents> PFLlayout = {0, 4 MB, 8 MB, 16 MB, 32 MB, 64 MB}; //layout :start offset of each component
+constexpr std::array<uint64_t, PFLcomponents> PFLsize = {512 KB, 1 MB, 2 MB, 4 MB, 8 MB, 16 MB};//stripe size
+constexpr std::array<uint64_t, PFLcomponents> PFLcount = {1, 3, 8, 16, 32, 64}; //stripe count 
+inline const std::array<uint64_t, PFLcomponents >  generateID() {
+    std::array<uint64_t, PFLcomponents >  chunkid;
+    int pre_id = 0, pre = 0;
+    chunkid[0] = 0;
+    for(unsigned int i = 1 ; i <PFLlayout.size(); i++){
+      chunkid[i] = (PFLlayout[i] - pre)/PFLsize[i-1] + pre_id ;
+      pre_id = (PFLlayout[i] - pre)/PFLsize[i-1] + pre_id;
+      pre = PFLlayout[i];
+    }
+    return chunkid;
+}
+const std::array<uint64_t, PFLcomponents>  PFLchunkID = generateID();   //chunk start id of each component
+/* PFL configuration */
+
 // size of preallocated buffer to hold directory entries in rpc call
 constexpr auto dirents_buff_size = (8 * 1024 * 1024); // 8 mega
 /*

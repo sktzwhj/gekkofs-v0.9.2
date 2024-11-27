@@ -56,7 +56,8 @@ using namespace std;
 
 
 namespace {
-
+namespace cfg = gkfs::config::rpc;
+using gkfs::utils::arithmetic::last_smaller_equal;
 /**
  * @brief Serves a write request transferring the chunks associated with this
  * daemon and store them on the node-local FS.
@@ -216,6 +217,13 @@ rpc_srv_write(hg_handle_t handle) {
     auto transfer_size = (bulk_size <= gkfs::config::rpc::chunksize)
                                  ? bulk_size
                                  : gkfs::config::rpc::chunksize;
+    /* --PFL implementation-- */
+    //component number of first chunk
+    auto cpn = last_smaller_equal(cfg::PFLchunkID, in.chunk_start);
+    //help to calculate origin_offset
+    uint64_t ori_offset = 0;
+    uint64_t chunksize = gkfs::config::rpc::chunksize;
+    /* --PFL implementation-- */
     uint64_t origin_offset;
     uint64_t local_offset;
     // object for asynchronous disk IO
@@ -230,6 +238,22 @@ rpc_srv_write(hg_handle_t handle) {
     for(auto chnk_id_file = in.chunk_start;
         chnk_id_file <= in.chunk_end && chnk_id_curr < in.chunk_n;
         chnk_id_file++) {
+        /* --PFL implementation-- */
+        if(cfg::use_PFL) {
+            //track component number of current chunk
+            if(cpn + 1 < cfg::PFLcomponents && 
+                chnk_id_file >= cfg::PFLchunkID[cpn + 1]) cpn++; 
+            chunksize = cfg::PFLsize[cpn];
+            //It seems that bulk_size is no use to transfer_size as transfer_size
+            //is not used when bulk_size <= chunksize 
+            transfer_size = (bulk_size <= chunksize)? bulk_size : chunksize;
+            //ori_offset denotes the size from in.offset to chnk_id_file.end 
+            if(chnk_id_file == in.chunk_start && in.offset > 0) 
+                ori_offset = chunksize - in.offset;
+            else
+                ori_offset += chunksize;
+        }
+        /* --PFL implementation-- */
         // Continue if chunk does not hash to this host
 
         if(!(gkfs::rpc::get_bitset(write_ops_vect,
@@ -252,11 +276,11 @@ rpc_srv_write(hg_handle_t handle) {
             // if only 1 destination and 1 chunk (small write) the transfer_size
             // == bulk_size
             size_t offset_transfer_size = 0;
-            if(in.offset + bulk_size <= gkfs::config::rpc::chunksize)
+            if(in.offset + bulk_size <= chunksize)
                 offset_transfer_size = bulk_size;
             else
                 offset_transfer_size = static_cast<size_t>(
-                        gkfs::config::rpc::chunksize - in.offset);
+                        chunksize - in.offset);
             ret = margo_bulk_transfer(mid, HG_BULK_PULL, hgi->addr,
                                       in.bulk_handle, 0, bulk_handle, 0,
                                       offset_transfer_size);
@@ -284,6 +308,11 @@ rpc_srv_write(hg_handle_t handle) {
             else
                 origin_offset = (chnk_id_file - in.chunk_start) *
                                 gkfs::config::rpc::chunksize;
+            /* --PFL implementation-- */
+            if(cfg::use_PFL) {
+                //origin_offset denotes the size from in.offset to chnk_id_file.start
+                origin_offset = ori_offset - chunksize;
+            }/* --PFL implementation-- */
             // last chunk might have different transfer_size
             if(chnk_id_curr == in.chunk_n - 1)
                 transfer_size = chnk_size_left_host;
@@ -509,6 +538,13 @@ rpc_srv_read(hg_handle_t handle) {
     auto transfer_size = (bulk_size <= gkfs::config::rpc::chunksize)
                                  ? bulk_size
                                  : gkfs::config::rpc::chunksize;
+    /* --PFL implementation-- */
+    //component number of first chunk
+    auto cpn = last_smaller_equal(cfg::PFLchunkID, in.chunk_start);
+    //help to calculate origin_offset
+    uint64_t ori_offset = 0;
+    uint64_t chunksize = gkfs::config::rpc::chunksize;
+    /* --PFL implementation-- */
     // object for asynchronous disk IO
     gkfs::data::ChunkReadOperation chunk_read_op{in.path, in.chunk_n};
     /*
@@ -520,6 +556,22 @@ rpc_srv_read(hg_handle_t handle) {
     for(auto chnk_id_file = in.chunk_start;
         chnk_id_file <= in.chunk_end && chnk_id_curr < in.chunk_n;
         chnk_id_file++) {
+        /* --PFL implementation-- */
+        if(cfg::use_PFL) {
+            //track component number of current chunk
+            if(cpn + 1 < cfg::PFLcomponents && 
+                chnk_id_file >= cfg::PFLchunkID[cpn + 1]) cpn++; 
+            chunksize = cfg::PFLsize[cpn];
+            //It seems that bulk_size is no use to transfer_size as transfer_size
+            //is not used when bulk_size <= chunksize 
+            transfer_size = (bulk_size <= chunksize)? bulk_size : chunksize;
+            //ori_offset denotes the size from in.offset to chnk_id_file.end 
+            if(chnk_id_file == in.chunk_start && in.offset > 0) 
+                ori_offset = chunksize - in.offset;
+            else
+                ori_offset += chunksize;
+        }
+        /* --PFL implementation-- */
         // Continue if chunk does not hash to this host
 
         // We only check if we are not using replicas
@@ -544,11 +596,11 @@ rpc_srv_read(hg_handle_t handle) {
             // if only 1 destination and 1 chunk (small read) the transfer_size
             // == bulk_size
             size_t offset_transfer_size = 0;
-            if(in.offset + bulk_size <= gkfs::config::rpc::chunksize)
+            if(in.offset + bulk_size <= chunksize)
                 offset_transfer_size = bulk_size;
             else
                 offset_transfer_size = static_cast<size_t>(
-                        gkfs::config::rpc::chunksize - in.offset);
+                        chunksize - in.offset);
             // Setting later transfer offsets
             local_offsets[chnk_id_curr] = 0;
             origin_offsets[chnk_id_curr] = 0;
@@ -570,6 +622,11 @@ rpc_srv_read(hg_handle_t handle) {
             else
                 origin_offsets[chnk_id_curr] = (chnk_id_file - in.chunk_start) *
                                                gkfs::config::rpc::chunksize;
+            /* --PFL implementation-- */
+            if(cfg::use_PFL) {
+                //origin_offset denotes the size from in.offset to chnk_id_file.start
+                origin_offsets[chnk_id_curr] = ori_offset - chunksize;
+            }/* --PFL implementation-- */
             // last chunk might have different transfer_size
             if(chnk_id_curr == in.chunk_n - 1)
                 transfer_size = chnk_size_left_host;
