@@ -1,0 +1,3 @@
+stage-in ./tools cp /fs2/home/wuhuijun/lmj/software/test/1G /dev/shm/gekkofs/gkfs/1G
+stage-out ./tools cp /dev/shm/gekkofs/gkfs/1G /fs2/home/wuhuijun/lmj/software/test/bbb
+srun -w cn[78966-78969] -p cp6 ./ior -b 10g -t 512K -w -r -C -o /fs2/home/wuhuijun/lmj/gkfs/out/aa

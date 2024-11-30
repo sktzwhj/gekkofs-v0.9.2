@@ -1,0 +1,6 @@
+./stage-in
+./stage-out
+./tools
+gkfs_hosts.txt
+gkfs_hosts.txt.pid
+

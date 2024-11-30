@@ -1,0 +1,9 @@
+tools:
+  gekkofs: # gekkofs 的相关配置
+    mount_dir: /dev/shm/gkfs # 填入挂载目录
+    data_dir:  /dev/shm/data # 这里你可以填入挂载的数据目录
+    hosts_file: /fs2/home/wuhuijun/lmj/source/gekkofs-v0.9.2/scripts/yh-run/gkfs_hosts.txt
+    ld_preload_file: /fs2/home/wuhuijun/lmj/source/gekkofs-v0.9.2/install/lib64/libgkfs_intercept.so #TODO 修改为client file
+  clush: # clush的配置文件路径
+    conf: ./clush.conf
+
