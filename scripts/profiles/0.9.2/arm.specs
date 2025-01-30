@@ -37,6 +37,9 @@ comment="Dependencies for PowerPC supercomputer"
 
 # Dependencies that must be downloaded directly
 wgetdeps=(
+    ["libevent"]="2.1.12-stable" 
+    ["memcached"]="1.6.34"
+    ["libmemcached"]="1.1.4"
     ["redis"]="7.4.0"
     ["hiredis"]="1.2.0"
     ["redis-plus-plus"]="1.3.12"
@@ -70,7 +73,7 @@ clonedeps_patches=(
 
 # Ordering that MUST be followed when downloading
 order=(
-   "redis" "hiredis" "redis-plus-plus" "ucx" "lz4" "capstone" "json-c" "psm2" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date" 
+   ""libevent" "memcached" "libmemcached" "redis" "hiredis" "redis-plus-plus" "ucx" "lz4" "capstone" "json-c" "psm2" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date" 
 )
 
 # Extra arguments passed to the installation script. As such, they can

@@ -28,7 +28,6 @@
 
 #include <daemon/backend/metadata/db.hpp>
 #include <daemon/backend/exceptions.hpp>
-#include <daemon/backend/metadata/metadata_module.hpp>
 
 #include <common/metadata.hpp>
 #include <common/path_util.hpp>
@@ -40,16 +39,18 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <daemon/backend/metadata/redis_backend.hpp>
+#include <cctype>
+#include <sstream>
+#include <daemon/backend/metadata/memcached_backend.hpp>
 using namespace std;
 extern "C" {
 #include <sys/stat.h>
 }
-std::recursive_mutex redis_mutex_;
+std::recursive_mutex memcached_mutex_;
 namespace gkfs::metadata {
 
 /**
- * Find available port for redis server.
+ * Find available port for memcached server.
  * @param startport 
  */
 static int find_port(int startport = 6000) {
@@ -71,49 +72,49 @@ static int find_port(int startport = 6000) {
         }
         close(sockfd);
     }
-    throw std::runtime_error("Failed to find available port for redis server.");
+    throw std::runtime_error("Failed to find available port for memcached server.");
 }
 
 /**
  * Called when the daemon is started: Connects to the KV store
  * @param path where KV store data is stored
  */
-RedisBackend::RedisBackend(const std::string& path, const std::string& redis_server) {
+MemcachedBackend::MemcachedBackend(const std::string& path, const std::string& memcached_server) {
     int port = find_port();
-    std::string redis_bind = " --bind localhost --port " + std::to_string(port);
-    std::string redis_dir = " --dir " + path;
-    std::string redis_server_command =  redis_server + redis_bind + redis_dir + " &";
-    system(redis_server_command.c_str());
-
-    sw::redis::ConnectionOptions connection_options;
-    connection_options.host = "localhost";  // Required.
-    connection_options.port = port; // Optional. The default port is 6379.
-    connection_options.socket_timeout = std::chrono::milliseconds(200);
-    auto rds = std::make_unique<sw::redis::Redis>(connection_options);
-    if (!rds) {
-        throw std::runtime_error("Redis connection failed.");
+    std::string memcached_bind = " -l localhost -p " + std::to_string(port);
+    std::string memcached_pid = " -P " + path + "/memcached.pid ";
+    std::string other_options = " -A -m 8192 ";
+    std::string memcached_server_command =  memcached_server + memcached_bind + other_options + " &";
+    system(memcached_server_command.c_str());
+    mmc_db_ = memcached_create(nullptr);
+    if (!mmc_db_) {
+        throw std::runtime_error("Failed to create Memcached object.");
     }
-    this->rds_db_.reset(rds.release());
+    memcached_return_t rc = memcached_server_add(mmc_db_, "localhost", port);
+    if (rc != MEMCACHED_SUCCESS) {
+        memcached_free(mmc_db_);
+        throw std::runtime_error("Failed to connect to Memcached server.");
+    }
 }
 
 
-RedisBackend::~RedisBackend() {
+MemcachedBackend::~MemcachedBackend() {
     try{
-        rds_db_->command("shutdown");
+        system("pkill -f memcached");
+        memcached_free(mmc_db_);
     } catch(const std::exception& e) {
-        ;
+        throw std::runtime_error("Failed to shutdown Memcached server.");
     }
-    this->rds_db_.reset();
 }
 
 /**
  * Exception wrapper on Status object. Throws NotFoundException if
  * s.IsNotFound(), general DBException otherwise
- * @param Redis status
+ * @param Memcached status
  * @throws DBException
  */
 void
-RedisBackend::throw_status_excpt(const std::string& s) {
+MemcachedBackend::throw_status_excpt(const std::string& s) {
     if(s == "Not Found") {
         throw NotFoundException(s);
     } else {
@@ -129,12 +130,19 @@ RedisBackend::throw_status_excpt(const std::string& s) {
  * @throws DBException on failure, NotFoundException if entry doesn't exist
  */
 std::string
-RedisBackend::get_impl(const std::string& key) const {
-    auto val = rds_db_->get(key);
-    if(!val) {
+MemcachedBackend::get_impl(const std::string& key) const {
+    size_t len_val;
+    uint32_t flags;
+    memcached_return_t rc;
+
+    auto value = memcached_get(mmc_db_, key.c_str(), key.length(), 
+                              &len_val, &flags, &rc);
+    if (rc != MEMCACHED_SUCCESS) {
         throw_status_excpt("Not Found");
     }
-    return *val;
+    std::string val(value, len_val);
+    free(value);
+    return val;
 }
 
 /**
@@ -144,9 +152,10 @@ RedisBackend::get_impl(const std::string& key) const {
  * @throws DBException on failure
  */
 void
-RedisBackend::put_impl(const std::string& key, const std::string& val) {
-    auto s = rds_db_->set(key,val);
-    if(!s) {
+MemcachedBackend::put_impl(const std::string& key, const std::string& val) {
+    memcached_return_t rc = memcached_set(mmc_db_, key.c_str(), key.length(),
+                                         val.c_str(), val.length(), 0, 0);
+    if (rc != MEMCACHED_SUCCESS) {
         throw_status_excpt("Put failed.");
     }
 }
@@ -159,7 +168,7 @@ RedisBackend::put_impl(const std::string& key, const std::string& val) {
  * @throws DBException on failure, ExistException if entry already exists
  */
 void
-RedisBackend::put_no_exist_impl(const std::string& key,
+MemcachedBackend::put_no_exist_impl(const std::string& key,
                                   const std::string& val) {       
     if(exists(key))
         throw ExistsException(key);
@@ -172,9 +181,10 @@ RedisBackend::put_no_exist_impl(const std::string& key,
  * @throws DBException on failure, NotFoundException if entry doesn't exist
  */
 void
-RedisBackend::remove_impl(const std::string& key) {
-    auto s = rds_db_->del(key);
-    if(!s) {
+MemcachedBackend::remove_impl(const std::string& key) {
+    memcached_return_t rc = memcached_delete(mmc_db_, key.c_str(), 
+                                            key.length(), 0);
+    if (rc != MEMCACHED_SUCCESS) {
         throw_status_excpt("Not Found");
     }
 }
@@ -186,12 +196,9 @@ RedisBackend::remove_impl(const std::string& key) {
  * @throws DBException on failure
  */
 bool
-RedisBackend::exists_impl(const std::string& key) {
-    auto s = rds_db_->exists(key);
-    if(!s) {
-        return false;
-    }
-    return true;
+MemcachedBackend::exists_impl(const std::string& key) {
+    return MEMCACHED_SUCCESS == 
+                memcached_exist(mmc_db_, key.c_str(), key.length()) ;
 }
 
 /**
@@ -202,10 +209,10 @@ RedisBackend::exists_impl(const std::string& key) {
  * @throws DBException on failure, NotFoundException if entry doesn't exist
  */
 void
-RedisBackend::update_impl(const std::string& old_key,
+MemcachedBackend::update_impl(const std::string& old_key,
                             const std::string& new_key,
                             const std::string& val) {
-    // TODO use rdb::Put() method
+    
     if(new_key != old_key) {
         remove(old_key);
     }
@@ -224,9 +231,9 @@ RedisBackend::update_impl(const std::string& old_key,
  * append is set
  */
 off_t
-RedisBackend::increase_size_impl(const std::string& key, size_t io_size,
+MemcachedBackend::increase_size_impl(const std::string& key, size_t io_size,
                                    off_t offset, bool append) {
-    lock_guard<recursive_mutex> lock_guard(redis_mutex_);
+    lock_guard<recursive_mutex> lock_guard(memcached_mutex_);
     off_t out_offset = -1;
     auto value = get(key);
     // Decompress string
@@ -248,8 +255,8 @@ RedisBackend::increase_size_impl(const std::string& key, size_t io_size,
  * @throws DBException on failure
  */
 void
-RedisBackend::decrease_size_impl(const std::string& key, size_t size) {
-    lock_guard<recursive_mutex> lock_guard(redis_mutex_);
+MemcachedBackend::decrease_size_impl(const std::string& key, size_t size) {
+    lock_guard<recursive_mutex> lock_guard(memcached_mutex_);
     auto value = get(key);
     // Decompress string
     Metadata md(value);
@@ -265,15 +272,28 @@ RedisBackend::decrease_size_impl(const std::string& key, size_t size) {
  *         is true in the case the entry is a directory.
  */
 std::vector<std::pair<std::string, bool>>
-RedisBackend::get_dirents_impl(const std::string& dir) const {
+MemcachedBackend::get_dirents_impl(const std::string& dir) const {
     auto root_path = dir;
-    long long cursor = 0;
-    unsigned int count = 50;
     std::vector<std::string> keys;
     std::vector<std::pair<std::string, bool>> entries;
-    do {
-        cursor = rds_db_->scan(cursor, root_path + "*", count, std::inserter(keys, keys.begin()));
-    } while (cursor); 
+    
+    memcached_dump_fn dump_callback = [](const memcached_st*, const char* key, 
+                                        size_t key_length, void* context) {
+        std::vector<std::string>* keys = 
+                                static_cast<std::vector<std::string>*>(context);
+        std::string current_key(key, key_length);
+        std::string root_path = keys->front();
+        if(current_key.size() >= root_path.size() && 
+        current_key.compare(0, root_path.size(), root_path) == 0)
+            keys->push_back(current_key);
+        return MEMCACHED_SUCCESS; 
+    };
+
+    keys.push_back(root_path);
+    memcached_return_t rc = memcached_dump(mmc_db_, &dump_callback, &keys, 1, true);
+    if (rc != MEMCACHED_SUCCESS) {
+        throw_status_excpt("Get dirents failed.");
+    }
     for (auto key : keys){
         if(key.size() == root_path.size()) 
             continue; 
@@ -301,15 +321,28 @@ RedisBackend::get_dirents_impl(const std::string& dir) const {
  *         is true in the case the entry is a directory.
  */
 std::vector<std::tuple<std::string, bool, size_t, time_t>>
-RedisBackend::get_dirents_extended_impl(const std::string& dir) const {
+MemcachedBackend::get_dirents_extended_impl(const std::string& dir) const {
     auto root_path = dir;
-    long long cursor = 0;
-    unsigned int count = 50;
     std::vector<std::string> keys;
     std::vector<std::tuple<std::string, bool, size_t, time_t>> entries;
-    do {
-        cursor = rds_db_->scan(cursor, root_path + "*", count, std::inserter(keys, keys.begin()));
-    } while (cursor); 
+
+    memcached_dump_fn dump_callback = [](const memcached_st*, const char* key, 
+                                        size_t key_length, void* context) {
+        std::vector<std::string>* keys = 
+                                static_cast<std::vector<std::string>*>(context);
+        std::string current_key(key, key_length);
+        std::string root_path = keys->back();
+        if(current_key.size() >= root_path.size() && 
+        current_key.compare(0, root_path.size(), root_path) == 0)
+            keys->push_back(current_key);
+        return MEMCACHED_SUCCESS; 
+    };
+
+    keys.push_back(root_path);
+    memcached_return_t rc = memcached_dump(mmc_db_, &dump_callback, &keys, 1, true);
+    if (rc != MEMCACHED_SUCCESS) {
+        throw_status_excpt("Get dirents failed.");
+    }
     for (auto key : keys){
         if(key.size() == root_path.size()) 
             continue; 
@@ -336,7 +369,7 @@ RedisBackend::get_dirents_extended_impl(const std::string& dir) const {
  * it is too expensive
  */
 void
-RedisBackend::iterate_all_impl() const {
+MemcachedBackend::iterate_all_impl() const {
     ;
 }
 
@@ -344,8 +377,8 @@ RedisBackend::iterate_all_impl() const {
  * Used for setting KV store settings
  */
 void
-RedisBackend::optimize_database_impl() {
-    rds_db_->command("CONFIG", "SET", "maxmemory-policy", "noeviction");
+MemcachedBackend::optimize_database_impl() {
+    ;
 }
 
 } // namespace gkfs::metadata
