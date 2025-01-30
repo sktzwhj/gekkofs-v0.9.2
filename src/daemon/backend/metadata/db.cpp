@@ -49,7 +49,7 @@ namespace gkfs::metadata {
  */
 struct MetadataDBFactory {
     static std::unique_ptr<AbstractMetadataBackend>
-    create(const std::string& path, const std::string_view id, const std::string& redis_server) {
+    create(const std::string& path, const std::string_view id, const std::string& server) {
 
         if(id == gkfs::metadata::parallax_backend) {
 #ifdef GKFS_ENABLE_PARALLAX
@@ -75,7 +75,16 @@ struct MetadataDBFactory {
             fs::create_directories(metadata_path);
             GKFS_METADATA_MOD->log()->trace("Using Redis directory '{}'",
                                             metadata_path);
-            return std::make_unique<RedisBackend>(metadata_path, redis_server);
+            return std::make_unique<RedisBackend>(metadata_path, server);
+#endif
+        } else if(id == gkfs::metadata::memcached_backend) {
+#ifdef GKFS_ENABLE_MEMCACHED
+            auto metadata_path =
+                    fmt::format("{}/{}", path, gkfs::metadata::memcached_backend);
+            fs::create_directories(metadata_path);
+            GKFS_METADATA_MOD->log()->trace("Using Redis directory '{}'",
+                                            metadata_path);
+            return std::make_unique<MemcachedBackend>(metadata_path, server);
 #endif
         }
         GKFS_METADATA_MOD->log()->error("No valid metadata backend selected");
@@ -90,7 +99,7 @@ struct MetadataDBFactory {
  * see here: https://github.com/facebook/rocksdb/wiki/RocksDB-Tuning-Guide
  * @endinternal
  */
-MetadataDB::MetadataDB(const std::string& path, const std::string_view database, const std::string& redis_server)
+MetadataDB::MetadataDB(const std::string& path, const std::string_view database, const std::string& server)
     : path_(path) {
 
     /* Get logger instance and set it for data module and chunk storage */
@@ -99,7 +108,7 @@ MetadataDB::MetadataDB(const std::string& path, const std::string_view database,
     log_ = spdlog::get(GKFS_METADATA_MOD->LOGGER_NAME);
     assert(log_);
 
-    backend_ = MetadataDBFactory::create(path, database, redis_server);
+    backend_ = MetadataDBFactory::create(path, database, server);
 }
 
 MetadataDB::~MetadataDB() {

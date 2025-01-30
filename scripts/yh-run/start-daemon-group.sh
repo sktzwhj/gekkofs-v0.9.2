@@ -23,13 +23,17 @@ mkdir -p $MOUNT
 export LIBGKFS_REGISTRY=off
 
 
-#cd /dev/shm/gkfs
+killall gkfs_daemon
+cd $1
 
+#cd /dev/shm/gkfs
+echo "$PWD"
 
 for i in $(seq 1 ${DAEMON_EACH_NODE});
 do
 	echo "starting daemon $i at node `hostname`"
 	mkdir -p $DATA$i
+	echo "LIBGKFS_LOG_OUTPUT=/tmp/gkfs_daemon-new-"$i".log  nohup  $BIN -P "ucx+all" -l $LISTEN -r $DATA$i -m $MOUNT 1>/tmp/stdout.log 2>/tmp/stderr.log &"
 	LIBGKFS_LOG_OUTPUT=/tmp/gkfs_daemon-new-"$i".log  nohup  $BIN -P "ucx+all" -l $LISTEN -r $DATA$i -m $MOUNT 1>/tmp/stdout.log 2>/tmp/stderr.log  &
 	
 done

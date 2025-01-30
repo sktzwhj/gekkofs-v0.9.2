@@ -292,6 +292,22 @@ gkfs_define_option(
   DESCRIPTION "Use RocksDB key-value store for the metadata backend"
 )
 
+## REDIS support
+gkfs_define_option(
+  GKFS_ENABLE_REDIS
+  HELP_TEXT "Enable Redis metadata backend"
+  DEFAULT_VALUE ON
+  DESCRIPTION "Use Redis key-value store for the metadata backend"
+)
+
+## MEMCACHED support
+gkfs_define_option(
+  GKFS_ENABLE_MEMCACHED
+  HELP_TEXT "Enable Memcached metadata backend"
+  DEFAULT_VALUE ON
+  DESCRIPTION "Use Memcached key-value store for the metadata backend"
+)
+
 ## Parallax support
 gkfs_define_option(
   GKFS_ENABLE_PARALLAX

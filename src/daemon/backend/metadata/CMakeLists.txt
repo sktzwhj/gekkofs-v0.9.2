@@ -88,3 +88,11 @@ if(GKFS_ENABLE_REDIS)
     )
   target_link_libraries(metadata_backend PUBLIC ${HIREDIS_LIB} ${REDIS_PLUS_PLUS_LIB})
 endif()
+
+if(GKFS_ENABLE_MEMCACHED)
+  target_sources(metadata_backend
+    PUBLIC ${CMAKE_SOURCE_DIR}/include/daemon/backend/metadata/memcached_backend.hpp
+    PRIVATE memcached_backend.cpp
+    )
+  target_link_libraries(metadata_backend PUBLIC ${LIBEVENT_LIB} ${LIBMEMCACHED_LIB} ${LIBMEMCACHEDUTIL_LIB})
+endif()

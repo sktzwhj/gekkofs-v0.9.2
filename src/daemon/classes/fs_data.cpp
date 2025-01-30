@@ -121,13 +121,13 @@ FsData::dbbackend(const std::string& dbbackend) {
 }
 
 const std::string&
-FsData::redis_server() const {
-    return redis_server_;
+FsData::server() const {
+    return server_;
 }
 
 void
-FsData::redis_server(const std::string& redis_server) {
-    FsData::redis_server_ = redis_server;
+FsData::server(const std::string& server) {
+    FsData::server_ = server;
 }
 
 const std::string&

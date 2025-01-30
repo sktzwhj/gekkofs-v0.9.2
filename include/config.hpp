@@ -101,7 +101,7 @@ constexpr auto chunk_dir = "chunks";
 namespace rpc {
 constexpr auto chunksize = 524288; // in bytes (e.g., 524288 == 512KB)
 /* PFL configuration */
-constexpr auto use_PFL = true;
+constexpr auto use_PFL = false;
 constexpr auto PFLcomponents = 6; //number of regions to seperate
 constexpr std::array<uint64_t, PFLcomponents> PFLlayout = {0, 4 MB, 8 MB, 16 MB, 32 MB, 64 MB}; //layout :start offset of each component
 constexpr std::array<uint64_t, PFLcomponents> PFLsize = {512 KB, 1 MB, 2 MB, 4 MB, 8 MB, 16 MB};//stripe size
