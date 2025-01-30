@@ -83,7 +83,7 @@ MemcachedBackend::MemcachedBackend(const std::string& path, const std::string& m
     int port = find_port();
     std::string memcached_bind = " -l localhost -p " + std::to_string(port);
     std::string memcached_pid = " -P " + path + "/memcached.pid ";
-    std::string other_options = " -A -m 8192 ";
+    std::string other_options = " -A -m 16384 ";
     std::string memcached_server_command =  memcached_server + memcached_bind + other_options + " &";
     system(memcached_server_command.c_str());
     mmc_db_ = memcached_create(nullptr);
@@ -100,7 +100,7 @@ MemcachedBackend::MemcachedBackend(const std::string& path, const std::string& m
 
 MemcachedBackend::~MemcachedBackend() {
     try{
-        system("pkill -f memcached");
+        system("killall -r memcached");
         memcached_free(mmc_db_);
     } catch(const std::exception& e) {
         throw std::runtime_error("Failed to shutdown Memcached server.");

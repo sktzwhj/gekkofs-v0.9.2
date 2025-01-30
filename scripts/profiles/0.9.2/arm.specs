@@ -73,7 +73,7 @@ clonedeps_patches=(
 
 # Ordering that MUST be followed when downloading
 order=(
-   ""libevent" "memcached" "libmemcached" "redis" "hiredis" "redis-plus-plus" "ucx" "lz4" "capstone" "json-c" "psm2" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date" 
+   "libevent" "memcached" "libmemcached" "redis" "hiredis" "redis-plus-plus" "ucx" "lz4" "capstone" "json-c" "psm2" "libfabric" "mercury" "argobots" "margo" "rocksdb" "syscall_intercept" "date" 
 )
 
 # Extra arguments passed to the installation script. As such, they can
