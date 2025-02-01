@@ -107,7 +107,7 @@ MemcachedBackend::MemcachedBackend(const std::string& path, const std::string& m
 
 MemcachedBackend::~MemcachedBackend() {
     try{
-        system("pkill -f memcached");
+        system("killall -r memcached");
         memcached_pool_destroy(mmc_pool_);
     } catch(const std::exception& e) {
         throw std::runtime_error("Failed to shutdown Memcached server.");
