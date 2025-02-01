@@ -94,5 +94,5 @@ if(GKFS_ENABLE_MEMCACHED)
     PUBLIC ${CMAKE_SOURCE_DIR}/include/daemon/backend/metadata/memcached_backend.hpp
     PRIVATE memcached_backend.cpp
     )
-  target_link_libraries(metadata_backend PUBLIC ${LIBEVENT_LIB} ${LIBMEMCACHED_LIB})
+  target_link_libraries(metadata_backend PUBLIC ${LIBEVENT_LIB} ${LIBMEMCACHED_LIB} ${LIBMEMCACHEDUTIL_LIB})
 endif()

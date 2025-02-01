@@ -81,27 +81,34 @@ static int find_port(int startport = 6000) {
  */
 MemcachedBackend::MemcachedBackend(const std::string& path, const std::string& memcached_server) {
     int port = find_port();
+    unsigned int pool_size = 4096;
     std::string memcached_bind = " -l localhost -p " + std::to_string(port);
     std::string memcached_pid = " -P " + path + "/memcached.pid ";
-    std::string other_options = " -A -m 16384 ";
-    std::string memcached_server_command =  memcached_server + memcached_bind + other_options + " &";
+    std::string memcached_max_conn = " -c " + std::to_string(pool_size);
+    std::string other_options = " -A -M -m 1024 -n 32 ";
+    std::string memcached_server_command =  
+        memcached_server + memcached_bind + memcached_max_conn + other_options + "-vvv &";
     system(memcached_server_command.c_str());
-    mmc_db_ = memcached_create(nullptr);
-    if (!mmc_db_) {
+    memcached_st *memc = memcached_create(nullptr);
+    if (!memc) {
         throw std::runtime_error("Failed to create Memcached object.");
     }
-    memcached_return_t rc = memcached_server_add(mmc_db_, "localhost", port);
+    memcached_return_t rc = memcached_server_add(memc, "localhost", port);
     if (rc != MEMCACHED_SUCCESS) {
-        memcached_free(mmc_db_);
+        memcached_free(memc);
         throw std::runtime_error("Failed to connect to Memcached server.");
+    }
+    mmc_pool_= memcached_pool_create(memc , 5 , pool_size);//初始大小，和最大值，连接池会动态扩展
+    if (!mmc_pool_) {
+        throw std::runtime_error("Failed to create Memcached connection pool.");
     }
 }
 
 
 MemcachedBackend::~MemcachedBackend() {
     try{
-        system("killall -r memcached");
-        memcached_free(mmc_db_);
+        system("pkill -f memcached");
+        memcached_pool_destroy(mmc_pool_);
     } catch(const std::exception& e) {
         throw std::runtime_error("Failed to shutdown Memcached server.");
     }
@@ -135,10 +142,15 @@ MemcachedBackend::get_impl(const std::string& key) const {
     uint32_t flags;
     memcached_return_t rc;
 
-    auto value = memcached_get(mmc_db_, key.c_str(), key.length(), 
-                              &len_val, &flags, &rc);
+    memcached_st *memc = memcached_pool_pop(mmc_pool_ , NULL , &rc); 
     if (rc != MEMCACHED_SUCCESS) {
-        throw_status_excpt("Not Found");
+        throw_status_excpt(memcached_strerror(memc, rc));
+    }
+    auto value = memcached_get(memc, key.c_str(), key.length(), 
+                              &len_val, &flags, &rc);
+    memcached_pool_push(mmc_pool_ , memc);  
+    if (rc != MEMCACHED_SUCCESS) {
+        throw_status_excpt(memcached_strerror(memc, rc));
     }
     std::string val(value, len_val);
     free(value);
@@ -153,10 +165,16 @@ MemcachedBackend::get_impl(const std::string& key) const {
  */
 void
 MemcachedBackend::put_impl(const std::string& key, const std::string& val) {
-    memcached_return_t rc = memcached_set(mmc_db_, key.c_str(), key.length(),
-                                         val.c_str(), val.length(), 0, 0);
+    memcached_return_t rc;
+    memcached_st *memc = memcached_pool_pop(mmc_pool_ , NULL , &rc); 
     if (rc != MEMCACHED_SUCCESS) {
-        throw_status_excpt("Put failed.");
+        throw_status_excpt(memcached_strerror(memc, rc));
+    }
+    rc = memcached_set(memc, key.c_str(), key.length(),
+                                         val.c_str(), val.length(), 0, 0);
+    memcached_pool_push(mmc_pool_ , memc);  
+    if (rc != MEMCACHED_SUCCESS) {
+        throw_status_excpt(memcached_strerror(memc, rc));
     }
 }
 
@@ -182,10 +200,16 @@ MemcachedBackend::put_no_exist_impl(const std::string& key,
  */
 void
 MemcachedBackend::remove_impl(const std::string& key) {
-    memcached_return_t rc = memcached_delete(mmc_db_, key.c_str(), 
-                                            key.length(), 0);
+    memcached_return_t rc;
+    memcached_st *memc = memcached_pool_pop(mmc_pool_ , NULL , &rc); 
     if (rc != MEMCACHED_SUCCESS) {
-        throw_status_excpt("Not Found");
+        throw_status_excpt(memcached_strerror(memc, rc));
+    }
+    rc = memcached_delete(memc, key.c_str(), 
+                                            key.length(), 0);
+    memcached_pool_push(mmc_pool_ , memc);  
+    if (rc != MEMCACHED_SUCCESS) {
+        throw_status_excpt(memcached_strerror(memc, rc));
     }
 }
 
@@ -197,8 +221,15 @@ MemcachedBackend::remove_impl(const std::string& key) {
  */
 bool
 MemcachedBackend::exists_impl(const std::string& key) {
-    return MEMCACHED_SUCCESS == 
-                memcached_exist(mmc_db_, key.c_str(), key.length()) ;
+    memcached_return_t rc;
+    memcached_st *memc = memcached_pool_pop(mmc_pool_ , NULL , &rc); 
+    if (rc != MEMCACHED_SUCCESS) {
+        throw_status_excpt(memcached_strerror(memc, rc));
+    }
+    bool ans = MEMCACHED_SUCCESS == 
+                memcached_exist(memc, key.c_str(), key.length()) ;
+    memcached_pool_push(mmc_pool_ , memc);  
+    return ans;
 }
 
 /**
@@ -212,7 +243,6 @@ void
 MemcachedBackend::update_impl(const std::string& old_key,
                             const std::string& new_key,
                             const std::string& val) {
-    
     if(new_key != old_key) {
         remove(old_key);
     }
@@ -233,7 +263,7 @@ MemcachedBackend::update_impl(const std::string& old_key,
 off_t
 MemcachedBackend::increase_size_impl(const std::string& key, size_t io_size,
                                    off_t offset, bool append) {
-    lock_guard<recursive_mutex> lock_guard(memcached_mutex_);
+    //lock_guard<recursive_mutex> lock_guard(memcached_mutex_);
     off_t out_offset = -1;
     auto value = get(key);
     // Decompress string
@@ -256,7 +286,7 @@ MemcachedBackend::increase_size_impl(const std::string& key, size_t io_size,
  */
 void
 MemcachedBackend::decrease_size_impl(const std::string& key, size_t size) {
-    lock_guard<recursive_mutex> lock_guard(memcached_mutex_);
+    //lock_guard<recursive_mutex> lock_guard(memcached_mutex_);
     auto value = get(key);
     // Decompress string
     Metadata md(value);
@@ -290,10 +320,18 @@ MemcachedBackend::get_dirents_impl(const std::string& dir) const {
     };
 
     keys.push_back(root_path);
-    memcached_return_t rc = memcached_dump(mmc_db_, &dump_callback, &keys, 1, true);
+
+    memcached_return_t rc;
+    memcached_st *memc = memcached_pool_pop(mmc_pool_ , NULL , &rc); 
     if (rc != MEMCACHED_SUCCESS) {
-        throw_status_excpt("Get dirents failed.");
+        throw_status_excpt(memcached_strerror(memc, rc));
     }
+    rc = memcached_dump(memc, &dump_callback, &keys, 1, true);
+    memcached_pool_push(mmc_pool_ , memc);  
+    if (rc != MEMCACHED_SUCCESS) {
+        throw_status_excpt(memcached_strerror(memc, rc));
+    }
+
     for (auto key : keys){
         if(key.size() == root_path.size()) 
             continue; 
@@ -339,10 +377,18 @@ MemcachedBackend::get_dirents_extended_impl(const std::string& dir) const {
     };
 
     keys.push_back(root_path);
-    memcached_return_t rc = memcached_dump(mmc_db_, &dump_callback, &keys, 1, true);
+
+    memcached_return_t rc;
+    memcached_st *memc = memcached_pool_pop(mmc_pool_ , NULL , &rc); 
     if (rc != MEMCACHED_SUCCESS) {
-        throw_status_excpt("Get dirents failed.");
+        throw_status_excpt(memcached_strerror(memc, rc));
     }
+    rc = memcached_dump(memc, &dump_callback, &keys, 1, true);
+    memcached_pool_push(mmc_pool_ , memc);  
+    if (rc != MEMCACHED_SUCCESS) {
+        throw_status_excpt(memcached_strerror(memc, rc));
+    }
+
     for (auto key : keys){
         if(key.size() == root_path.size()) 
             continue; 

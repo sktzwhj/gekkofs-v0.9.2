@@ -32,6 +32,7 @@
 #include <memory>
 #include <spdlog/spdlog.h>
 #include <libmemcached/memcached.h>  
+#include <libmemcached/util.h>  
 #include <daemon/backend/exceptions.hpp>
 #include <tuple>
 #include "metadata_backend.hpp"
@@ -45,7 +46,7 @@ namespace gkfs::metadata {
  */
 class MemcachedBackend : public MetadataBackend<MemcachedBackend> {
 private:
-    memcached_st* mmc_db_;
+    memcached_pool_st* mmc_pool_;
 
 public:
     explicit MemcachedBackend(const std::string& path, const std::string& memcached_server);
