@@ -84,6 +84,7 @@ struct cli_options {
     string parallax_size;
     string stats_file;
     string prometheus_gateway;
+    string server = "";
 };
 
 /**
@@ -253,7 +254,7 @@ init_environment() {
                                   __func__, metadata_path);
     try {
         GKFS_DATA->mdb(std::make_shared<gkfs::metadata::MetadataDB>(
-                metadata_path, GKFS_DATA->dbbackend()));
+                metadata_path, GKFS_DATA->dbbackend(), GKFS_DATA->server()));
     } catch(const std::exception& e) {
         GKFS_DATA->spdlogger()->error(
                 "{}() Failed to initialize metadata DB: {}", __func__,
@@ -625,7 +626,9 @@ parse_input(const cli_options& opts, const CLI::App& desc) {
 
     if(desc.count("--dbbackend")) {
         if(opts.dbbackend == gkfs::metadata::rocksdb_backend ||
-           opts.dbbackend == gkfs::metadata::parallax_backend) {
+           opts.dbbackend == gkfs::metadata::parallax_backend ||
+           opts.dbbackend == gkfs::metadata::redis_backend ||
+           opts.dbbackend == gkfs::metadata::memcached_backend ) {
 #ifndef GKFS_ENABLE_PARALLAX
             if(opts.dbbackend == gkfs::metadata::parallax_backend) {
                 throw runtime_error(fmt::format(
@@ -642,7 +645,29 @@ parse_input(const cli_options& opts, const CLI::App& desc) {
                         opts.dbbackend));
             }
 #endif
+#ifndef GKFS_ENABLE_REDIS
+            if(opts.dbbackend == gkfs::metadata::redis_backend) {
+                throw runtime_error(fmt::format(
+                        "dbbackend '{}' was not compiled and is disabled. "
+                        "Pass -DGKFS_ENABLE_REDIS:BOOL=ON to CMake to enable.",
+                        opts.dbbackend));
+            }
+#endif
+#ifndef GKFS_ENABLE_MEMCACHED
+            if(opts.dbbackend == gkfs::metadata::memcached_backend) {
+                throw runtime_error(fmt::format(
+                        "dbbackend '{}' was not compiled and is disabled. "
+                        "Pass -DGKFS_ENABLE_MEMCACHED:BOOL=ON to CMake to enable.",
+                        opts.dbbackend));
+            }
+#endif
+            if( (opts.dbbackend == gkfs::metadata::redis_backend || 
+                opts.dbbackend == gkfs::metadata::memcached_backend)
+                && !desc.count("--server"))   {
+                    throw runtime_error("--server is not set. Consult `--help` for more."); 
+            }
             GKFS_DATA->dbbackend(opts.dbbackend);
+            GKFS_DATA->server(opts.server);
         } else {
             throw runtime_error(
                     fmt::format("dbbackend '{}' is not valid. Consult `--help`",
@@ -771,9 +796,12 @@ main(int argc, const char* argv[]) {
                 "Cleans Rootdir >after< the deamon finishes");
     desc.add_option(
                 "--dbbackend,-d", opts.dbbackend,
-                "Metadata database backend to use. Available: {rocksdb, parallaxdb}\n"
+                "Metadata database backend to use. Available: {rocksdb, parallaxdb, redisdb, memcacheddb}\n"
                 "RocksDB is default if not set. Parallax support is experimental.\n"
                 "Note, parallaxdb creates a file called rocksdbx with 8GB created in metadir.");
+    desc.add_option(
+                "--server", opts.server,
+                "Redis/Memcached server exec file to use.");
     desc.add_option("--parallaxsize", opts.parallax_size,
                     "parallaxdb - metadata file size in GB (default 8GB), "
                     "used only with new files");

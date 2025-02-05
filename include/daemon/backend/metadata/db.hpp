@@ -43,12 +43,19 @@
 #ifdef GKFS_ENABLE_PARALLAX
 #include <daemon/backend/metadata/parallax_backend.hpp>
 #endif
-
+#ifdef GKFS_ENABLE_REDIS
+#include <daemon/backend/metadata/redis_backend.hpp>
+#endif
+#ifdef GKFS_ENABLE_MEMCACHED
+#include <daemon/backend/metadata/memcached_backend.hpp>
+#endif
 
 namespace gkfs::metadata {
 
 constexpr auto rocksdb_backend = "rocksdb";
 constexpr auto parallax_backend = "parallaxdb";
+constexpr auto redis_backend = "redisdb";
+constexpr auto memcached_backend = "memcacheddb";
 
 class MetadataDB {
 private:
@@ -57,7 +64,7 @@ private:
     std::unique_ptr<AbstractMetadataBackend> backend_;
 
 public:
-    MetadataDB(const std::string& path, const std::string_view database);
+    MetadataDB(const std::string& path, const std::string_view database, const std::string& server);
 
     ~MetadataDB();
 

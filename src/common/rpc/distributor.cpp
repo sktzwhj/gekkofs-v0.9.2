@@ -27,12 +27,15 @@
 */
 
 #include <common/rpc/distributor.hpp>
-
+#include <iostream>
 using namespace std;
 
 namespace gkfs {
 
 namespace rpc {
+#define min(a, b)	((a) < (b) ? a : b)
+namespace cfg = gkfs::config::rpc;
+using gkfs::utils::arithmetic::last_smaller_equal;
 /**
  * --Multiple GekkoFS--
  * Client distributor construction
@@ -84,7 +87,8 @@ SimpleHashDistributor::locate_fs(const std::string& path) const{
  * Only used for forward_getSuccessThread
  */
 host_t
-SimpleHashDistributor::locate(const std::string& path, unsigned int hostnum, const int num_copy) const{
+SimpleHashDistributor::locate(const std::string& path, 
+                unsigned int hostnum, const int num_copy) const{
     return (str_hash(path) + num_copy) % hostnum;
 }
 
@@ -92,6 +96,12 @@ SimpleHashDistributor::locate(const std::string& path, unsigned int hostnum, con
  * --Multiple GekkoFS--
  * Locate host(daemon) id for data
  * Only used at Client: first locate fs id, second locate host(daemon) id
+ * --PFL implementation--
+ * A simple hash strategy for stripe count:
+ * locate first host in hosts: hash % hosts.size
+ * get step for stripe count: hosts.size / stripe count
+ * locate order number in stripe count: hash % stripe count
+ * final host: first host + step * order
  */
 host_t
 SimpleHashDistributor::locate_data(const string& path, const chunkid_t& chnk_id,
@@ -101,13 +111,31 @@ SimpleHashDistributor::locate_data(const string& path, const chunkid_t& chnk_id,
     unsigned int prefix_hosts = 0;
     for(unsigned int fs = 0 ;fs < fs_id ; fs++)
         prefix_hosts += hosts_size_[fs];
-    return (str_hash(path + ::to_string(chnk_id)) + num_copy) % hosts_size_.at(fs_id) + prefix_hosts;
+    if(!cfg::use_PFL)
+        return (str_hash(path + ::to_string(chnk_id)) + num_copy) 
+                                        % hosts_size_.at(fs_id) + prefix_hosts;    
+    // /*  --PFL implementation-- */
+    auto cpn = last_smaller_equal(cfg::PFLchunkID, chnk_id);
+    auto host_size = hosts_size_.at(fs_id);
+    auto stripe_count = min(cfg::PFLcount[cpn], host_size);
+    auto hash = str_hash(path + ::to_string(chnk_id)) + num_copy;
+    //locate first host in hosts
+    auto hash_p = str_hash(path) + num_copy;
+    //final host: first host + order * step 
+    return (hash_p + hash % stripe_count * (host_size / stripe_count)) 
+                                                    % host_size + prefix_hosts;
 }
 
 /**
  * --Multiple GekkoFS--
  * Locate host(daemon) id for data
  * Only used at Daemon: pathfs_ is nullptr, localfs_ is default 0, host_size_ length is 1
+ * --PFL implementation--
+ * A simple hash strategy for stripe count:
+ * locate first host in hosts: hash % hosts.size
+ * get step for stripe count: hosts.size / stripe count
+ * locate order number in stripe count: hash % stripe count
+ * final host: first host + step * order
  */
 host_t
 SimpleHashDistributor::locate_data(const string& path, const chunkid_t& chnk_id,
@@ -123,7 +151,61 @@ SimpleHashDistributor::locate_data(const string& path, const chunkid_t& chnk_id,
     unsigned int prefix_hosts = 0;
     for(unsigned int fs = 0 ;fs < fs_id ; fs++)
         prefix_hosts += hosts_size_[fs];
-    return (str_hash(path + ::to_string(chnk_id)) + num_copy) % hosts_size_.at(fs_id) + prefix_hosts;
+    if(!cfg::use_PFL)
+        return (str_hash(path + ::to_string(chnk_id)) + num_copy) 
+                                        % hosts_size_.at(fs_id) + prefix_hosts;  
+    // /*  --PFL implementation-- */  
+    auto cpn = last_smaller_equal(cfg::PFLchunkID, chnk_id);
+    auto host_size = hosts_size_.at(fs_id);
+    auto stripe_count = min(cfg::PFLcount[cpn], host_size);
+    auto hash = str_hash(path + ::to_string(chnk_id)) + num_copy;
+    //locate first host in hosts
+    auto hash_p = str_hash(path) + num_copy;
+    //final host: first host + order * step 
+    return (hash_p + hash % stripe_count * (host_size / stripe_count)) 
+                                                    % host_size + prefix_hosts;
+}
+
+/** 
+ * --PFL implementation--
+ * find the host set because of stripe count
+ * Only used for forward_remove: find all hosts
+ */
+std::set<host_t>
+SimpleHashDistributor::locate_host_set(const string& path, const uint64_t size,
+                                   const int num_copy) const {
+    assert(cfg::use_PFL);
+
+    unsigned int fs_id = localfs_;
+    if(pathfs_ && pathfs_->count(path)) fs_id = (*pathfs_)[path];
+    unsigned int prefix_hosts = 0;
+    for(unsigned int fs = 0 ;fs < fs_id ; fs++)
+        prefix_hosts += hosts_size_[fs];
+
+    std::set<host_t> host_set;
+    auto host_size = hosts_size_.at(fs_id);
+    auto end_cpn = last_smaller_equal(cfg::PFLlayout, size);
+    //hosts before end component 
+    for(uint32_t cpn = 0; cpn < end_cpn; cpn ++){
+        auto stripe_count = min(cfg::PFLcount[cpn], host_size); 
+        auto step = host_size / stripe_count;
+        for(auto cpy = 0;cpy < num_copy + 1; cpy ++ ){
+            auto hash_p = str_hash(path) + cpy;
+            for(uint32_t stripe = 0; stripe < stripe_count; stripe ++){
+                host_t host = (hash_p + stripe * step) % host_size + prefix_hosts;
+                host_set.insert(host);
+            }
+        }
+    }
+    //hosts at end component 
+    auto chnk_id = cfg::PFLchunkID[end_cpn];
+    auto chnk_num = (size - cfg::PFLlayout[end_cpn]) / cfg::PFLsize[end_cpn] + 1;
+    for(uint32_t chnk_off = 0; chnk_off < chnk_num; chnk_off ++){
+        for(auto cpy = 0; cpy < num_copy + 1; cpy ++){
+            host_set.insert(locate_data(path, chnk_id + chnk_off, num_copy));
+        }
+    }
+    return host_set;
 }
 
 /**

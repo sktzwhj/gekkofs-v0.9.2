@@ -144,8 +144,8 @@ ssize_t
 ChunkStorage::write_chunk(const string& file_path,
                           gkfs::rpc::chnk_id_t chunk_id, const char* buf,
                           size_t size, off64_t offset) const {
-
-    assert((offset + size) <= chunksize_);
+    // /* --PFL implementation-- */ remove this assert
+    //assert((offset + size) <= chunksize_);
     // may throw ChunkStorageException on failure
     init_chunk_space(file_path);
 
@@ -194,7 +194,8 @@ ChunkStorage::write_chunk(const string& file_path,
 ssize_t
 ChunkStorage::read_chunk(const string& file_path, gkfs::rpc::chnk_id_t chunk_id,
                          char* buf, size_t size, off64_t offset) const {
-    assert((offset + size) <= chunksize_);
+    // /* --PFL implementation-- */ remove this assert
+    //assert((offset + size) <= chunksize_);
     auto chunk_path = absolute(get_chunk_path(file_path, chunk_id));
 
     FileHandle fh(open(chunk_path.c_str(), O_RDONLY), chunk_path);
@@ -291,8 +292,9 @@ void
 ChunkStorage::truncate_chunk_file(const string& file_path,
                                   gkfs::rpc::chnk_id_t chunk_id, off_t length) {
     auto chunk_path = absolute(get_chunk_path(file_path, chunk_id));
-    assert(length > 0 &&
-           static_cast<gkfs::rpc::chnk_id_t>(length) <= chunksize_);
+    // /* --PFL implementation-- */ change this assert
+    assert(length > 0); //&&
+    //       static_cast<gkfs::rpc::chnk_id_t>(length) <= chunksize_);
     auto ret = truncate(chunk_path.c_str(), length);
     if(ret == -1) {
         auto err_str = fmt::format(
@@ -303,6 +305,9 @@ ChunkStorage::truncate_chunk_file(const string& file_path,
 }
 
 /**
+ * --PFL implementation-- this func gives wrong stat when
+ * enabling PFL, making statfs() system calls get wrong stat,
+ * but it doesn't matter to real read/write situations.
  * @internal
  * Return ChunkStat with following fields:
  * unsigned long chunk_size;

@@ -121,6 +121,16 @@ FsData::dbbackend(const std::string& dbbackend) {
 }
 
 const std::string&
+FsData::server() const {
+    return server_;
+}
+
+void
+FsData::server(const std::string& server) {
+    FsData::server_ = server;
+}
+
+const std::string&
 FsData::rpc_protocol() const {
     return rpc_protocol_;
 }

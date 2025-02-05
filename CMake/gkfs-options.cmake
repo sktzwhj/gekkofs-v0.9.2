@@ -264,7 +264,7 @@ gkfs_define_option(
 ################################################################################
 
 ## Maximum number of internal file descriptors reserved for GekkoFS
-gkfs_define_variable(GKFS_MAX_INTERNAL_FDS 8192
+gkfs_define_variable(GKFS_MAX_INTERNAL_FDS 256
   STRING "Number of file descriptors reserved for internal use" ADVANCED
 )
 
@@ -290,6 +290,22 @@ gkfs_define_option(
   HELP_TEXT "Enable RocksDB metadata backend"
   DEFAULT_VALUE ON
   DESCRIPTION "Use RocksDB key-value store for the metadata backend"
+)
+
+## REDIS support
+gkfs_define_option(
+  GKFS_ENABLE_REDIS
+  HELP_TEXT "Enable Redis metadata backend"
+  DEFAULT_VALUE ON
+  DESCRIPTION "Use Redis key-value store for the metadata backend"
+)
+
+## MEMCACHED support
+gkfs_define_option(
+  GKFS_ENABLE_MEMCACHED
+  HELP_TEXT "Enable Memcached metadata backend"
+  DEFAULT_VALUE ON
+  DESCRIPTION "Use Memcached key-value store for the metadata backend"
 )
 
 ## Parallax support

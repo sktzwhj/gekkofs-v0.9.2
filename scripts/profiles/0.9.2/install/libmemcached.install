@@ -1,0 +1,64 @@
+################################################################################
+# Copyright 2018-2024, Barcelona Supercomputing Center (BSC), Spain            #
+# Copyright 2015-2024, Johannes Gutenberg Universitaet Mainz, Germany          #
+#                                                                              #
+# This software was partially supported by the                                 #
+# EC H2020 funded project NEXTGenIO (Project ID: 671951, www.nextgenio.eu).    #
+#                                                                              #
+# This software was partially supported by the                                 #
+# ADA-FS project under the SPPEXA project funded by the DFG.                   #
+#                                                                              #
+# This file is part of GekkoFS.                                                #
+#                                                                              #
+# GekkoFS is free software: you can redistribute it and/or modify              #
+# it under the terms of the GNU General Public License as published by         #
+# the Free Software Foundation, either version 3 of the License, or            #
+# (at your option) any later version.                                          #
+#                                                                              #
+# GekkoFS is distributed in the hope that it will be useful,                   #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of               #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                #
+# GNU General Public License for more details.                                 #
+#                                                                              #
+# You should have received a copy of the GNU General Public License            #
+# along with GekkoFS.  If not, see <https://www.gnu.org/licenses/>.            #
+#                                                                              #
+# SPDX-License-Identifier: GPL-3.0-or-later                                    #
+################################################################################
+# vi: ft=bash
+################################################################################
+## The installation script must define both a pkg_install function and
+## pkg_check function that, as their name implies, must specify how
+## a dependency package should be installed and tested.
+##
+## The following variables can be used in the installation script:
+## - CMAKE: a variable that expands to the cmake binary
+## - SOURCE_DIR: the directory where the sources for the package were
+##               downloaded
+## - INSTALL_DIR: the directory where the package should be installed
+## - CORES: the number of cores to use when building
+## - COMPILER_NAME: the name of the compiler being used (e.g. g++, clang, etc.)
+## - COMPILER_FULL_VERSION: the compiler's full version (e.g. 9.3.0)
+## - COMPILER_MAJOR_VERSION: the compiler's major version (e.g. 9)
+## - PERFORM_TEST: whether tests for the package should be executed
+################################################################################
+pkg_install() {
+    ID="libmemcached"
+    TAR="libmem-1.1.4.tar.gz"
+    mkdir -p ${SOURCE_DIR}/${ID}
+    tar -xvf "${SOURCE_DIR}/${TAR}" -C "${SOURCE_DIR}/${ID}" \
+        --strip-components 1 --overwrite
+    CURR="${SOURCE_DIR}/${ID}"
+    cd "${CURR}"
+    patch -N -p1 < "${SOURCE_DIR}/${ID}.patch"
+    prepare_build_dir "${CURR}"
+    cd "${CURR}/build"
+    ${CMAKE} -DCMAKE_PREFIX_PATH="${INSTALL_DIR}" \
+    -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+    -DCMAKE_BUILD_TYPE:STRING=Release ..
+    make -j"${CORES}" install
+}
+
+pkg_check() {
+    :
+}

@@ -29,13 +29,15 @@
 #ifndef GEKKOFS_RPC_DISTRIBUTOR_HPP
 #define GEKKOFS_RPC_DISTRIBUTOR_HPP
 
-#include "../include/config.hpp"
+#include "config.hpp"
 #include <vector>
 #include <string>
 #include <numeric>
 #include <unordered_map>
 #include <fstream>
 #include <map>
+#include <set>
+#include <common/arithmetic/arithmetic.hpp>
 
 namespace gkfs::rpc {
 
@@ -49,6 +51,9 @@ public:
 
     virtual host_t
     locate_fs(const std::string& path) const = 0;
+
+    virtual std::set<host_t>
+    locate_host_set(const std::string& path, const uint64_t size, const int num_copy) const = 0;
 
     virtual host_t
     locate(const std::string& path, unsigned int hostnum, const int num_copy) const = 0;
@@ -93,6 +98,9 @@ public:
     
     host_t
     locate_fs(const std::string& path) const override;
+
+    std::set<host_t>
+    locate_host_set(const std::string& path, const uint64_t size, const int num_copy) const override;
 
     host_t
     locate(const std::string& path, unsigned int hostnum, const int num_copy) const override;

@@ -15,6 +15,8 @@
       "binaryDir": "${sourceDir}/builds/${presetName}",
       "cacheVariables": {
         "GKFS_ENABLE_ROCKSDB": true,
+        "GKFS_ENABLE_REDIS": true,
+        "GKFS_ENABLE_MEMCACHED": true,
         "GKFS_ENABLE_PARALLAX": false,
         "GKFS_BUILD_TESTS": false,
         "GKFS_INSTALL_TESTS": false,

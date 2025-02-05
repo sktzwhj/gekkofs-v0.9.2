@@ -76,6 +76,7 @@ private:
     // Database
     std::shared_ptr<gkfs::metadata::MetadataDB> mdb_;
     std::string dbbackend_;
+    std::string server_;
 
     // Parallax
     unsigned long long parallax_size_md_ = 8589934592ull;
@@ -149,6 +150,12 @@ public:
 
     void
     dbbackend(const std::string& dbbackend_);
+
+    const std::string&
+    server() const;
+
+    void
+    server(const std::string& server_);
 
     const std::shared_ptr<gkfs::metadata::MetadataDB>&
     mdb() const;

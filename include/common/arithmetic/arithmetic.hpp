@@ -32,8 +32,26 @@
 #include <cstdint>
 #include <unistd.h>
 #include <cassert>
-
+#include <algorithm>
 namespace gkfs::utils::arithmetic {
+
+namespace cfg = gkfs::config::rpc;
+
+/** 
+ * --PFL implementation-- 
+ * Used for locate component according to chunkId or offset
+ * @param [in] container, PFL containner, PFLchunkID or PFLlayout
+ * @param [in] x, chunkId or offset
+ * @returns component number, from 0 to PFLcomponent -1
+ */
+template<typename Container>
+typename Container::size_type last_smaller_equal(const Container& container, const typename Container::value_type& x) {
+    auto it = std::upper_bound(container.begin(), container.end(), x);
+    if (it == container.begin()) {
+        return container.size() ;
+    }
+    return std::distance(container.begin(), it - 1);
+}
 
 /**
  * Check whether integer `n` is a power of 2.
@@ -121,9 +139,18 @@ align_right(const uint64_t offset, const size_t block_size) {
  * @param [in] block_size the block size used to compute boundaries.
  * @returns the distance in bytes between the left-side boundary of @offset
  */
-constexpr size_t
-block_overrun(const uint64_t offset, const size_t block_size) {
-    // This check is automatically removed in release builds
+inline size_t
+block_overrun(uint64_t offset, size_t block_size) {
+    /* --PFL implementation-- 
+    * reset offset and blocksize to those of component
+    * offset = offset at current component
+    * blocksize = stripe size at current component */
+    if(cfg::use_PFL){
+        unsigned int cpn = last_smaller_equal(cfg::PFLlayout, offset); //component number
+        offset = offset - cfg::PFLlayout[cpn];
+        block_size = cfg::PFLsize[cpn];
+    }
+    /* --PFL implementation-- */
     assert(is_power_of_2(block_size));
     return offset & (block_size - 1u);
 }
@@ -140,9 +167,19 @@ block_overrun(const uint64_t offset, const size_t block_size) {
  * @param [in] block_size the block size used to compute boundaries.
  * @returns the distance in bytes between the right-side boundary of @offset
  */
-constexpr size_t
-block_underrun(const uint64_t offset, const size_t block_size) {
-    // This check is automatically removed in release builds
+inline size_t
+block_underrun(uint64_t offset, size_t block_size) {
+    /* --PFL implementation-- 
+    * reset offset and blocksize to those of component
+    * offset = offset at current component
+    * blocksize = stripe size at current component */
+    if(cfg::use_PFL){
+        unsigned int cpn = last_smaller_equal(cfg::PFLlayout, offset); //component number
+        offset = offset - cfg::PFLlayout[cpn];
+        block_size = cfg::PFLsize[cpn];
+    }
+    if(is_aligned(offset, block_size))
+        return 0;
     assert(is_power_of_2(block_size));
     return align_right(offset, block_size) - offset;
 }
@@ -164,18 +201,34 @@ block_underrun(const uint64_t offset, const size_t block_size) {
  * index.
  * @returns the index of the block containing @offset.
  */
-constexpr uint64_t
-block_index(const uint64_t offset, const size_t block_size) {
+inline uint64_t
+block_index(uint64_t offset, size_t block_size) {
 
     using gkfs::utils::arithmetic::log2;
+    unsigned long long prefix = 0;
+    /* --PFL implementation-- 
+    * reset offset and blocksize to those of component
+    * offset = offset at current component
+    * blocksize = stripe size at current component 
+    * prefix should revise this reset
+    * */
+    if(cfg::use_PFL){
+        //component number
+        unsigned int cpn = last_smaller_equal(cfg::PFLlayout, offset); 
+        offset = offset - cfg::PFLlayout[cpn];
+        block_size = cfg::PFLsize[cpn];
+        prefix = cfg::PFLchunkID[cpn];
+    }
+    /* --PFL implementation-- */
 
     // This check is automatically removed in release builds
     assert(is_power_of_2(block_size));
-    return align_left(offset, block_size) >> log2(block_size);
+    return (align_left(offset, block_size) >> log2(block_size)) + prefix;
 }
 
 
 /**
+ * --PFL implementation-- This func seems no use in real situations.
  * Compute the number of blocks involved in an operation affecting the
  * regions from [@offset, to @offset + @count).
  *

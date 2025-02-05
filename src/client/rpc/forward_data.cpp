@@ -41,7 +41,8 @@
 using namespace std;
 
 namespace gkfs::rpc {
-
+namespace cfg = gkfs::config::rpc;
+using gkfs::utils::arithmetic::last_smaller_equal;
 /*
  * This file includes all data RPC calls.
  * NOTE: No errno is defined here!
@@ -76,11 +77,16 @@ forward_write(const string& path, const void* buf, const off64_t offset,
                                 gkfs::config::rpc::chunksize);
 
     auto chnk_total = (chnk_end - chnk_start) + 1;
-
+    /* --PFL implementation-- */
+    //component number of first chunk
+    auto cpn = last_smaller_equal(cfg::PFLchunkID, chnk_start);
+    //help to calculate total chunk size of target
+    std::map<uint64_t, uint64_t> target_total_size{};
+    /* --PFL implementation-- */
     // Collect all chunk ids within count that have the same destination so
     // that those are send in one rpc bulk transfer
     std::map<uint64_t, std::vector<uint64_t>> target_chnks{};
-
+    
     // contains the target ids, used to access the target_chnks map.
     // First idx is chunk with potential offset
     std::vector<uint64_t> targets{};
@@ -95,6 +101,10 @@ forward_write(const string& path, const void* buf, const off64_t offset,
     // If num_copies is 0, we do the normal write operation. Otherwise
     // we process all the replicas.
     for(uint64_t chnk_id = chnk_start; chnk_id <= chnk_end; chnk_id++) {
+        // /* --PFL implementation-- */
+        //track component number of current chunk
+        if(cpn + 1 < cfg::PFLcomponents 
+            && chnk_id >= cfg::PFLchunkID[cpn + 1]) cpn++;
         for(auto copy = num_copies ? 1 : 0; copy < num_copies + 1; copy++) {
             auto target = CTX->distributor()->locate_data(path, chnk_id, copy);
 
@@ -107,8 +117,13 @@ forward_write(const string& path, const void* buf, const off64_t offset,
                 target_chnks.insert(
                         std::make_pair(target, std::vector<uint64_t>{chnk_id}));
                 targets.push_back(target);
+                // /* --PFL implementation-- */
+                target_total_size.insert(
+                        std::make_pair(target, cfg::PFLsize[cpn]));
             } else {
                 target_chnks[target].push_back(chnk_id);
+                // /* --PFL implementation-- */
+                target_total_size[target] += cfg::PFLsize[cpn];
             }
 
             // set first and last chnk targets
@@ -152,6 +167,9 @@ forward_write(const string& path, const void* buf, const off64_t offset,
         // total chunk_size for target
         auto total_chunk_size =
                 target_chnks[target].size() * gkfs::config::rpc::chunksize;
+        // /* --PFL implementation-- */
+        if(cfg::use_PFL) 
+            total_chunk_size = target_total_size[target];
 
         // receiver of first chunk must subtract the offset from first chunk
         if(chnk_start_target.end() != chnk_start_target.find(target)) {
@@ -160,8 +178,7 @@ forward_write(const string& path, const void* buf, const off64_t offset,
         }
 
         // receiver of last chunk must subtract
-        if(chnk_end_target.end() != chnk_end_target.find(target) &&
-           !is_aligned(offset + write_size, gkfs::config::rpc::chunksize)) {
+        if(chnk_end_target.end() != chnk_end_target.find(target) ) { //&&!is_aligned(offset + write_size, gkfs::config::rpc::chunksize)
             total_chunk_size -= block_underrun(offset + write_size,
                                                gkfs::config::rpc::chunksize);
         }
@@ -317,6 +334,12 @@ forward_read(const string& path, void* buf, const off64_t offset,
     auto chnk_end =
             block_index((offset + read_size - 1), gkfs::config::rpc::chunksize);
     auto chnk_total = (chnk_end - chnk_start) + 1;
+    /* --PFL implementation-- */
+    //component number of first chunk
+    auto cpn = last_smaller_equal(cfg::PFLchunkID, chnk_start);
+    //help to calculate total chunk size of target
+    std::map<uint64_t, uint64_t> target_total_size{};
+    /* --PFL implementation-- */
     // Collect all chunk ids within count that have the same destination so
     // that those are send in one rpc bulk transfer
     std::map<uint64_t, std::vector<uint64_t>> target_chnks{};
@@ -330,6 +353,10 @@ forward_read(const string& path, void* buf, const off64_t offset,
     std::unordered_map<uint64_t, std::vector<uint8_t>> read_bitset_vect;
 
     for(uint64_t chnk_id = chnk_start; chnk_id <= chnk_end; chnk_id++) {
+        // /* --PFL implementation-- */
+        //track component number of current chunk
+        if(cpn + 1 < cfg::PFLcomponents 
+            && chnk_id >= cfg::PFLchunkID[cpn + 1]) cpn++;
         auto target = CTX->distributor()->locate_data(path, chnk_id, 0);
         if(num_copies > 0) {
             // If we have some failures we select another copy (randomly).
@@ -350,8 +377,13 @@ forward_read(const string& path, void* buf, const off64_t offset,
             target_chnks.insert(
                     std::make_pair(target, std::vector<uint64_t>{chnk_id}));
             targets.push_back(target);
+            // /* --PFL implementation-- */
+            target_total_size.insert(
+                        std::make_pair(target, cfg::PFLsize[cpn]));
         } else {
             target_chnks[target].push_back(chnk_id);
+            // /* --PFL implementation-- */
+            target_total_size[target] += cfg::PFLsize[cpn];
         }
 
         // set first and last chnk targets
@@ -395,7 +427,9 @@ forward_read(const string& path, void* buf, const off64_t offset,
         // total chunk_size for target
         auto total_chunk_size =
                 target_chnks[target].size() * gkfs::config::rpc::chunksize;
-
+        // /* --PFL implementation-- */
+        if(cfg::use_PFL) 
+            total_chunk_size = target_total_size[target];        
         // receiver of first chunk must subtract the offset from first chunk
         if(target == chnk_start_target) {
             total_chunk_size -=
@@ -403,8 +437,7 @@ forward_read(const string& path, void* buf, const off64_t offset,
         }
 
         // receiver of last chunk must subtract
-        if(target == chnk_end_target &&
-           !is_aligned(offset + read_size, gkfs::config::rpc::chunksize)) {
+        if(target == chnk_end_target ) { //&& !is_aligned(offset + read_size, gkfs::config::rpc::chunksize)
             total_chunk_size -= block_underrun(offset + read_size,
                                                gkfs::config::rpc::chunksize);
         }

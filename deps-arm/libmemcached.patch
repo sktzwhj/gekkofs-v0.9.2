@@ -1,0 +1,204 @@
+diff -Naur b/include/libmemcached-1.0/dump.h a/include/libmemcached-1.0/dump.h
+--- b/include/libmemcached-1.0/dump.h	2023-03-06 16:47:30.000000000 +0800
++++ a/include/libmemcached-1.0/dump.h	2025-01-28 10:22:58.698081000 +0800
+@@ -16,13 +16,12 @@
+ #pragma once
+ 
+ #ifdef __cplusplus
+-extern "C" {
+-#endif
+ 
+ LIBMEMCACHED_API
+ memcached_return_t memcached_dump(memcached_st *ptr, memcached_dump_fn *function, void *context,
+-                                  uint32_t number_of_callbacks);
+-
++                                  uint32_t number_of_callbacks, bool lru_dump_all = false);
++extern "C" {
++#endif
+ #ifdef __cplusplus
+ }
+ #endif
+diff -Naur b/src/libmemcached/dump.cc a/src/libmemcached/dump.cc
+--- b/src/libmemcached/dump.cc	2023-03-06 16:47:30.000000000 +0800
++++ a/src/libmemcached/dump.cc	2025-01-28 13:49:04.936301000 +0800
+@@ -16,10 +16,10 @@
+ #include "libmemcached/common.h"
+ 
+ static memcached_return_t ascii_dump(Memcached *memc, memcached_dump_fn *callback, void *context,
+-                                     uint32_t number_of_callbacks) {
++                                     uint32_t number_of_callbacks, bool lru_dump_all) {
+   memcached_version(memc);
+   /* MAX_NUMBER_OF_SLAB_CLASSES is defined to 200 in Memcached 1.4.10 */
+-  for (uint32_t x = 0; x < 200; x++) {
++  for (uint32_t x = 0; x < 200 && !(lru_dump_all && x); x++) {
+     char buffer[MEMCACHED_DEFAULT_COMMAND_SIZE];
+     int buffer_length = snprintf(buffer, sizeof(buffer), "%u", x);
+     if (size_t(buffer_length) >= sizeof(buffer) or buffer_length < 0) {
+@@ -32,6 +32,11 @@
+     libmemcached_io_vector_st vector[] = {{memcached_literal_param("stats cachedump ")},
+                                           {buffer, size_t(buffer_length)},
+                                           {memcached_literal_param(" 0\r\n")}};
++    if(lru_dump_all){
++      vector[0] = {memcached_literal_param("lru_crawler mgdump")};
++      vector[1] = {buffer, 0};
++      vector[2] = {memcached_literal_param(" all\r\n")};
++    }
+ 
+     // Send message to all servers
+     for (uint32_t server_key = 0; server_key < memcached_server_count(memc); server_key++) {
+@@ -50,58 +55,60 @@
+     memcached_instance_st *instance;
+     memcached_return_t read_ret = MEMCACHED_SUCCESS;
+     while ((instance = memcached_io_get_readable_server(memc, read_ret))) {
+-      memcached_return_t response_rc =
+-          memcached_response(instance, buffer, MEMCACHED_DEFAULT_COMMAND_SIZE, NULL);
+-      if (response_rc == MEMCACHED_ITEM) {
+-        char *string_ptr, *end_ptr;
+-
+-        string_ptr = buffer;
+-        string_ptr += 5; /* Move past ITEM */
+-
+-        for (end_ptr = string_ptr; isgraph(*end_ptr); end_ptr++) {
+-        };
+-
+-        char *key = string_ptr;
+-        key[(size_t)(end_ptr - string_ptr)] = 0;
+-
+-        for (uint32_t callback_counter = 0; callback_counter < number_of_callbacks;
+-             callback_counter++) {
+-          memcached_return_t callback_rc =
+-              (*callback[callback_counter])(memc, key, (size_t)(end_ptr - string_ptr), context);
+-          if (callback_rc != MEMCACHED_SUCCESS) {
+-            // @todo build up a message for the error from the value
+-            memcached_set_error(*instance, callback_rc, MEMCACHED_AT);
+-            break;
++      while(instance->response_count()){
++        memcached_return_t response_rc =
++        memcached_response(instance, buffer, MEMCACHED_DEFAULT_COMMAND_SIZE, NULL);
++        if (response_rc == MEMCACHED_ITEM) {
++          char *string_ptr, *end_ptr;
++
++          string_ptr = buffer;
++          string_ptr += 5; /* Move past ITEM */
++          if(lru_dump_all) string_ptr -=2;
++          for (end_ptr = string_ptr; isgraph(*end_ptr); end_ptr++) {
++          };
++
++          char *key = string_ptr;
++          key[(size_t)(end_ptr - string_ptr)] = 0;
++
++          for (uint32_t callback_counter = 0; callback_counter < number_of_callbacks;
++              callback_counter++) {
++            memcached_return_t callback_rc =
++                (*callback[callback_counter])(memc, key, (size_t)(end_ptr - string_ptr), context);
++            if (callback_rc != MEMCACHED_SUCCESS) {
++              // @todo build up a message for the error from the value
++              memcached_set_error(*instance, callback_rc, MEMCACHED_AT);
++              break;
++            }
++          }
++        } else if (response_rc == MEMCACHED_END) {
++          // All items have been returned
++        } else if (response_rc == MEMCACHED_SERVER_ERROR) {
++          /* If we try to request stats cachedump for a slab class that is too big
++          * the server will return an incorrect error message:
++          * "MEMCACHED_SERVER_ERROR failed to allocate memory"
++          * This isn't really a fatal error, so let's just skip it. I want to
++          * fix the return value from the memcached server to a CLIENT_ERROR,
++          * so let's add support for that as well right now.
++          */
++          assert(response_rc == MEMCACHED_SUCCESS); // Just fail
++          return response_rc;
++        } else if (response_rc == MEMCACHED_CLIENT_ERROR) {
++          /* The maximum number of slabs has changed in the past (currently 1<<6-1),
++          * so ignore any client errors complaining about an illegal slab id.
++          */
++          if (0
++              == strncmp(buffer, "CLIENT_ERROR Illegal slab id",
++                        sizeof("CLIENT_ERROR Illegal slab id") - 1))
++          {
++            memcached_error_free(*instance);
++            memcached_error_free(*memc);
++          } else {
++            return response_rc;
+           }
+-        }
+-      } else if (response_rc == MEMCACHED_END) {
+-        // All items have been returned
+-      } else if (response_rc == MEMCACHED_SERVER_ERROR) {
+-        /* If we try to request stats cachedump for a slab class that is too big
+-         * the server will return an incorrect error message:
+-         * "MEMCACHED_SERVER_ERROR failed to allocate memory"
+-         * This isn't really a fatal error, so let's just skip it. I want to
+-         * fix the return value from the memcached server to a CLIENT_ERROR,
+-         * so let's add support for that as well right now.
+-         */
+-        assert(response_rc == MEMCACHED_SUCCESS); // Just fail
+-        return response_rc;
+-      } else if (response_rc == MEMCACHED_CLIENT_ERROR) {
+-        /* The maximum number of slabs has changed in the past (currently 1<<6-1),
+-         * so ignore any client errors complaining about an illegal slab id.
+-         */
+-        if (0
+-            == strncmp(buffer, "CLIENT_ERROR Illegal slab id",
+-                       sizeof("CLIENT_ERROR Illegal slab id") - 1))
+-        {
+-          memcached_error_free(*instance);
+-          memcached_error_free(*memc);
+         } else {
++          // IO error of some sort must have occurred
+           return response_rc;
+         }
+-      } else {
+-        // IO error of some sort must have occurred
+-        return response_rc;
+       }
+     }
+   }
+@@ -110,7 +117,7 @@
+ }
+ 
+ memcached_return_t memcached_dump(memcached_st *shell, memcached_dump_fn *callback, void *context,
+-                                  uint32_t number_of_callbacks) {
++                                  uint32_t number_of_callbacks, bool lru_dump_all) {
+   Memcached *ptr = memcached2Memcached(shell);
+   memcached_return_t rc;
+   if (memcached_failed(rc = initialize_query(ptr, true))) {
+@@ -127,5 +134,5 @@
+         memcached_literal_param("Binary protocol is not supported for memcached_dump()"));
+   }
+ 
+-  return ascii_dump(ptr, callback, context, number_of_callbacks);
++  return ascii_dump(ptr, callback, context, number_of_callbacks, lru_dump_all);
+ }
+diff -Naur b/src/libmemcached/response.cc a/src/libmemcached/response.cc
+--- b/src/libmemcached/response.cc	2023-03-06 16:47:30.000000000 +0800
++++ a/src/libmemcached/response.cc	2025-01-28 09:52:07.831104000 +0800
+@@ -320,8 +320,8 @@
+ 
+   case 'E': /* PROTOCOL ERROR or END */
+   {
+-    // END
+-    if (buffer[1] == 'N' and buffer[2] == 'D') {
++    // END or EN
++    if (buffer[1] == 'N') {
+       return MEMCACHED_END;
+     }
+ #if 0
+@@ -363,6 +363,16 @@
+       /* We add back in one because we will need to search for END */
+       memcached_server_response_increment(instance);
+       return MEMCACHED_ITEM;
++    }
++  } break;
++
++  case 'm': /* mgdump */
++  {
++    // lru_crawler metadump 1 
++    if (buffer[1] == 'g') {
++      /* We add back in one because we will need to search for END */
++      memcached_server_response_increment(instance);
++      return MEMCACHED_ITEM;
+     }
+   } break;
+ 

@@ -40,7 +40,7 @@ extern "C" {
 #include <vector>
 
 namespace gkfs::rpc {
-
+  
 hg_bool_t
 bool_to_merc_bool(bool state);
 
