@@ -85,7 +85,7 @@ MemcachedBackend::MemcachedBackend(const std::string& path, const std::string& m
     std::string memcached_bind = " -l localhost -p " + std::to_string(port);
     std::string memcached_pid = " -P " + path + "/memcached.pid ";
     std::string memcached_max_conn = " -c " + std::to_string(pool_size);
-    std::string other_options = " -A -M -m 16384 -n 32 ";
+    std::string other_options = " -A -M -m 16384 -n 32 -u nobody ";
     std::string memcached_server_command =  
         memcached_server + memcached_bind + memcached_max_conn + other_options + " &";
     system(memcached_server_command.c_str());
